@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import { Heart } from "lucide-react";
+import { Heart, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useCart } from "@/context/CartContext";
 
 interface ProductCardProps {
   id: string;
@@ -16,6 +17,7 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({
+  id,
   slug,
   title,
   shortDescription,
@@ -24,6 +26,13 @@ const ProductCard = ({
   priceEstimateMax,
   tags,
 }: ProductCardProps) => {
+  const { addToCart } = useCart();
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    addToCart({ id, slug, title, image: images[0], priceEstimateMin });
+  };
+
   return (
     <div className="card-premium group hover-lift hover-glow">
       <Link to={`/product/${slug}`} className="block">
@@ -81,8 +90,9 @@ const ProductCard = ({
           </div>
 
           {/* CTA */}
-          <Button className="w-full btn-outline-premium mt-4">
-            Request Quote
+          <Button onClick={handleAddToCart} className="w-full btn-premium mt-4">
+            <ShoppingCart className="h-4 w-4 mr-2" />
+            Add to Cart
           </Button>
         </div>
       </Link>

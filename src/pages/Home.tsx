@@ -8,6 +8,7 @@ import heroImage from "@/assets/hero-main.jpg";
 import craftsmanshipImage from "@/assets/craftsmanship.jpg";
 
 const Home = () => {
+  const bestsellerProducts = seedData.products.filter(p => p.tags.includes("Bestseller")).slice(0, 3);
   const featuredProducts = seedData.products.slice(0, 4);
   const categories = [
     { name: "Beds", slug: "beds", count: 4 },
@@ -97,8 +98,36 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Categories Section */}
+      {/* Bestseller Products Section */}
       <section className="section-padding">
+        <div className="container mx-auto">
+          <div className="text-center mb-12 space-y-4">
+            <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
+              Bestsellers
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Our most loved pieces. Shop customer favorites and see why they choose Bēige & Oak.
+            </p>
+          </div>
+          
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+            {bestsellerProducts.map((product) => (
+              <ProductCard key={product.id} {...product} />
+            ))}
+          </div>
+
+          <div className="text-center">
+            <Button asChild size="lg" className="btn-premium">
+              <Link to="/catalog">
+                Shop All Products <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Categories Section */}
+      <section className="section-padding bg-secondary/20">
         <div className="container mx-auto">
           <div className="text-center mb-12 space-y-4">
             <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
@@ -130,7 +159,7 @@ const Home = () => {
       </section>
 
       {/* Featured Products */}
-      <section className="section-padding bg-secondary/20">
+      <section className="section-padding">
         <div className="container mx-auto">
           <div className="text-center mb-12 space-y-4">
             <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">

@@ -1,15 +1,17 @@
 import { useParams, Link } from "react-router-dom";
 import { useState } from "react";
-import { Heart, Ruler, Package, Shield, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Heart, Ruler, Package, Shield, ArrowLeft, CheckCircle2, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import seedData from "@/data/seed-data.json";
+import { useCart } from "@/context/CartContext";
 
 const ProductDetail = () => {
   const { slug } = useParams();
   const product = seedData.products.find((p) => p.slug === slug);
   const [selectedImage, setSelectedImage] = useState(0);
+  const { addToCart } = useCart();
 
   if (!product) {
     return (
@@ -137,13 +139,23 @@ const ProductDetail = () => {
 
             {/* CTAs */}
             <div className="space-y-3 pt-4">
-              <Button asChild className="w-full btn-premium text-base py-6">
+              <Button 
+                className="w-full btn-premium text-base py-6"
+                onClick={() => addToCart({ 
+                  id: product.id, 
+                  slug: product.slug, 
+                  title: product.title, 
+                  image: product.images[0], 
+                  priceEstimateMin: product.priceEstimateMin 
+                })}
+              >
+                <ShoppingCart className="h-5 w-5 mr-2" />
+                Add to Cart - ${product.priceEstimateMin.toLocaleString()}
+              </Button>
+              <Button asChild variant="outline" className="w-full btn-outline-premium text-base py-6">
                 <Link to="/custom-order" state={{ product }}>
                   Request Custom Quote
                 </Link>
-              </Button>
-              <Button variant="outline" className="w-full btn-outline-premium text-base py-6">
-                Schedule Showroom Visit
               </Button>
             </div>
 
