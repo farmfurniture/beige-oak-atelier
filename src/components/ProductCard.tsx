@@ -47,7 +47,7 @@ const ProductCard = ({
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-110"
           />
-          
+
           {/* Wishlist Button */}
           <Button
             variant="ghost"
@@ -65,7 +65,11 @@ const ProductCard = ({
           {tags.length > 0 && (
             <div className="absolute top-4 left-4 flex flex-wrap gap-2">
               {tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="bg-background/90 backdrop-blur-sm">
+                <Badge
+                  key={tag}
+                  variant="secondary"
+                  className="bg-background/90 backdrop-blur-sm"
+                >
                   {tag}
                 </Badge>
               ))}
@@ -78,8 +82,10 @@ const ProductCard = ({
           <h3 className="text-xl font-serif font-semibold text-foreground group-hover:text-primary transition-colors">
             {title}
           </h3>
-          <p className="text-sm text-muted-foreground line-clamp-2">{shortDescription}</p>
-          
+          <p className="text-sm text-muted-foreground line-clamp-2">
+            {shortDescription}
+          </p>
+
           {/* Price Range */}
           <div className="flex items-baseline space-x-2">
             <span className="text-sm text-muted-foreground">From</span>

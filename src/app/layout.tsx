@@ -10,7 +10,8 @@ import "./globals.css";
 
 export const metadata = {
   title: "Bēige & Oak Atelier - Premium Handcrafted Furniture",
-  description: "Premium furniture crafted by master artisans. Each piece tells a story of dedication, quality materials, and timeless design.",
+  description:
+    "Premium furniture crafted by master artisans. Each piece tells a story of dedication, quality materials, and timeless design.",
 };
 
 export default function RootLayout({
@@ -29,9 +30,7 @@ export default function RootLayout({
                 <Sonner />
                 <div className="flex flex-col min-h-screen">
                   <Header />
-                  <main className="flex-1">
-                    {children}
-                  </main>
+                  <main className="flex-1">{children}</main>
                   <Footer />
                 </div>
               </CartProvider>

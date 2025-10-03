@@ -9,7 +9,9 @@ import ProductCard from "@/components/ProductCard";
 import seedData from "@/data/seed-data.json";
 
 export default function Home() {
-  const bestsellerProducts = seedData.products.filter(p => p.tags.includes("Bestseller")).slice(0, 3);
+  const bestsellerProducts = seedData.products
+    .filter((p) => p.tags.includes("Bestseller"))
+    .slice(0, 3);
   const featuredProducts = seedData.products.slice(0, 4);
   const categories = [
     { name: "Beds", slug: "beds", count: 4 },
@@ -32,7 +34,7 @@ export default function Home() {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/50 to-transparent" />
         </div>
-        
+
         <div className="relative z-10 container mx-auto px-4">
           <div className="max-w-2xl space-y-6 animate-fade-in-up">
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-foreground leading-tight">
@@ -41,8 +43,8 @@ export default function Home() {
               <span className="text-gradient-premium">Loved for years.</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-xl">
-              Premium furniture crafted by master artisans. Each piece tells a story of dedication, 
-              quality materials, and timeless design.
+              Premium furniture crafted by master artisans. Each piece tells a
+              story of dedication, quality materials, and timeless design.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Button asChild size="lg" className="btn-premium text-base">
@@ -50,7 +52,12 @@ export default function Home() {
                   Explore Collection <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="btn-outline-premium text-base">
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="btn-outline-premium text-base"
+              >
                 <Link href="/custom-order">Request Custom Quote</Link>
               </Button>
             </div>
@@ -67,9 +74,10 @@ export default function Home() {
                 Craftsmanship That Speaks
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                For over two decades, Bēige & Oak has been creating furniture that transcends trends. 
-                Our workshop combines traditional joinery techniques with modern design sensibilities, 
-                ensuring each piece is both beautiful and built to last.
+                For over two decades, Bēige & Oak has been creating furniture
+                that transcends trends. Our workshop combines traditional
+                joinery techniques with modern design sensibilities, ensuring
+                each piece is both beautiful and built to last.
               </p>
               <ul className="space-y-3">
                 {[
@@ -111,10 +119,11 @@ export default function Home() {
               Bestsellers
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Our most loved pieces. Shop customer favorites and see why they choose Bēige & Oak.
+              Our most loved pieces. Shop customer favorites and see why they
+              choose Bēige & Oak.
             </p>
           </div>
-          
+
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
             {bestsellerProducts.map((product) => (
               <ProductCard key={product.id} {...product} />
@@ -139,10 +148,11 @@ export default function Home() {
               Browse by Category
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              From statement beds to inviting sofas, discover furniture designed for how you live.
+              From statement beds to inviting sofas, discover furniture designed
+              for how you live.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {categories.map((category) => (
               <Link
@@ -154,7 +164,8 @@ export default function Home() {
                   {category.name}
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  {category.count} {category.count === 1 ? 'Collection' : 'Collections'}
+                  {category.count}{" "}
+                  {category.count === 1 ? "Collection" : "Collections"}
                 </p>
                 <ArrowRight className="h-5 w-5 mx-auto text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
               </Link>
@@ -171,7 +182,8 @@ export default function Home() {
               Featured Collection
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Handpicked pieces that exemplify our commitment to quality and design.
+              Handpicked pieces that exemplify our commitment to quality and
+              design.
             </p>
           </div>
 
@@ -212,8 +224,12 @@ export default function Home() {
                   &quot;{testimonial.content}&quot;
                 </p>
                 <div className="pt-4 border-t border-border">
-                  <p className="font-semibold text-foreground">{testimonial.name}</p>
-                  <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                  <p className="font-semibold text-foreground">
+                    {testimonial.name}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {testimonial.role}
+                  </p>
                 </div>
               </Card>
             ))}
@@ -228,13 +244,19 @@ export default function Home() {
             Ready to Create Something Special?
           </h2>
           <p className="text-lg max-w-2xl mx-auto opacity-90">
-            Book a showroom visit or request a custom quote. Our team is ready to bring your vision to life.
+            Book a showroom visit or request a custom quote. Our team is ready
+            to bring your vision to life.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Button asChild size="lg" variant="secondary" className="text-base">
               <Link href="/showroom">Book Showroom Visit</Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="text-base border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="text-base border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary"
+            >
               <Link href="/custom-order">Start Custom Project</Link>
             </Button>
           </div>

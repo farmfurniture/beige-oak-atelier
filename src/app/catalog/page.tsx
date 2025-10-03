@@ -4,7 +4,13 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import ProductCard from "@/components/ProductCard";
@@ -14,9 +20,9 @@ function CatalogContent() {
   const searchParams = useSearchParams();
   const [filteredProducts, setFilteredProducts] = useState(seedData.products);
   const [showFilters, setShowFilters] = useState(false);
-  
+
   const categoryParam = searchParams.get("category");
-  
+
   const categories = ["beds", "sofas", "couches", "custom"];
   const materials = ["Linen", "Leather", "Velvet", "Wood", "Fabric"];
   const priceRanges = [
@@ -38,7 +44,9 @@ function CatalogContent() {
 
     // Category filter
     if (selectedCategories.length > 0) {
-      filtered = filtered.filter((p) => selectedCategories.includes(p.category));
+      filtered = filtered.filter((p) =>
+        selectedCategories.includes(p.category)
+      );
     }
 
     // Material filter
@@ -53,7 +61,8 @@ function CatalogContent() {
       const range = priceRanges.find((r) => r.label === selectedPriceRange);
       if (range) {
         filtered = filtered.filter(
-          (p) => p.priceEstimateMin >= range.min && p.priceEstimateMin <= range.max
+          (p) =>
+            p.priceEstimateMin >= range.min && p.priceEstimateMin <= range.max
         );
       }
     }
@@ -72,13 +81,17 @@ function CatalogContent() {
 
   const toggleCategory = (category: string) => {
     setSelectedCategories((prev) =>
-      prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]
+      prev.includes(category)
+        ? prev.filter((c) => c !== category)
+        : [...prev, category]
     );
   };
 
   const toggleMaterial = (material: string) => {
     setSelectedMaterials((prev) =>
-      prev.includes(material) ? prev.filter((m) => m !== material) : [...prev, material]
+      prev.includes(material)
+        ? prev.filter((m) => m !== material)
+        : [...prev, material]
     );
   };
 
@@ -91,7 +104,8 @@ function CatalogContent() {
             Our Collection
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl">
-            Discover handcrafted furniture designed to elevate your living spaces.
+            Discover handcrafted furniture designed to elevate your living
+            spaces.
           </p>
         </div>
       </div>
@@ -109,7 +123,8 @@ function CatalogContent() {
               Filters
             </Button>
             <p className="text-sm text-muted-foreground">
-              {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
+              {filteredProducts.length}{" "}
+              {filteredProducts.length === 1 ? "product" : "products"}
             </p>
           </div>
 
@@ -145,7 +160,10 @@ function CatalogContent() {
                     checked={selectedCategories.includes(category)}
                     onCheckedChange={() => toggleCategory(category)}
                   />
-                  <Label htmlFor={category} className="text-sm capitalize cursor-pointer">
+                  <Label
+                    htmlFor={category}
+                    className="text-sm capitalize cursor-pointer"
+                  >
                     {category}
                   </Label>
                 </div>
@@ -176,7 +194,10 @@ function CatalogContent() {
               <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">
                 Price Range
               </h3>
-              <Select value={selectedPriceRange} onValueChange={setSelectedPriceRange}>
+              <Select
+                value={selectedPriceRange}
+                onValueChange={setSelectedPriceRange}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="All Prices" />
                 </SelectTrigger>
@@ -243,7 +264,13 @@ function CatalogContent() {
 
 export default function Catalog() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          Loading...
+        </div>
+      }
+    >
       <CatalogContent />
     </Suspense>
   );

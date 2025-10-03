@@ -53,7 +53,12 @@ const Header = () => {
 
           {/* Right Actions */}
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="icon" className="hidden md:flex" asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hidden md:flex"
+              asChild
+            >
               <Link href="/search">
                 <Search className="h-5 w-5" />
               </Link>
@@ -63,7 +68,12 @@ const Header = () => {
                 <Heart className="h-5 w-5" />
               </Link>
             </Button>
-            <Button variant="ghost" size="icon" className="hidden md:flex" asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hidden md:flex"
+              asChild
+            >
               <Link href="/account">
                 <User className="h-5 w-5" />
               </Link>
@@ -86,7 +96,11 @@ const Header = () => {
               className="lg:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
-              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {mobileMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </Button>
           </div>
         </div>
@@ -101,7 +115,9 @@ const Header = () => {
                   href={link.path}
                   onClick={() => setMobileMenuOpen(false)}
                   className={`text-base font-medium transition-colors hover:text-primary ${
-                    isActive(link.path) ? "text-primary" : "text-muted-foreground"
+                    isActive(link.path)
+                      ? "text-primary"
+                      : "text-muted-foreground"
                   }`}
                 >
                   {link.name}
