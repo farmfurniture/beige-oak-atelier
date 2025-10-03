@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Facebook, Instagram, Twitter, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,22 +35,22 @@ const Footer = () => {
             <h4 className="text-sm font-semibold text-foreground mb-4">Shop</h4>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link to="/catalog?category=beds" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/catalog?category=beds" className="text-muted-foreground hover:text-primary transition-colors">
                   Beds
                 </Link>
               </li>
               <li>
-                <Link to="/catalog?category=sofas" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/catalog?category=sofas" className="text-muted-foreground hover:text-primary transition-colors">
                   Sofas
                 </Link>
               </li>
               <li>
-                <Link to="/catalog?category=couches" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/catalog?category=couches" className="text-muted-foreground hover:text-primary transition-colors">
                   Couches
                 </Link>
               </li>
               <li>
-                <Link to="/custom-order" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/custom-order" className="text-muted-foreground hover:text-primary transition-colors">
                   Custom Orders
                 </Link>
               </li>
@@ -62,22 +62,22 @@ const Footer = () => {
             <h4 className="text-sm font-semibold text-foreground mb-4">Company</h4>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link to="/about" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link to="/showroom" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/showroom" className="text-muted-foreground hover:text-primary transition-colors">
                   Visit Showroom
                 </Link>
               </li>
               <li>
-                <Link to="/faq" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/faq" className="text-muted-foreground hover:text-primary transition-colors">
                   FAQ
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/contact" className="text-muted-foreground hover:text-primary transition-colors">
                   Contact
                 </Link>
               </li>
@@ -109,13 +109,13 @@ const Footer = () => {
             © {currentYear} Bēige & Oak. All rights reserved.
           </p>
           <div className="flex space-x-6 text-sm">
-            <Link to="/privacy" className="text-muted-foreground hover:text-primary transition-colors">
+            <Link href="/privacy" className="text-muted-foreground hover:text-primary transition-colors">
               Privacy Policy
             </Link>
-            <Link to="/terms" className="text-muted-foreground hover:text-primary transition-colors">
+            <Link href="/terms" className="text-muted-foreground hover:text-primary transition-colors">
               Terms of Service
             </Link>
-            <Link to="/shipping" className="text-muted-foreground hover:text-primary transition-colors">
+            <Link href="/shipping" className="text-muted-foreground hover:text-primary transition-colors">
               Shipping & Returns
             </Link>
           </div>

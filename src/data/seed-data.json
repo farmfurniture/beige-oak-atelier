@@ -119,7 +119,7 @@
       "shortDescription": "Flexible configuration for any space",
       "longDescription": "Adapt to your lifestyle with our Modular Sectional. Reconfigure pieces as needed for ultimate versatility.",
       "category": "couches",
-      "images": ["/src/assets/sofa-lifestyle.jpg"],
+      "images": ["/sofa-lifestyle.jpg"],
       "priceEstimateMin": 3900,
       "priceEstimateMax": 5800,
       "materials": ["Solid Wood Frame", "Stain-Resistant Fabric", "Reversible Cushions"],
@@ -135,7 +135,7 @@
       "shortDescription": "Smart storage meets elegant design",
       "longDescription": "Maximize your bedroom space with our Hydraulic Storage Bed featuring easy-lift hydraulics.",
       "category": "beds",
-      "images": ["/src/assets/bed-lifestyle.jpg"],
+      "images": ["/bed-lifestyle.jpg"],
       "priceEstimateMin": 2200,
       "priceEstimateMax": 3500,
       "materials": ["Engineered Wood Frame", "Soft-Close Hydraulics", "Upholstered Finish"],
@@ -151,7 +151,7 @@
       "shortDescription": "Your vision, our craftsmanship",
       "longDescription": "Work directly with our master craftsmen to create a truly unique piece. From initial concept to final delivery, we'll guide you through every step.",
       "category": "custom",
-      "images": ["/src/assets/craftsmanship.jpg"],
+      "images": ["/craftsmanship.jpg"],
       "priceEstimateMin": 5000,
       "priceEstimateMax": 25000,
       "materials": ["Your Choice of Wood", "Your Choice of Fabric/Leather", "Custom Hardware"],
@@ -198,7 +198,7 @@
       "id": "project-001",
       "title": "Modern Penthouse Living Room",
       "description": "Complete custom furniture suite for a 3000 sq ft penthouse featuring bespoke sectional, dining set, and bedroom furniture.",
-      "image": "/src/assets/hero-main.jpg",
+      "image": "/hero-main.jpg",
       "category": "Residential",
       "completionYear": 2024
     },
@@ -206,7 +206,7 @@
       "id": "project-002",
       "title": "Boutique Hotel Suites",
       "description": "42 rooms furnished with custom beds, seating, and storage solutions maintaining brand aesthetics.",
-      "image": "/src/assets/craftsmanship.jpg",
+      "image": "/craftsmanship.jpg",
       "category": "Commercial",
       "completionYear": 2023
     },
@@ -214,7 +214,7 @@
       "id": "project-003",
       "title": "Heritage Home Restoration",
       "description": "Period-accurate custom furniture for a restored 1920s manor house.",
-      "image": "/src/assets/sofa-lifestyle.jpg",
+      "image": "/sofa-lifestyle.jpg",
       "category": "Restoration",
       "completionYear": 2023
     },
@@ -222,7 +222,7 @@
       "id": "project-004",
       "title": "Executive Office Suite",
       "description": "Bespoke desk, conference table, and seating for a C-suite office.",
-      "image": "/src/assets/bed-lifestyle.jpg",
+      "image": "/bed-lifestyle.jpg",
       "category": "Commercial",
       "completionYear": 2024
     }
