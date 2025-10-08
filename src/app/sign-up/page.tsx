@@ -21,19 +21,19 @@ export default function SignUp() {
     email: "",
     password: "",
     confirmPassword: "",
-    agreeToTerms: false
+    agreeToTerms: false,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords don't match");
       return;
@@ -49,9 +49,11 @@ export default function SignUp() {
         email: formData.email,
         password: formData.password,
         firstName: formData.firstName,
-        lastName: formData.lastName
+        lastName: formData.lastName,
       });
-      toast.success("Account created successfully! Welcome to Bēige & Oak.");
+      toast.success(
+        "Account created successfully! Welcome to Wine & White Atelier."
+      );
       router.push("/account");
     } catch (error) {
       toast.error("Failed to create account");
@@ -66,7 +68,7 @@ export default function SignUp() {
             Create Account
           </h1>
           <p className="text-muted-foreground">
-            Join Bēige & Oak for exclusive benefits
+            Join Wine & White Atelier for exclusive benefits
           </p>
         </div>
 
@@ -144,11 +146,17 @@ export default function SignUp() {
             <Checkbox
               id="terms"
               checked={formData.agreeToTerms}
-              onCheckedChange={(checked) => 
-                setFormData(prev => ({ ...prev, agreeToTerms: checked as boolean }))
+              onCheckedChange={(checked) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  agreeToTerms: checked as boolean,
+                }))
               }
             />
-            <Label htmlFor="terms" className="text-sm leading-relaxed cursor-pointer">
+            <Label
+              htmlFor="terms"
+              className="text-sm leading-relaxed cursor-pointer"
+            >
               I agree to the{" "}
               <Link href="/terms" className="text-primary hover:underline">
                 Terms & Conditions
@@ -183,7 +191,10 @@ export default function SignUp() {
 
         <p className="text-center text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link href="/sign-in" className="text-primary hover:underline font-medium">
+          <Link
+            href="/sign-in"
+            className="text-primary hover:underline font-medium"
+          >
             Sign in
           </Link>
         </p>

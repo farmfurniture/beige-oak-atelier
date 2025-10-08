@@ -7,8 +7,11 @@ import Footer from "@/components/Footer";
 import { Providers } from "@/app/providers";
 import "./globals.css";
 
+// Force dynamic rendering since Header uses cookies
+export const dynamic = "force-dynamic";
+
 export const metadata = {
-  title: "Bēige & Oak Atelier - Premium Handcrafted Furniture",
+  title: "Wine & White Atelier - Premium Handcrafted Furniture",
   description:
     "Premium furniture crafted by master artisans. Each piece tells a story of dedication, quality materials, and timeless design.",
 };

@@ -11,8 +11,8 @@ import {
   getTestimonials,
 } from "@/services/products.service";
 
-// Enable ISR with 1 hour revalidation
-export const revalidate = 3600;
+// Force dynamic rendering since we use cookies for cart
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   // Fetch data on the server with proper caching
@@ -78,10 +78,10 @@ export default async function Home() {
                 Craftsmanship That Speaks
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                For over two decades, Bēige & Oak has been creating furniture
-                that transcends trends. Our workshop combines traditional
-                joinery techniques with modern design sensibilities, ensuring
-                each piece is both beautiful and built to last.
+                For over two decades, Wine & White Atelier has been creating
+                furniture that transcends trends. Our workshop combines
+                traditional joinery techniques with modern design sensibilities,
+                ensuring each piece is both beautiful and built to last.
               </p>
               <ul className="space-y-3">
                 {[
@@ -124,7 +124,7 @@ export default async function Home() {
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Our most loved pieces. Shop customer favorites and see why they
-              choose Bēige & Oak.
+              choose Wine & White Atelier.
             </p>
           </div>
 

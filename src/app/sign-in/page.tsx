@@ -16,13 +16,13 @@ export default function SignIn() {
   const { signIn } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
+    password: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   };
 
@@ -45,7 +45,7 @@ export default function SignIn() {
             Welcome Back
           </h1>
           <p className="text-muted-foreground">
-            Sign in to your Bēige & Oak account
+            Sign in to your Wine & White Atelier account
           </p>
         </div>
 
@@ -66,8 +66,8 @@ export default function SignIn() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              <Link 
-                href="/forgot-password" 
+              <Link
+                href="/forgot-password"
                 className="text-sm text-primary hover:underline"
               >
                 Forgot password?
@@ -107,7 +107,10 @@ export default function SignIn() {
 
         <p className="text-center text-sm text-muted-foreground">
           Don't have an account?{" "}
-          <Link href="/sign-up" className="text-primary hover:underline font-medium">
+          <Link
+            href="/sign-up"
+            className="text-primary hover:underline font-medium"
+          >
             Sign up
           </Link>
         </p>

@@ -4,41 +4,44 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Premium Furniture Design System - Bēige & Oak */
+/* Premium Furniture Design System - Wine & White */
 
 @layer base {
   :root {
-    /* Warm Premium Palette */
-    --background: 30 25% 96%;        /* Warm Beige #F5EEE6 */
-    --foreground: 25 30% 20%;         /* Dark Walnut #4A372B */
+    /* Wine & White Premium Palette */
+    --background: 345 50% 97%;        /* Light Wine White #FBF7F8 */
+    --foreground: 345 40% 20%;        /* Deep Wine #4A2C32 */
 
-    --card: 30 20% 98%;
-    --card-foreground: 25 30% 20%;
+    --card: 0 0% 100%;                /* Pure White */
+    --card-foreground: 345 40% 20%;
 
-    --popover: 30 25% 96%;
-    --popover-foreground: 25 30% 20%;
+    --popover: 345 50% 97%;
+    --popover-foreground: 345 40% 20%;
 
-    --primary: 25 25% 33%;            /* Rich Brown #6B4F3A */
-    --primary-foreground: 30 25% 96%;
+    --primary: 345 75% 40%;           /* Rich Maroon #B8273E */
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 30 20% 85%;          /* Sand #E7D9C8 */
-    --secondary-foreground: 25 30% 20%;
+    --secondary: 345 30% 92%;         /* Light Wine Background #F5E8EB */
+    --secondary-foreground: 345 40% 20%;
 
-    --muted: 30 15% 90%;
-    --muted-foreground: 25 15% 45%;
+    --muted: 345 25% 94%;             /* Very Light Wine #F8F1F3 */
+    --muted-foreground: 345 20% 50%;
 
-    --accent: 40 60% 65%;             /* Soft Gold */
-    --accent-foreground: 25 30% 20%;
+    --accent: 345 65% 45%;            /* Wine Accent #C73250 */
+    --accent-foreground: 0 0% 98%;
 
-    --forest: 150 35% 30%;            /* Deep Forest Green for CTA hover */
-    --forest-foreground: 30 25% 96%;
+    --wine: 345 75% 40%;              /* Primary Wine Color */
+    --wine-foreground: 0 0% 98%;
+
+    --forest: 345 60% 35%;            /* Wine hover instead of forest */
+    --forest-foreground: 0 0% 98%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 30 25% 96%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 30 15% 88%;
-    --input: 30 15% 88%;
-    --ring: 25 25% 33%;
+    --border: 345 20% 86%;            /* Light Wine Border */
+    --input: 345 20% 86%;
+    --ring: 345 75% 40%;
 
     --radius: 0.75rem;                /* 12px rounded corners */
   }
@@ -59,7 +62,7 @@
 @layer components {
   /* Premium Button Variants */
   .btn-premium {
-    @apply bg-primary text-primary-foreground hover:bg-forest hover:bg-opacity-90 
+    @apply bg-primary text-primary-foreground hover:bg-wine hover:bg-opacity-90 
            transition-all duration-300 px-8 py-4 rounded-xl font-medium
            shadow-sm hover:shadow-lg;
   }

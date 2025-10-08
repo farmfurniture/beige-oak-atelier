@@ -2,9 +2,12 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  // Remove static export as it's incompatible with server features like cookies
+  // output: 'export', // Remove this if it exists
   images: {
     domains: [],
-    unoptimized: true, // Since we're using local images
+    // Only use unoptimized for static export, remove for regular deployment
+    // unoptimized: true,
   },
 }
 
