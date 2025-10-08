@@ -1,24 +1,28 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, CheckCircle2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import ProductCard from "@/components/ProductCard";
-import seedData from "@/data/seed-data.json";
+import {
+  getBestsellerProducts,
+  getFeaturedProducts,
+  getProductCategories,
+  getTestimonials,
+} from "@/services/products.service";
 
-export default function Home() {
-  const bestsellerProducts = seedData.products
-    .filter((p) => p.tags.includes("Bestseller"))
-    .slice(0, 3);
-  const featuredProducts = seedData.products.slice(0, 4);
-  const categories = [
-    { name: "Beds", slug: "beds", count: 4 },
-    { name: "Sofas", slug: "sofas", count: 4 },
-    { name: "Couches", slug: "couches", count: 3 },
-    { name: "Custom", slug: "custom", count: 1 },
-  ];
+// Enable ISR with 1 hour revalidation
+export const revalidate = 3600;
+
+export default async function Home() {
+  // Fetch data on the server with proper caching
+  const [bestsellerProducts, featuredProducts, categories, testimonials] =
+    await Promise.all([
+      getBestsellerProducts(),
+      getFeaturedProducts(),
+      getProductCategories(),
+      getTestimonials(),
+    ]);
 
   return (
     <div className="min-h-screen">
@@ -213,7 +217,7 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {seedData.testimonials.map((testimonial) => (
+            {testimonials.map((testimonial) => (
               <Card key={testimonial.id} className="p-8 space-y-4 card-premium">
                 <div className="flex space-x-1">
                   {[...Array(testimonial.rating)].map((_, i) => (

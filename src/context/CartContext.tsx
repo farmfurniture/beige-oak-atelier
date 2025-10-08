@@ -1,16 +1,9 @@
 "use client";
 
+import "client-only";
 import { createContext, useContext, useState, ReactNode } from "react";
 import { toast } from "sonner";
-
-interface CartItem {
-  id: string;
-  title: string;
-  image: string;
-  price: number;
-  quantity: number;
-  slug: string;
-}
+import type { CartItem } from "@/models/Cart";
 
 interface CartContextType {
   items: CartItem[];
@@ -53,7 +46,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       toast.success("Added to cart");
       return [
         ...prev,
-        { ...product, price: product.priceEstimateMin, quantity: 1 },
+        {
+          id: product.id,
+          title: product.title,
+          image: product.image,
+          price: product.priceEstimateMin,
+          quantity: 1,
+          slug: product.slug,
+        },
       ];
     });
   };

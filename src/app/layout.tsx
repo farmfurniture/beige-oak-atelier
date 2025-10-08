@@ -1,7 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -25,15 +24,13 @@ export default function RootLayout({
         <Providers>
           <AuthProvider>
             <TooltipProvider>
-              <CartProvider>
-                <Toaster />
-                <Sonner />
-                <div className="flex flex-col min-h-screen">
-                  <Header />
-                  <main className="flex-1">{children}</main>
-                  <Footer />
-                </div>
-              </CartProvider>
+              <Toaster />
+              <Sonner />
+              <div className="flex flex-col min-h-screen">
+                <Header />
+                <main className="flex-1">{children}</main>
+                <Footer />
+              </div>
             </TooltipProvider>
           </AuthProvider>
         </Providers>
