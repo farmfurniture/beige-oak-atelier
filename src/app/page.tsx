@@ -78,10 +78,10 @@ export default async function Home() {
                 Craftsmanship That Speaks
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                For over two decades, Wine & White Atelier has been creating
-                furniture that transcends trends. Our workshop combines
-                traditional joinery techniques with modern design sensibilities,
-                ensuring each piece is both beautiful and built to last.
+                For over two decades, Farm Craft has been creating furniture
+                that transcends trends. Our workshop combines traditional
+                joinery techniques with modern design sensibilities, ensuring
+                each piece is both beautiful and built to last.
               </p>
               <ul className="space-y-3">
                 {[
@@ -124,7 +124,7 @@ export default async function Home() {
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Our most loved pieces. Shop customer favorites and see why they
-              choose Wine & White Atelier.
+              choose Farm Craft.
             </p>
           </div>
 
@@ -242,7 +242,7 @@ export default async function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="section-padding bg-primary text-primary-foreground">
+      <section className="section-padding bg-wine-light text-wine-light-foreground">
         <div className="container mx-auto text-center space-y-6">
           <h2 className="text-4xl md:text-5xl font-serif font-bold">
             Ready to Create Something Special?
@@ -252,14 +252,14 @@ export default async function Home() {
             to bring your vision to life.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button asChild size="lg" variant="secondary" className="text-base">
+            <Button asChild size="lg" className="btn-premium text-base">
               <Link href="/showroom">Book Showroom Visit</Link>
             </Button>
             <Button
               asChild
               size="lg"
               variant="outline"
-              className="text-base border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary"
+              className="text-base border-2 border-wine-light-foreground text-wine-light-foreground hover:bg-wine-light-foreground hover:text-wine-light"
             >
               <Link href="/custom-order">Start Custom Project</Link>
             </Button>

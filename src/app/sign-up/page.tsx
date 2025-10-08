@@ -51,9 +51,7 @@ export default function SignUp() {
         firstName: formData.firstName,
         lastName: formData.lastName,
       });
-      toast.success(
-        "Account created successfully! Welcome to Wine & White Atelier."
-      );
+      toast.success("Account created successfully! Welcome to Farm Craft.");
       router.push("/account");
     } catch (error) {
       toast.error("Failed to create account");
@@ -68,7 +66,7 @@ export default function SignUp() {
             Create Account
           </h1>
           <p className="text-muted-foreground">
-            Join Wine & White Atelier for exclusive benefits
+            Join Farm Craft for exclusive benefits
           </p>
         </div>
 

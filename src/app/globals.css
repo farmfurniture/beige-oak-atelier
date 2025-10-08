@@ -33,6 +33,9 @@
     --wine: 345 75% 40%;              /* Primary Wine Color */
     --wine-foreground: 0 0% 98%;
 
+    --wine-light: 345 50% 85%;        /* Light Wine for CTA #E8CDD4 */
+    --wine-light-foreground: 345 40% 25%;
+
     --forest: 345 60% 35%;            /* Wine hover instead of forest */
     --forest-foreground: 0 0% 98%;
 

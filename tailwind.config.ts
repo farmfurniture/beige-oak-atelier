@@ -56,6 +56,10 @@ export default {
           DEFAULT: "hsl(var(--wine))",
           foreground: "hsl(var(--wine-foreground))",
         },
+        "wine-light": {
+          DEFAULT: "hsl(var(--wine-light))",
+          foreground: "hsl(var(--wine-light-foreground))",
+        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",

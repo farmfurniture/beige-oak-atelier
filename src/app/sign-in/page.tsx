@@ -45,7 +45,7 @@ export default function SignIn() {
             Welcome Back
           </h1>
           <p className="text-muted-foreground">
-            Sign in to your Wine & White Atelier account
+            Sign in to your Farm Craft account
           </p>
         </div>
 
