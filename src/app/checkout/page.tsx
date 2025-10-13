@@ -62,7 +62,7 @@ export default function Checkout() {
     <div className="min-h-screen bg-background">
       <div className="bg-secondary/20 border-b border-border">
         <div className="container mx-auto px-4 py-12">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-4">
+          <h1 className="section-title text-foreground mb-4">
             Checkout
           </h1>
           <p className="text-lg text-muted-foreground">Complete your order</p>
@@ -76,7 +76,7 @@ export default function Checkout() {
             <div className="lg:col-span-2 space-y-6">
               {/* Contact Information */}
               <Card className="p-6">
-                <h2 className="text-xl font-serif font-bold text-foreground mb-4">
+                <h2 className="roboto-italic-medium text-xl text-foreground mb-4">
                   Contact Information
                 </h2>
                 <div className="space-y-4">
@@ -97,7 +97,7 @@ export default function Checkout() {
 
               {/* Shipping Address */}
               <Card className="p-6">
-                <h2 className="text-xl font-serif font-bold text-foreground mb-4">
+                <h2 className="roboto-italic-medium text-xl text-foreground mb-4">
                   Shipping Address
                 </h2>
                 <div className="space-y-4">
@@ -189,7 +189,7 @@ export default function Checkout() {
               {/* Payment Information */}
               <Card className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-serif font-bold text-foreground">
+                  <h2 className="roboto-italic-medium text-xl text-foreground">
                     Payment Information
                   </h2>
                   <Lock className="h-5 w-5 text-muted-foreground" />
@@ -256,7 +256,7 @@ export default function Checkout() {
             {/* Order Summary */}
             <div className="lg:col-span-1">
               <Card className="p-6 sticky top-24 space-y-4">
-                <h2 className="text-xl font-serif font-bold text-foreground">
+                <h2 className="roboto-italic-medium text-xl text-foreground">
                   Order Summary
                 </h2>
 

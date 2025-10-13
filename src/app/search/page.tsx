@@ -36,7 +36,7 @@ function SearchContent() {
     <div className="min-h-screen bg-background">
       <div className="bg-secondary/20 border-b border-border">
         <div className="container mx-auto px-4 py-12">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-6">
+          <h1 className="section-title text-foreground mb-6">
             Search
           </h1>
           
@@ -73,7 +73,7 @@ function SearchContent() {
         ) : (
           <div className="text-center py-16">
             <SearchIcon className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-2xl font-serif font-bold text-foreground mb-2">
+            <h2 className="roboto-italic-medium text-2xl text-foreground mb-2">
               No Results Found
             </h2>
             <p className="text-muted-foreground mb-6">

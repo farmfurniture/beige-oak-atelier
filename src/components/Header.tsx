@@ -24,8 +24,8 @@ const Header = async () => {
         <div className="flex h-20 items-center justify-between px-4">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <h1 className="text-2xl md:text-3xl font-serif font-semibold text-primary">
-              Farm Craft
+            <h1 className="brand-name text-2xl md:text-3xl text-primary">
+              FarmCraft
             </h1>
           </Link>
 
@@ -35,7 +35,7 @@ const Header = async () => {
               <Link
                 key={link.path}
                 href={link.path}
-                className="text-sm font-medium transition-colors text-muted-foreground hover:text-primary"
+                className="nav-link text-sm font-medium text-muted-foreground hover:text-primary"
               >
                 {link.name}
               </Link>

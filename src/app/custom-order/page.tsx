@@ -62,7 +62,7 @@ export default function CustomOrder() {
     <div className="min-h-screen bg-background">
       <div className="bg-secondary/20 border-b border-border">
         <div className="container mx-auto px-4 py-12">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-4">
+          <h1 className="section-title text-foreground mb-4">
             Custom Order
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl">
@@ -241,7 +241,7 @@ export default function CustomOrder() {
           {/* Info Sidebar */}
           <div className="space-y-6">
             <Card className="p-6">
-              <h3 className="text-xl font-serif font-bold text-foreground mb-4">
+              <h3 className="roboto-italic-medium text-xl text-foreground mb-4">
                 How It Works
               </h3>
               <div className="space-y-4">
@@ -266,7 +266,7 @@ export default function CustomOrder() {
             </Card>
 
             <Card className="p-6 bg-secondary/20">
-              <h3 className="text-xl font-serif font-bold text-foreground mb-4">
+              <h3 className="roboto-italic-medium text-xl text-foreground mb-4">
                 Why Custom?
               </h3>
               <ul className="space-y-3">

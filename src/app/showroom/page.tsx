@@ -43,7 +43,7 @@ export default function Showroom() {
     <div className="min-h-screen bg-background">
       <div className="bg-secondary/20 border-b border-border">
         <div className="container mx-auto px-4 py-12">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-4">
+          <h1 className="section-title text-foreground mb-4">
             Visit Our Showroom
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl">
@@ -57,7 +57,7 @@ export default function Showroom() {
           {/* Booking Form */}
           <div>
             <Card className="p-8">
-              <h2 className="text-2xl font-serif font-bold text-foreground mb-6">
+              <h2 className="roboto-italic-medium text-2xl text-foreground mb-6">
                 Schedule Your Visit
               </h2>
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -168,7 +168,7 @@ export default function Showroom() {
           {/* Showroom Info */}
           <div className="space-y-6">
             <Card className="p-6">
-              <h3 className="text-xl font-serif font-bold text-foreground mb-4">
+              <h3 className="roboto-italic-medium text-xl text-foreground mb-4">
                 Showroom Information
               </h3>
               <div className="space-y-4">
@@ -219,7 +219,7 @@ export default function Showroom() {
             </Card>
 
             <Card className="p-6 bg-secondary/20">
-              <h3 className="text-xl font-serif font-bold text-foreground mb-4">
+              <h3 className="roboto-italic-medium text-xl text-foreground mb-4">
                 What to Expect
               </h3>
               <ul className="space-y-3 text-muted-foreground">
@@ -247,7 +247,7 @@ export default function Showroom() {
             </Card>
 
             <Card className="p-6">
-              <h3 className="text-xl font-serif font-bold text-foreground mb-4">
+              <h3 className="roboto-italic-medium text-xl text-foreground mb-4">
                 Parking & Accessibility
               </h3>
               <p className="text-muted-foreground mb-3">

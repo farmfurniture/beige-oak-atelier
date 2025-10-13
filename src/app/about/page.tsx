@@ -17,7 +17,7 @@ export default function About() {
           />
         </div>
         <div className="relative z-10 container mx-auto px-4 text-center">
-          <h1 className="text-5xl md:text-6xl font-serif font-bold text-foreground mb-4">
+          <h1 className="hero-title text-foreground mb-4">
             Our Story
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -31,7 +31,7 @@ export default function About() {
         <div className="container mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
-              <h2 className="text-4xl font-serif font-bold text-foreground">
+              <h2 className="section-title text-foreground">
                 Made by Hand, Loved for Years
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
@@ -60,7 +60,7 @@ export default function About() {
       <section className="section-padding bg-secondary/20">
         <div className="container mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-serif font-bold text-foreground mb-4">
+            <h2 className="section-title text-foreground mb-4">
               Our Values
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -85,7 +85,7 @@ export default function About() {
             ].map((value) => (
               <div key={value.title} className="card-premium p-8 text-center space-y-4">
                 <CheckCircle2 className="h-12 w-12 text-accent mx-auto" />
-                <h3 className="text-2xl font-serif font-semibold text-foreground">
+                <h3 className="roboto-italic-medium text-2xl text-foreground">
                   {value.title}
                 </h3>
                 <p className="text-muted-foreground">
@@ -100,7 +100,7 @@ export default function About() {
       {/* CTA Section */}
       <section className="section-padding">
         <div className="container mx-auto text-center space-y-6">
-          <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
+          <h2 className="section-title text-foreground">
             Experience the Difference
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">

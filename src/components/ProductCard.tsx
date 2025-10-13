@@ -52,10 +52,10 @@ const ProductCard = ({
 
           {/* Content */}
           <div className="p-6 space-y-3">
-            <h3 className="text-xl font-serif font-semibold text-foreground group-hover:text-primary transition-colors">
+            <h3 className="roboto-italic-medium text-xl text-foreground group-hover:text-primary transition-colors">
               {title}
             </h3>
-            <p className="text-sm text-muted-foreground line-clamp-2">
+            <p className="craft-detail line-clamp-2">
               {shortDescription}
             </p>
 

@@ -41,12 +41,12 @@ export default async function Home() {
 
         <div className="relative z-10 container mx-auto px-4">
           <div className="max-w-2xl space-y-6 animate-fade-in-up">
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-foreground leading-tight">
+            <h1 className="hero-title text-foreground">
               Made by hand.
               <br />
               <span className="text-gradient-premium">Loved for years.</span>
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-xl">
+            <p className="hero-subtitle text-muted-foreground">
               Premium furniture crafted by master artisans. Each piece tells a
               story of dedication, quality materials, and timeless design.
             </p>
@@ -74,10 +74,10 @@ export default async function Home() {
         <div className="container mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6 animate-fade-in-up">
-              <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
+              <h2 className="section-title text-foreground">
                 Craftsmanship That Speaks
               </h2>
-              <p className="text-lg text-muted-foreground leading-relaxed">
+              <p className="product-description leading-relaxed">
                 For over two decades, Farm Craft has been creating furniture
                 that transcends trends. Our workshop combines traditional
                 joinery techniques with modern design sensibilities, ensuring
@@ -119,10 +119,10 @@ export default async function Home() {
       <section className="section-padding">
         <div className="container mx-auto">
           <div className="text-center mb-12 space-y-4">
-            <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
+            <h2 className="section-title text-foreground">
               Bestsellers
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="section-subtitle max-w-2xl mx-auto">
               Our most loved pieces. Shop customer favorites and see why they
               choose Farm Craft.
             </p>
@@ -148,10 +148,10 @@ export default async function Home() {
       <section className="section-padding bg-secondary/20">
         <div className="container mx-auto">
           <div className="text-center mb-12 space-y-4">
-            <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
+            <h2 className="section-title text-foreground">
               Browse by Category
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="section-subtitle max-w-2xl mx-auto">
               From statement beds to inviting sofas, discover furniture designed
               for how you live.
             </p>
@@ -164,7 +164,7 @@ export default async function Home() {
                 href={`/catalog?category=${category.slug}`}
                 className="card-premium group hover-lift p-8 text-center space-y-3"
               >
-                <h3 className="text-2xl font-serif font-semibold text-foreground group-hover:text-primary transition-colors">
+                <h3 className="roboto-italic-medium text-2xl text-foreground group-hover:text-primary transition-colors">
                   {category.name}
                 </h3>
                 <p className="text-sm text-muted-foreground">
@@ -182,10 +182,10 @@ export default async function Home() {
       <section className="section-padding">
         <div className="container mx-auto">
           <div className="text-center mb-12 space-y-4">
-            <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
+            <h2 className="section-title text-foreground">
               Featured Collection
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="section-subtitle max-w-2xl mx-auto">
               Handpicked pieces that exemplify our commitment to quality and
               design.
             </p>
@@ -211,7 +211,7 @@ export default async function Home() {
       <section className="section-padding">
         <div className="container mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
+            <h2 className="section-title text-foreground">
               Client Stories
             </h2>
           </div>
@@ -224,14 +224,14 @@ export default async function Home() {
                     <Star key={i} className="h-5 w-5 fill-accent text-accent" />
                   ))}
                 </div>
-                <p className="text-muted-foreground italic leading-relaxed">
+                <p className="testimonial-quote text-muted-foreground">
                   &quot;{testimonial.content}&quot;
                 </p>
                 <div className="pt-4 border-t border-border">
                   <p className="font-semibold text-foreground">
                     {testimonial.name}
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="artisan-signature">
                     {testimonial.role}
                   </p>
                 </div>
@@ -244,10 +244,10 @@ export default async function Home() {
       {/* CTA Section */}
       <section className="section-padding bg-wine-light text-wine-light-foreground">
         <div className="container mx-auto text-center space-y-6">
-          <h2 className="text-4xl md:text-5xl font-serif font-bold">
+          <h2 className="section-title">
             Ready to Create Something Special?
           </h2>
-          <p className="text-lg max-w-2xl mx-auto opacity-90">
+          <p className="premium-subtitle max-w-2xl mx-auto opacity-90">
             Book a showroom visit or request a custom quote. Our team is ready
             to bring your vision to life.
           </p>

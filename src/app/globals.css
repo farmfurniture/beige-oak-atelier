@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -18,7 +18,7 @@
     --popover: 345 50% 97%;
     --popover-foreground: 345 40% 20%;
 
-    --primary: 345 75% 40%;           /* Rich Maroon #B8273E */
+    --primary: 345 81% 13%;           /* Dark Wine #3E060D */
     --primary-foreground: 0 0% 98%;
 
     --secondary: 345 30% 92%;         /* Light Wine Background #F5E8EB */
@@ -27,16 +27,16 @@
     --muted: 345 25% 94%;             /* Very Light Wine #F8F1F3 */
     --muted-foreground: 345 20% 50%;
 
-    --accent: 345 65% 45%;            /* Wine Accent #C73250 */
+    --accent: 345 81% 13%;            /* Dark Wine Accent #3E060D */
     --accent-foreground: 0 0% 98%;
 
-    --wine: 345 75% 40%;              /* Primary Wine Color */
+    --wine: 345 81% 13%;              /* Primary Wine Color #3E060D */
     --wine-foreground: 0 0% 98%;
 
     --wine-light: 345 50% 85%;        /* Light Wine for CTA #E8CDD4 */
     --wine-light-foreground: 345 40% 25%;
 
-    --forest: 345 60% 35%;            /* Wine hover instead of forest */
+    --forest: 345 81% 13%;            /* Dark Wine hover #3E060D */
     --forest-foreground: 0 0% 98%;
 
     --destructive: 0 84.2% 60.2%;
@@ -44,7 +44,7 @@
 
     --border: 345 20% 86%;            /* Light Wine Border */
     --input: 345 20% 86%;
-    --ring: 345 75% 40%;
+    --ring: 345 81% 13%;
 
     --radius: 0.75rem;                /* 12px rounded corners */
   }
@@ -58,7 +58,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-serif;
+    @apply font-roboto italic font-medium;
   }
 }
 
@@ -95,6 +95,76 @@
   /* Premium Section Spacing */
   .section-padding {
     @apply py-16 md:py-24 lg:py-32 px-4 md:px-8 lg:px-12;
+  }
+
+  /* Roboto Italic Typography Classes */
+  .roboto-italic-light {
+    @apply font-roboto italic font-light;
+  }
+
+  .roboto-italic-normal {
+    @apply font-roboto italic font-normal;
+  }
+
+  .roboto-italic-medium {
+    @apply font-roboto italic font-medium;
+  }
+
+  /* Specific Use Cases for Roboto Italic */
+  .tagline {
+    @apply roboto-italic-light text-lg md:text-xl text-muted-foreground;
+  }
+
+  .product-description {
+    @apply roboto-italic-normal text-base text-muted-foreground;
+  }
+
+  .testimonial-quote {
+    @apply roboto-italic-normal text-lg md:text-xl leading-relaxed;
+  }
+
+  .artisan-signature {
+    @apply roboto-italic-medium text-sm text-primary;
+  }
+
+  .craft-detail {
+    @apply roboto-italic-light text-sm text-muted-foreground;
+  }
+
+  .premium-subtitle {
+    @apply roboto-italic-medium text-base md:text-lg text-foreground/80;
+  }
+
+  /* Hero Section Specific */
+  .hero-title {
+    @apply font-roboto italic font-medium text-5xl md:text-6xl lg:text-7xl leading-tight;
+  }
+
+  .hero-subtitle {
+    @apply roboto-italic-normal text-lg md:text-xl max-w-xl;
+  }
+
+  /* Section Headings */
+  .section-title {
+    @apply font-roboto italic font-medium text-4xl md:text-5xl;
+  }
+
+  .section-subtitle {
+    @apply roboto-italic-light text-base md:text-lg text-muted-foreground;
+  }
+
+  /* Navigation and UI */
+  .nav-link {
+    @apply roboto-italic-light transition-colors;
+  }
+
+  /* Brand Elements */
+  .brand-name {
+    @apply font-roboto italic font-medium;
+  }
+
+  .brand-tagline {
+    @apply roboto-italic-light text-sm;
   }
 }
 

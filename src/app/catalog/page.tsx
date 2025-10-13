@@ -100,7 +100,7 @@ function CatalogContent() {
       {/* Header */}
       <div className="bg-secondary/20 border-b border-border">
         <div className="container mx-auto px-4 py-12">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-4">
+          <h1 className="hero-title text-foreground mb-4">
             Our Collection
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl">

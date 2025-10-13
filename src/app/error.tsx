@@ -27,7 +27,7 @@ export default function Error({
           </div>
 
           <div className="space-y-2">
-            <h1 className="text-2xl font-serif font-bold text-foreground">
+            <h1 className="roboto-italic-medium text-2xl text-foreground">
               Something went wrong
             </h1>
             <p className="text-muted-foreground">

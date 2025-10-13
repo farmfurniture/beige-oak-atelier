@@ -34,7 +34,7 @@ export default function Contact() {
     <div className="min-h-screen bg-background">
       <div className="bg-secondary/20 border-b border-border">
         <div className="container mx-auto px-4 py-12">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-4">
+          <h1 className="section-title text-foreground mb-4">
             Get in Touch
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl">
@@ -48,7 +48,7 @@ export default function Contact() {
           {/* Contact Form */}
           <div>
             <Card className="p-8">
-              <h2 className="text-2xl font-serif font-bold text-foreground mb-6">
+              <h2 className="roboto-italic-medium text-2xl text-foreground mb-6">
                 Send us a Message
               </h2>
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -112,7 +112,7 @@ export default function Contact() {
           {/* Contact Information */}
           <div className="space-y-8">
             <div>
-              <h2 className="text-2xl font-serif font-bold text-foreground mb-6">
+              <h2 className="roboto-italic-medium text-2xl text-foreground mb-6">
                 Contact Information
               </h2>
               <div className="space-y-6">

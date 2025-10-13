@@ -62,7 +62,7 @@ export default function SignUp() {
     <div className="min-h-screen flex items-center justify-center bg-secondary/10 px-4 py-12">
       <Card className="w-full max-w-md p-8 space-y-6">
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-serif font-bold text-foreground">
+          <h1 className="roboto-italic-medium text-3xl text-foreground">
             Create Account
           </h1>
           <p className="text-muted-foreground">
