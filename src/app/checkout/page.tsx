@@ -266,7 +266,7 @@ export default function Checkout() {
                   {items.map((item) => (
                     <div key={item.id} className="flex justify-between text-sm">
                       <span className="text-muted-foreground">
-                        {item.title} × {item.quantity}
+                        {item.title} x {item.quantity}
                       </span>
                       <span className="font-medium">
                         ${(item.price * item.quantity).toLocaleString()}
