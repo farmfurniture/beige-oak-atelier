@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, CheckCircle2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -42,9 +42,9 @@ export default async function Home() {
         <div className="relative z-10 container mx-auto px-4">
           <div className="max-w-2xl space-y-6 animate-fade-in-up">
             <h1 className="hero-title text-foreground">
-              Made by hand.
+              The
               <br />
-              <span className="text-gradient-premium">Loved for years.</span>
+              <span className="text-gradient-premium">FarmCraft</span>
             </h1>
             <p className="hero-subtitle text-muted-foreground">
               Premium furniture crafted by master artisans. Each piece tells a
@@ -164,7 +164,7 @@ export default async function Home() {
                 href={`/catalog?category=${category.slug}`}
                 className="card-premium group hover-lift p-8 text-center space-y-3"
               >
-                <h3 className="roboto-italic-medium text-2xl text-foreground group-hover:text-primary transition-colors">
+                <h3 className="exo-semibold text-2xl text-foreground group-hover:text-primary transition-colors">
                   {category.name}
                 </h3>
                 <p className="text-sm text-muted-foreground">

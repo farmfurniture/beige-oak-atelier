@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
@@ -48,7 +48,7 @@ export default function Contact() {
           {/* Contact Form */}
           <div>
             <Card className="p-8">
-              <h2 className="roboto-italic-medium text-2xl text-foreground mb-6">
+              <h2 className="exo-semibold text-2xl text-foreground mb-6">
                 Send us a Message
               </h2>
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -112,7 +112,7 @@ export default function Contact() {
           {/* Contact Information */}
           <div className="space-y-8">
             <div>
-              <h2 className="roboto-italic-medium text-2xl text-foreground mb-6">
+              <h2 className="exo-semibold text-2xl text-foreground mb-6">
                 Contact Information
               </h2>
               <div className="space-y-6">

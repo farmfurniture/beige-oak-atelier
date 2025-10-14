@@ -57,7 +57,7 @@ export default function Showroom() {
           {/* Booking Form */}
           <div>
             <Card className="p-8">
-              <h2 className="roboto-italic-medium text-2xl text-foreground mb-6">
+              <h2 className="exo-semibold text-2xl text-foreground mb-6">
                 Schedule Your Visit
               </h2>
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -168,7 +168,7 @@ export default function Showroom() {
           {/* Showroom Info */}
           <div className="space-y-6">
             <Card className="p-6">
-              <h3 className="roboto-italic-medium text-xl text-foreground mb-4">
+              <h3 className="exo-medium text-xl text-foreground mb-4">
                 Showroom Information
               </h3>
               <div className="space-y-4">
@@ -219,35 +219,35 @@ export default function Showroom() {
             </Card>
 
             <Card className="p-6 bg-secondary/20">
-              <h3 className="roboto-italic-medium text-xl text-foreground mb-4">
+              <h3 className="exo-medium text-xl text-foreground mb-4">
                 What to Expect
               </h3>
               <ul className="space-y-3 text-muted-foreground">
                 <li className="flex items-start gap-2">
-                  <span className="text-accent">•</span>
+                  <span className="text-accent">�</span>
                   <span>Personal consultation with design experts</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-accent">•</span>
+                  <span className="text-accent">�</span>
                   <span>See and feel our furniture in person</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-accent">•</span>
+                  <span className="text-accent">�</span>
                   <span>Explore material and finish options</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-accent">•</span>
+                  <span className="text-accent">�</span>
                   <span>Discuss custom design possibilities</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-accent">•</span>
+                  <span className="text-accent">�</span>
                   <span>Complimentary refreshments</span>
                 </li>
               </ul>
             </Card>
 
             <Card className="p-6">
-              <h3 className="roboto-italic-medium text-xl text-foreground mb-4">
+              <h3 className="exo-medium text-xl text-foreground mb-4">
                 Parking & Accessibility
               </h3>
               <p className="text-muted-foreground mb-3">

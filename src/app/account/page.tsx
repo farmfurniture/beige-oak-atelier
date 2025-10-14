@@ -118,7 +118,7 @@ export default function Account() {
           {/* Profile Tab */}
           <TabsContent value="profile">
             <Card className="p-8">
-              <h2 className="roboto-italic-medium text-2xl text-foreground mb-6">
+              <h2 className="exo-semibold text-2xl text-foreground mb-6">
                 Profile Information
               </h2>
               <form onSubmit={handleSave} className="space-y-6">
@@ -182,7 +182,7 @@ export default function Account() {
           {/* Orders Tab */}
           <TabsContent value="orders">
             <div className="space-y-4">
-              <h2 className="roboto-italic-medium text-2xl text-foreground mb-6">
+              <h2 className="exo-semibold text-2xl text-foreground mb-6">
                 Order History
               </h2>
               {orders.map((order) => (
@@ -260,7 +260,7 @@ export default function Account() {
           <TabsContent value="settings">
             <div className="space-y-6">
               <Card className="p-6">
-                <h3 className="roboto-italic-medium text-xl text-foreground mb-4">
+                <h3 className="exo-medium text-xl text-foreground mb-4">
                   Password & Security
                 </h3>
                 <div className="space-y-4">
@@ -274,7 +274,7 @@ export default function Account() {
               </Card>
 
               <Card className="p-6">
-                <h3 className="roboto-italic-medium text-xl text-foreground mb-4">
+                <h3 className="exo-medium text-xl text-foreground mb-4">
                   Notifications
                 </h3>
                 <div className="space-y-4">
@@ -297,7 +297,7 @@ export default function Account() {
               </Card>
 
               <Card className="p-6 border-destructive/50">
-                <h3 className="roboto-italic-medium text-xl text-foreground mb-4">
+                <h3 className="exo-medium text-xl text-foreground mb-4">
                   Danger Zone
                 </h3>
                 <div className="space-y-4">

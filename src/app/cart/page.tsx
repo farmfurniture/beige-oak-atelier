@@ -19,7 +19,7 @@ export default function Cart() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-6 px-4">
           <ShoppingBag className="h-24 w-24 text-muted-foreground mx-auto" />
-          <h1 className="roboto-italic-medium text-3xl text-foreground">
+          <h1 className="exo-bold text-3xl text-foreground">
             Your Cart is Empty
           </h1>
           <p className="text-lg text-muted-foreground max-w-md mx-auto">
@@ -67,7 +67,7 @@ export default function Cart() {
                     <div className="flex justify-between">
                       <div>
                         <Link href={`/product/${item.slug}`}>
-                          <h3 className="roboto-italic-medium text-xl text-foreground hover:text-primary transition-colors">
+                          <h3 className="exo-medium text-xl text-foreground hover:text-primary transition-colors">
                             {item.title}
                           </h3>
                         </Link>
@@ -118,7 +118,7 @@ export default function Cart() {
           {/* Order Summary */}
           <div className="lg:col-span-1">
             <Card className="p-6 sticky top-24 space-y-6">
-              <h2 className="roboto-italic-medium text-2xl text-foreground">
+              <h2 className="exo-semibold text-2xl text-foreground">
                 Order Summary
               </h2>
 

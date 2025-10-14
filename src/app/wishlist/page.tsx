@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Heart, Trash2 } from "lucide-react";
@@ -22,7 +22,7 @@ export default function Wishlist() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-6 px-4">
           <Heart className="h-24 w-24 text-muted-foreground mx-auto" />
-          <h1 className="roboto-italic-medium text-3xl text-foreground">
+          <h1 className="exo-bold text-3xl text-foreground">
             Your Wishlist is Empty
           </h1>
           <p className="text-lg text-muted-foreground max-w-md mx-auto">

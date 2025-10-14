@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -58,7 +58,9 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-roboto italic font-medium;
+    font-family: 'Exo 2', sans-serif;
+    font-style: italic;
+    font-weight: 600;
   }
 }
 
@@ -137,7 +139,7 @@
 
   /* Hero Section Specific */
   .hero-title {
-    @apply font-roboto italic font-medium text-5xl md:text-6xl lg:text-7xl leading-tight;
+    @apply font-exo italic font-bold text-5xl md:text-6xl lg:text-7xl leading-tight;
   }
 
   .hero-subtitle {
@@ -146,7 +148,7 @@
 
   /* Section Headings */
   .section-title {
-    @apply font-roboto italic font-medium text-4xl md:text-5xl;
+    @apply font-exo italic font-semibold text-4xl md:text-5xl;
   }
 
   .section-subtitle {
@@ -160,11 +162,28 @@
 
   /* Brand Elements */
   .brand-name {
-    @apply font-roboto italic font-medium;
+    @apply font-exo font-bold;
   }
 
   .brand-tagline {
     @apply roboto-italic-light text-sm;
+  }
+
+  /* Exo 2 Heading Classes */
+  .exo-light {
+    @apply font-exo font-normal;
+  }
+
+  .exo-medium {
+    @apply font-exo font-medium;
+  }
+
+  .exo-semibold {
+    @apply font-exo font-semibold;
+  }
+
+  .exo-bold {
+    @apply font-exo font-bold;
   }
 }
 

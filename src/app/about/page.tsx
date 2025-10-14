@@ -1,4 +1,4 @@
-import Image from "next/image";
+﻿import Image from "next/image";
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -85,7 +85,7 @@ export default function About() {
             ].map((value) => (
               <div key={value.title} className="card-premium p-8 text-center space-y-4">
                 <CheckCircle2 className="h-12 w-12 text-accent mx-auto" />
-                <h3 className="roboto-italic-medium text-2xl text-foreground">
+                <h3 className="exo-semibold text-2xl text-foreground">
                   {value.title}
                 </h3>
                 <p className="text-muted-foreground">

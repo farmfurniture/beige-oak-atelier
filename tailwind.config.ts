@@ -22,6 +22,7 @@ export default {
         serif: ["Georgia", "serif"],
         sans: ["Inter", "system-ui", "sans-serif"],
         roboto: ["Roboto", "system-ui", "sans-serif"],
+        exo: ["Exo 2", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",

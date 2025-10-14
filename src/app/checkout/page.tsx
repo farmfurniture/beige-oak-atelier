@@ -76,7 +76,7 @@ export default function Checkout() {
             <div className="lg:col-span-2 space-y-6">
               {/* Contact Information */}
               <Card className="p-6">
-                <h2 className="roboto-italic-medium text-xl text-foreground mb-4">
+                <h2 className="exo-medium text-xl text-foreground mb-4">
                   Contact Information
                 </h2>
                 <div className="space-y-4">
@@ -97,7 +97,7 @@ export default function Checkout() {
 
               {/* Shipping Address */}
               <Card className="p-6">
-                <h2 className="roboto-italic-medium text-xl text-foreground mb-4">
+                <h2 className="exo-medium text-xl text-foreground mb-4">
                   Shipping Address
                 </h2>
                 <div className="space-y-4">
@@ -189,7 +189,7 @@ export default function Checkout() {
               {/* Payment Information */}
               <Card className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="roboto-italic-medium text-xl text-foreground">
+                  <h2 className="exo-medium text-xl text-foreground">
                     Payment Information
                   </h2>
                   <Lock className="h-5 w-5 text-muted-foreground" />
@@ -256,7 +256,7 @@ export default function Checkout() {
             {/* Order Summary */}
             <div className="lg:col-span-1">
               <Card className="p-6 sticky top-24 space-y-4">
-                <h2 className="roboto-italic-medium text-xl text-foreground">
+                <h2 className="exo-medium text-xl text-foreground">
                   Order Summary
                 </h2>
 
@@ -266,7 +266,7 @@ export default function Checkout() {
                   {items.map((item) => (
                     <div key={item.id} className="flex justify-between text-sm">
                       <span className="text-muted-foreground">
-                        {item.title} Ã— {item.quantity}
+                        {item.title} × {item.quantity}
                       </span>
                       <span className="font-medium">
                         ${(item.price * item.quantity).toLocaleString()}

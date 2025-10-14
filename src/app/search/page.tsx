@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
@@ -73,7 +73,7 @@ function SearchContent() {
         ) : (
           <div className="text-center py-16">
             <SearchIcon className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h2 className="roboto-italic-medium text-2xl text-foreground mb-2">
+            <h2 className="exo-semibold text-2xl text-foreground mb-2">
               No Results Found
             </h2>
             <p className="text-muted-foreground mb-6">

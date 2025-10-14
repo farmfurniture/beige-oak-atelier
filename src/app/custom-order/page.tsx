@@ -241,7 +241,7 @@ export default function CustomOrder() {
           {/* Info Sidebar */}
           <div className="space-y-6">
             <Card className="p-6">
-              <h3 className="roboto-italic-medium text-xl text-foreground mb-4">
+              <h3 className="exo-medium text-xl text-foreground mb-4">
                 How It Works
               </h3>
               <div className="space-y-4">
@@ -266,7 +266,7 @@ export default function CustomOrder() {
             </Card>
 
             <Card className="p-6 bg-secondary/20">
-              <h3 className="roboto-italic-medium text-xl text-foreground mb-4">
+              <h3 className="exo-medium text-xl text-foreground mb-4">
                 Why Custom?
               </h3>
               <ul className="space-y-3">

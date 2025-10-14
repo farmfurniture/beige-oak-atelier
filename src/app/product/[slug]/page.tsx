@@ -25,7 +25,7 @@ export default function ProductDetail() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
-          <h1 className="roboto-italic-medium text-3xl text-foreground">
+          <h1 className="exo-bold text-3xl text-foreground">
             Product Not Found
           </h1>
           <Button asChild className="btn-premium">
@@ -215,7 +215,7 @@ export default function ProductDetail() {
         {/* Related Products */}
         {relatedProducts.length > 0 && (
           <div className="border-t border-border pt-16">
-            <h2 className="roboto-italic-medium text-3xl text-foreground mb-8">
+            <h2 className="exo-bold text-3xl text-foreground mb-8">
               You May Also Like
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
