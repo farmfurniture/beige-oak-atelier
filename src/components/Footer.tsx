@@ -1,7 +1,8 @@
 ﻿import Link from "next/link";
-import { Facebook, Instagram, Twitter, Linkedin } from "lucide-react";
+import { Facebook, Instagram, Twitter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { FaPinterest } from "react-icons/fa";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -19,17 +20,45 @@ const Footer = () => {
               Made by hand. Loved for years.
             </p>
             <div className="flex space-x-3">
-              <Button variant="ghost" size="icon" className="h-9 w-9 text-white/70 hover:text-white hover:bg-white/10">
-                <Instagram className="h-4 w-4" />
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-9 w-9 text-[#E4405F] hover:text-[#E4405F] hover:bg-white/10"
+                asChild
+              >
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                  <Instagram className="h-4 w-4" />
+                </a>
               </Button>
-              <Button variant="ghost" size="icon" className="h-9 w-9 text-white/70 hover:text-white hover:bg-white/10">
-                <Facebook className="h-4 w-4" />
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-9 w-9 text-[#1877F2] hover:text-[#1877F2] hover:bg-white/10"
+                asChild
+              >
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+                  <Facebook className="h-4 w-4" />
+                </a>
               </Button>
-              <Button variant="ghost" size="icon" className="h-9 w-9 text-white/70 hover:text-white hover:bg-white/10">
-                <Twitter className="h-4 w-4" />
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-9 w-9 text-[#1DA1F2] hover:text-[#1DA1F2] hover:bg-white/10"
+                asChild
+              >
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+                  <Twitter className="h-4 w-4" />
+                </a>
               </Button>
-              <Button variant="ghost" size="icon" className="h-9 w-9 text-white/70 hover:text-white hover:bg-white/10">
-                <Linkedin className="h-4 w-4" />
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-9 w-9 text-[#E60023] hover:text-[#E60023] hover:bg-white/10"
+                asChild
+              >
+                <a href="https://pinterest.com" target="_blank" rel="noopener noreferrer">
+                  <FaPinterest className="h-4 w-4" />
+                </a>
               </Button>
             </div>
           </div>
