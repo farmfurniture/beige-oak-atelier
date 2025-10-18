@@ -2,18 +2,17 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
-import { ChevronLeft, Check, Share2 } from "lucide-react";
+import Link from "next/link";
+import { ChevronLeft, Heart, Share2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import WishlistButton from "@/components/WishlistButton";
-import ProductCard from "@/components/ProductCard";
+import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/context/CartContext";
-import { formatCurrency } from "@/utils/formatters";
-import { Product } from "@/models/Product";
 import seedData from "@/data/seed-data.json";
+import ProductCard from "@/components/ProductCard";
+import { formatCurrency } from "@/utils/formatters";
 
 export default function ProductDetail() {
   const params = useParams();
@@ -110,21 +109,18 @@ export default function ProductDetail() {
                   id: product.id,
                   title: product.title,
                   image: product.images[0],
-                  priceEstimateMin: product.priceEstimateMin,
-                  slug: product.slug
+                  price: product.priceEstimateMin,
+                  slug: product.slug,
+                  quantity: 1
                 })}
                 className="flex-1 btn-premium" 
                 size="lg"
               >
                 Add to Cart
               </Button>
-              <WishlistButton 
-                product={{
-                  ...product,
-                  price: product.priceEstimateMin
-                }}
-                className="bg-background hover:bg-white/10 h-12 w-12 flex items-center justify-center rounded-lg"
-              />
+              <Button variant="outline" size="lg">
+                <Heart className="h-5 w-5" />
+              </Button>
               <Button variant="outline" size="lg">
                 <Share2 className="h-5 w-5" />
               </Button>
@@ -206,11 +202,7 @@ export default function ProductDetail() {
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {relatedProducts.map((relatedProduct) => (
-              <ProductCard 
-                key={relatedProduct.id} 
-                {...relatedProduct} 
-                price={relatedProduct.priceEstimateMin}
-              />
+              <ProductCard key={relatedProduct.id} {...relatedProduct} />
             ))}
           </div>
         </div>

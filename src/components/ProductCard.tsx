@@ -1,10 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import AddToCartButton from "@/components/AddToCartButton";
+import WishlistButton from "@/components/WishlistButton";
 import type { Product } from "@/models/Product";
+import { formatCurrency } from "@/utils/formatters";
 
 type ProductCardProps = Omit<
   Product,
@@ -63,11 +64,11 @@ const ProductCard = ({
             <div className="flex items-baseline space-x-2">
               <span className="text-sm text-muted-foreground">From</span>
               <span className="text-lg font-semibold text-primary">
-                ${priceEstimateMin.toLocaleString()}
+                {formatCurrency(priceEstimateMin)}
               </span>
               {priceEstimateMax > priceEstimateMin && (
                 <span className="text-sm text-muted-foreground">
-                  - ${priceEstimateMax.toLocaleString()}
+                  - {formatCurrency(priceEstimateMax)}
                 </span>
               )}
             </div>
@@ -76,13 +77,26 @@ const ProductCard = ({
 
         {/* Interactive Elements */}
         <div className="absolute top-4 right-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="bg-background/80 backdrop-blur-sm hover:bg-background"
-          >
-            <Heart className="h-5 w-5" />
-          </Button>
+          <WishlistButton
+            product={{ 
+              id,
+              slug,
+              title,
+              images,
+              price: priceEstimateMin,
+              priceEstimateMin,
+              priceEstimateMax,
+              shortDescription,
+              category: "beds",
+              materials: ["Sample Material"],
+              dimensions: { w: 0, h: 0, d: 0 },
+              leadTimeDays: 14,
+              isCustomAllowed: true,
+              tags: [],
+              longDescription: shortDescription
+            }}
+            className="bg-background/80 backdrop-blur-sm hover:bg-background rounded-full p-2"
+          />
         </div>
 
         <div className="p-6 pt-0">

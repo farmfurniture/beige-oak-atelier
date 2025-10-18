@@ -1,21 +1,14 @@
 ﻿"use client";
 
-import { useState } from "react";
 import { Heart, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/ProductCard";
 import Link from "next/link";
-import seedData from "@/data/seed-data.json";
+import { useWishlist } from "@/context/WishlistContext";
 
 export default function Wishlist() {
-  // Mock wishlist - in a real app, this would come from context or database
-  const [wishlistItems, setWishlistItems] = useState(
-    seedData.products.slice(0, 3)
-  );
-
-  const removeFromWishlist = (id: string) => {
-    setWishlistItems(prev => prev.filter(item => item.id !== id));
-  };
+  // Use the shared wishlist from context/localStorage
+  const { wishlistItems, removeFromWishlist } = useWishlist();
 
   if (wishlistItems.length === 0) {
     return (

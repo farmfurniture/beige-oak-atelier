@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { formatCurrency } from "@/utils/formatters";
 
 export default function Account() {
   const router = useRouter();
@@ -212,7 +213,7 @@ export default function Account() {
                       <div className="text-right">
                         <p className="text-sm text-muted-foreground">Total</p>
                         <p className="text-xl font-bold text-primary">
-                          ${order.total.toLocaleString()}
+                          {formatCurrency(order.total)}
                         </p>
                       </div>
                       <Button variant="outline">

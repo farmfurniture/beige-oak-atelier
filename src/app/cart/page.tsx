@@ -9,6 +9,7 @@ import Link from "next/link";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { formatCurrency } from "@/utils/formatters";
 
 export default function Cart() {
   const { items, updateQuantity, removeFromCart, getTotal, getItemCount } =
@@ -72,7 +73,7 @@ export default function Cart() {
                           </h3>
                         </Link>
                         <p className="text-lg font-semibold text-primary mt-2">
-                          ${item.price.toLocaleString()}
+                          {formatCurrency(item.price)}
                         </p>
                       </div>
                       <Button
@@ -125,7 +126,7 @@ export default function Cart() {
               <div className="space-y-3 border-t border-border pt-4">
                 <div className="flex justify-between text-muted-foreground">
                   <span>Subtotal</span>
-                  <span>${getTotal().toLocaleString()}</span>
+                  <span>{formatCurrency(getTotal())}</span>
                 </div>
                 <div className="flex justify-between text-muted-foreground">
                   <span>Shipping</span>
@@ -141,7 +142,7 @@ export default function Cart() {
                 <div className="flex justify-between text-xl font-bold">
                   <span>Total</span>
                   <span className="text-primary">
-                    ${getTotal().toLocaleString()}
+                    {formatCurrency(getTotal())}
                   </span>
                 </div>
               </div>

@@ -22,7 +22,11 @@ export const ProductSchema = z.object({
   leadTimeDays: z.number().positive(),
   isCustomAllowed: z.boolean(),
   tags: z.array(z.string()),
-});
+}).transform((data) => ({
+  ...data,
+  // Set price to priceEstimateMin for compatibility with wishlist
+  price: data.priceEstimateMin
+}));
 
 export const ProductsSchema = z.array(ProductSchema);
 

@@ -12,7 +12,11 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { Product } from "@/models/Product";
+import Image from "next/image";
+import Link from "next/link";
 import { CreditCard, Lock } from "lucide-react";
+import { formatCurrency } from "@/utils/formatters";
 
 export default function Checkout() {
   const { items, getTotal, clearCart } = useCart();
@@ -269,7 +273,7 @@ export default function Checkout() {
                         {item.title} x {item.quantity}
                       </span>
                       <span className="font-medium">
-                        ${(item.price * item.quantity).toLocaleString()}
+                        {formatCurrency(item.price * item.quantity)}
                       </span>
                     </div>
                   ))}
@@ -280,7 +284,7 @@ export default function Checkout() {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span>${subtotal.toLocaleString()}</span>
+                    <span>{formatCurrency(subtotal)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Shipping</span>
@@ -288,7 +292,7 @@ export default function Checkout() {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Tax</span>
-                    <span>${tax.toFixed(2)}</span>
+                    <span>{formatCurrency(tax)}</span>
                   </div>
                 </div>
 
@@ -296,7 +300,7 @@ export default function Checkout() {
 
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span className="text-primary">${total.toFixed(2)}</span>
+                  <span className="text-primary">{formatCurrency(total)}</span>
                 </div>
 
                 <Button type="submit" className="w-full btn-premium" size="lg">
