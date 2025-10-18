@@ -8,9 +8,7 @@ import { getCartData } from "@/actions/cart.actions";
 const navLinks = [
   { name: "Home", path: "/" },
   { name: "Catalog", path: "/catalog" },
-  { name: "Custom Order", path: "/custom-order" },
   { name: "About", path: "/about" },
-  { name: "Showroom", path: "/showroom" },
   { name: "Contact", path: "/contact" },
 ];
 

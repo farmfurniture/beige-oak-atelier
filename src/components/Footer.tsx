@@ -93,7 +93,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/custom-order"
+                  href="/contact"
                   className="text-white/70 hover:text-white transition-colors"
                 >
                   Custom Orders
@@ -118,7 +118,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/showroom"
+                  href="/contact"
                   className="text-white/70 hover:text-white transition-colors"
                 >
                   Visit Showroom

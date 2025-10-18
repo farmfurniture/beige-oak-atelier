@@ -118,7 +118,7 @@ export default async function Home() {
       {/* Bestseller Products Section */}
       <section className="section-padding">
         <div className="container mx-auto">
-          <div className="text-center mb-12 space-y-4">
+          <div className="text-center mb-8 space-y-3">
             <h2 className="section-title text-foreground">
               Bestsellers
             </h2>
@@ -128,7 +128,7 @@ export default async function Home() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
             {bestsellerProducts.map((product) => (
               <ProductCard key={product.id} {...product} />
             ))}
@@ -147,7 +147,7 @@ export default async function Home() {
       {/* Categories Section */}
       <section className="section-padding bg-secondary/20">
         <div className="container mx-auto">
-          <div className="text-center mb-12 space-y-4">
+          <div className="text-center mb-8 space-y-3">
             <h2 className="section-title text-foreground">
               Browse by Category
             </h2>
@@ -181,7 +181,7 @@ export default async function Home() {
       {/* Featured Products */}
       <section className="section-padding">
         <div className="container mx-auto">
-          <div className="text-center mb-12 space-y-4">
+          <div className="text-center mb-8 space-y-3">
             <h2 className="section-title text-foreground">
               Featured Collection
             </h2>
@@ -191,13 +191,13 @@ export default async function Home() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredProducts.map((product) => (
               <ProductCard key={product.id} {...product} />
             ))}
           </div>
 
-          <div className="text-center mt-12">
+          <div className="text-center mt-8">
             <Button asChild size="lg" className="btn-outline-premium">
               <Link href="/catalog">
                 View Full Catalog <ArrowRight className="ml-2 h-5 w-5" />
@@ -210,13 +210,13 @@ export default async function Home() {
       {/* Testimonials */}
       <section className="section-padding">
         <div className="container mx-auto">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8">
             <h2 className="section-title text-foreground">
               Client Stories
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-6">
             {testimonials.map((testimonial) => (
               <Card key={testimonial.id} className="p-8 space-y-4 card-premium">
                 <div className="flex space-x-1">
