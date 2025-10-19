@@ -1,15 +1,21 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import AddToCartButton from "@/components/AddToCartButton";
+import WishlistButton from "@/components/WishlistButton";
 import type { Product } from "@/models/Product";
+import { ProductCategory } from "@/models/Product";
+import { formatCurrency } from "@/utils/formatters";
 
-type ProductCardProps = Omit<
+type BaseProductCardProps = Omit<
   Product,
-  "longDescription" | "category" | "materials" | "dimensions" | "leadTimeDays"
+  "longDescription" | "category" | "materials" | "dimensions" | "leadTimeDays" | "price"
 >;
+
+export interface ProductCardProps extends BaseProductCardProps {
+  price?: number; // Will use priceEstimateMin if not provided
+}
 
 const ProductCard = ({
   id,
@@ -20,6 +26,7 @@ const ProductCard = ({
   priceEstimateMin,
   priceEstimateMax,
   tags,
+  price = priceEstimateMin, // Use priceEstimateMin as default if price not provided
 }: ProductCardProps) => {
   return (
     <div className="card-premium group hover-lift hover-glow">
@@ -63,11 +70,11 @@ const ProductCard = ({
             <div className="flex items-baseline space-x-2">
               <span className="text-sm text-muted-foreground">From</span>
               <span className="text-lg font-semibold text-primary">
-                ${priceEstimateMin.toLocaleString()}
+                {formatCurrency(priceEstimateMin)}
               </span>
               {priceEstimateMax > priceEstimateMin && (
                 <span className="text-sm text-muted-foreground">
-                  - ${priceEstimateMax.toLocaleString()}
+                  - {formatCurrency(priceEstimateMax)}
                 </span>
               )}
             </div>
@@ -76,13 +83,26 @@ const ProductCard = ({
 
         {/* Interactive Elements */}
         <div className="absolute top-4 right-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="bg-background/80 backdrop-blur-sm hover:bg-background"
-          >
-            <Heart className="h-5 w-5" />
-          </Button>
+          <WishlistButton
+            product={{
+              id,
+              slug,
+              title,
+              shortDescription,
+              images,
+              priceEstimateMin,
+              priceEstimateMax,
+              tags,
+              longDescription: shortDescription,
+              category: ProductCategory.BEDS,
+              materials: ["Wood"],
+              dimensions: { w: 100, h: 100, d: 100 },
+              leadTimeDays: 14,
+              isCustomAllowed: true,
+              price: price // Use the price prop which defaults to priceEstimateMin
+            }}
+            className="bg-background/80 backdrop-blur-sm hover:bg-background rounded-full p-2"
+          />
         </div>
 
         <div className="p-6 pt-0">
