@@ -33,20 +33,21 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("wishlist", JSON.stringify(wishlistItems));
   }, [wishlistItems]);
 
+  const isInWishlist = (productId: string) => {
+    return wishlistItems.some((item) => item.id === productId);
+  };
+
   const addToWishlist = (product: Product) => {
     setWishlistItems((prev) => {
-      // Don't add if already in wishlist
-      if (isInWishlist(product.id)) return prev;
+      // Check against the prev array instead of using isInWishlist
+      const isDuplicate = prev.some(item => item.id === product.id);
+      if (isDuplicate) return prev;
       return [...prev, { ...product, price: product.priceEstimateMin }];
     });
   };
 
   const removeFromWishlist = (productId: string) => {
     setWishlistItems((prev) => prev.filter((item) => item.id !== productId));
-  };
-
-  const isInWishlist = (productId: string) => {
-    return wishlistItems.some((item) => item.id === productId);
   };
 
   return (
