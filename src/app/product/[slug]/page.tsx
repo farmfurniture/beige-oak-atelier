@@ -2,219 +2,293 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
-import { ChevronLeft, Check, Share2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import WishlistButton from "@/components/WishlistButton";
-import ProductCard from "@/components/ProductCard";
+import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
-import { formatCurrency } from "@/utils/formatters";
-import { Product } from "@/models/Product";
+import { toast } from "sonner";
+
+// Import components
+import StickyNavigation from "@/components/product/StickyNavigation";
+import BreadcrumbNavigation from "@/components/product/BreadcrumbNavigation";
+import ProductImageGallery from "@/components/product/ProductImageGallery";
+import ProductInfo from "@/components/product/ProductInfo";
+import DeliveryChecker from "@/components/product/DeliveryChecker";
+import ServiceHighlights from "@/components/product/ServiceHighlights";
+import ProductDetails from "@/components/product/ProductDetails";
+import ReviewsSection from "@/components/product/ReviewsSection";
+import FAQsSection from "@/components/product/FAQsSection";
+import SimilarProducts from "@/components/product/SimilarProducts";
+
+// Import data
 import seedData from "@/data/seed-data.json";
+import productDetailsData from "@/data/product-details.json";
+import { type ProductDetail } from "@/models/ProductDetail";
 
 export default function ProductDetail() {
   const params = useParams();
   const slug = params.slug as string;
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { addToCart } = useCart();
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-  const product = seedData.products.find(p => p.slug === slug);
+  // Get basic product info from seed data
+  const basicProduct = seedData.products.find((p) => p.slug === slug);
 
-  if (!product) {
-    return <div>Product not found</div>;
+  // Get detailed product info from product-details.json
+  const productDetail = productDetailsData[
+    slug as keyof typeof productDetailsData
+  ] as ProductDetail | undefined;
+
+  if (!basicProduct) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-foreground mb-2">
+            Product not found
+          </h1>
+          <p className="text-muted-foreground">
+            The product you're looking for doesn't exist.
+          </p>
+        </div>
+      </div>
+    );
   }
 
-  // Filter related products (same category, excluding current product)
-  const relatedProducts = seedData.products
-    .filter(p => p.category === product.category && p.id !== product.id)
-    .slice(0, 3);
+  // If detailed product data is not available, use basic product info
+  const product: any = productDetail || {
+    ...basicProduct,
+    salePrice: basicProduct.priceEstimateMin,
+    originalPrice: basicProduct.priceEstimateMax,
+    discount: Math.round(
+      ((basicProduct.priceEstimateMax - basicProduct.priceEstimateMin) /
+        basicProduct.priceEstimateMax) *
+        100
+    ),
+    savings: basicProduct.priceEstimateMax - basicProduct.priceEstimateMin,
+    reviews: [],
+    reviewSummary: {
+      averageRating: 0,
+      totalReviews: 0,
+      distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
+    },
+    faqs: [],
+    offers: [],
+    sizeVariants: [
+      {
+        id: "default",
+        label: "Standard Size",
+        dimensions: `${basicProduct.dimensions.w} x ${basicProduct.dimensions.d}`,
+        height: `${basicProduct.dimensions.h}cm`,
+        price: basicProduct.priceEstimateMin,
+        originalPrice: basicProduct.priceEstimateMax,
+        available: true,
+      },
+    ],
+    defaultSizeId: "default",
+    specifications: {
+      dimensions: `${basicProduct.dimensions.w} × ${basicProduct.dimensions.h} × ${basicProduct.dimensions.d} cm`,
+      materials: basicProduct.materials.join(", "),
+    },
+    careInstructions: {
+      title: "Care Instructions",
+      content: "Please follow standard furniture care guidelines.",
+    },
+    warranty: {
+      title: "Warranty",
+      duration: "1 year",
+      description: "Manufacturer's warranty included.",
+    },
+    serviceHighlights: [
+      {
+        id: "service-001",
+        icon: "truck",
+        title: "Free delivery",
+        description: "Across major cities",
+      },
+      {
+        id: "service-002",
+        icon: "shield",
+        title: "Warranty",
+        description: "Up to 2 years",
+      },
+    ],
+    qualityPromises: [
+      {
+        id: "quality-001",
+        icon: "check-circle",
+        title: "Quality Assurance",
+        description: "Rigorous quality checks",
+      },
+      {
+        id: "quality-002",
+        icon: "truck",
+        title: "Fast Delivery",
+        description: "Quick and safe delivery",
+      },
+    ],
+    breadcrumbs: [
+      { label: "Home", href: "/" },
+      {
+        label: basicProduct.category,
+        href: `/catalog?category=${basicProduct.category}`,
+      },
+      { label: basicProduct.title, href: `/product/${basicProduct.slug}` },
+    ] as Array<{ label: string; href: string }>,
+  };
+
+  // Get similar products
+  const similarProducts = seedData.products
+    .filter(
+      (p) => p.category === basicProduct.category && p.id !== basicProduct.id
+    )
+    .slice(0, 3)
+    .map((p) => ({ ...p, price: p.priceEstimateMin }));
+
+  // Check if product is in wishlist
+  const isWishlisted = isInWishlist(basicProduct.id);
+
+  // Handlers
+  const handleWishlistClick = () => {
+    if (isWishlisted) {
+      removeFromWishlist(basicProduct.id);
+      toast.success("Removed from wishlist");
+    } else {
+      addToWishlist({
+        ...basicProduct,
+        price: basicProduct.priceEstimateMin,
+      });
+      toast.success("Added to wishlist");
+    }
+  };
+
+  const handleShareClick = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: product.title,
+        text: product.shortDescription,
+        url: window.location.href,
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      toast.success("Link copied to clipboard");
+    }
+  };
+
+  const handleAddToCart = (quantity: number, sizeId: string) => {
+    const selectedSize = product.sizeVariants.find((v) => v.id === sizeId);
+    addToCart({
+      id: basicProduct.id,
+      title: basicProduct.title,
+      image: basicProduct.images[0],
+      priceEstimateMin: selectedSize?.price || basicProduct.priceEstimateMin,
+      slug: basicProduct.slug,
+    });
+    toast.success(`Added ${quantity} item(s) to cart`);
+  };
+
+  const handleBuyNow = (quantity: number, sizeId: string) => {
+    handleAddToCart(quantity, sizeId);
+    // Redirect to checkout
+    window.location.href = "/checkout";
+  };
+
+  const handleDeliveryCheck = async (pincode: string) => {
+    // Mock delivery check - replace with actual API call
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Simulate delivery availability
+    const available = parseInt(pincode) % 2 === 0;
+
+    return {
+      available,
+      message: available
+        ? "Delivery available"
+        : "Delivery not available in this area",
+      estimatedDays: available ? 7 : undefined,
+    };
+  };
+
+  const handleSubmitReview = (reviewData: any) => {
+    // Handle review submission - replace with actual API call
+    toast.success("Thank you for your review!");
+    console.log("Review submitted:", reviewData);
+  };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Product Section */}
-      <section className="container mx-auto px-4 py-8">
-        <Link
-          href="/catalog"
-          className="inline-flex items-center text-muted-foreground hover:text-foreground mb-8"
-        >
-          <ChevronLeft className="h-4 w-4 mr-1" />
-          Back to Catalog
-        </Link>
+    <div className="min-h-screen bg-[#f5f5f7]">
+      {/* Sticky Navigation */}
+      <StickyNavigation />
 
-        <div className="grid lg:grid-cols-2 gap-12">
-          {/* Product Images */}
-          <div className="space-y-4">
-            <div className="relative aspect-square bg-secondary/20 rounded-2xl overflow-hidden">
-              <Image
-                src={product.images[selectedImageIndex]}
-                alt={product.title}
-                fill
-                className="object-cover"
+      {/* Hero/Product Overview Section */}
+      <section id="product" className="bg-background py-8 scroll-mt-20">
+        <div className="container mx-auto px-4 max-w-7xl">
+          {/* Breadcrumbs */}
+          <BreadcrumbNavigation items={product.breadcrumbs} />
+
+          {/* Two-Column Layout */}
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+            {/* Left Column: Image Gallery */}
+            <ProductImageGallery
+              images={product.images}
+              productTitle={product.title}
+              onWishlistClick={handleWishlistClick}
+              onShareClick={handleShareClick}
+              isWishlisted={isWishlisted}
+            />
+
+            {/* Right Column: Product Info */}
+            <div className="space-y-6">
+              <ProductInfo
+                title={product.title}
+                rating={product.reviewSummary.averageRating}
+                reviewCount={product.reviewSummary.totalReviews}
+                salePrice={product.salePrice}
+                originalPrice={product.originalPrice}
+                discount={product.discount}
+                savings={product.savings}
+                offers={product.offers}
+                sizeVariants={product.sizeVariants}
+                defaultSizeId={product.defaultSizeId}
+                onAddToCart={handleAddToCart}
+                onBuyNow={handleBuyNow}
               />
-            </div>
 
-            {/* Thumbnail Navigation */}
-            {product.images.length > 1 && (
-              <div className="flex gap-4">
-                {product.images.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImageIndex(index)}
-                    className={`relative aspect-square w-20 rounded-lg overflow-hidden ${
-                      selectedImageIndex === index
-                        ? "ring-2 ring-primary"
-                        : "ring-1 ring-border"
-                    }`}
-                  >
-                    <Image
-                      src={image}
-                      alt={`${product.title} view ${index + 1}`}
-                      fill
-                      className="object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Product Info */}
-          <div className="space-y-6">
-            <div>
-              <h1 className="section-title text-foreground mb-4">
-                {product.title}
-              </h1>
-              <p className="text-xl text-muted-foreground">
-                {product.shortDescription}
-              </p>
-            </div>
-
-            <div className="flex items-baseline space-x-2">
-              <span className="text-sm text-muted-foreground">From</span>
-              <span className="text-3xl font-bold text-primary">
-                {formatCurrency(product.priceEstimateMin)}
-              </span>
-              {product.priceEstimateMax > product.priceEstimateMin && (
-                <span className="text-lg text-muted-foreground">
-                  - {formatCurrency(product.priceEstimateMax)}
-                </span>
-              )}
-            </div>
-
-            <div className="flex gap-3">
-              <Button 
-                onClick={() => addToCart({
-                  id: product.id,
-                  title: product.title,
-                  image: product.images[0],
-                  priceEstimateMin: product.priceEstimateMin,
-                  slug: product.slug
-                })}
-                className="flex-1 btn-premium" 
-                size="lg"
-              >
-                Add to Cart
-              </Button>
-              <WishlistButton 
-                product={{
-                  ...product,
-                  price: product.priceEstimateMin
-                }}
-                className="bg-background hover:bg-white/10 h-12 w-12 flex items-center justify-center rounded-lg"
-              />
-              <Button variant="outline" size="lg">
-                <Share2 className="h-5 w-5" />
-              </Button>
-            </div>
-
-            {/* Product Details */}
-            <Tabs defaultValue="description" className="pt-6">
-              <TabsList>
-                <TabsTrigger value="description">Description</TabsTrigger>
-                <TabsTrigger value="details">Details</TabsTrigger>
-                <TabsTrigger value="materials">Materials</TabsTrigger>
-              </TabsList>
-              <TabsContent value="description" className="pt-4">
-                <p className="text-muted-foreground leading-relaxed">
-                  {product.longDescription}
-                </p>
-              </TabsContent>
-              <TabsContent value="details" className="pt-4">
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-medium mb-2">Dimensions</h4>
-                    <p className="text-muted-foreground">
-                      W: {product.dimensions.w}cm x H: {product.dimensions.h}cm x D:{" "}
-                      {product.dimensions.d}cm
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium mb-2">Lead Time</h4>
-                    <p className="text-muted-foreground">
-                      {product.leadTimeDays} days
-                    </p>
-                  </div>
-                  {product.isCustomAllowed && (
-                    <div>
-                      <h4 className="font-medium mb-2 flex items-center">
-                        <Check className="h-4 w-4 mr-2 text-primary" />
-                        Customization Available
-                      </h4>
-                      <p className="text-muted-foreground">
-                        This piece can be customized to your preferences. Contact us
-                        to discuss custom options.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
-              <TabsContent value="materials" className="pt-4">
-                <ul className="space-y-2">
-                  {product.materials.map((material, index) => (
-                    <li
-                      key={index}
-                      className="text-muted-foreground flex items-center"
-                    >
-                      <Check className="h-4 w-4 mr-2 text-primary" />
-                      {material}
-                    </li>
-                  ))}
-                </ul>
-              </TabsContent>
-            </Tabs>
-
-            {/* Features */}
-            <div className="flex flex-wrap gap-2">
-              {product.tags.map((tag) => (
-                <Badge key={tag} variant="secondary">
-                  {tag}
-                </Badge>
-              ))}
+              {/* Delivery Checker */}
+              <DeliveryChecker onCheck={handleDeliveryCheck} />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Related Products */}
-      <section className="bg-secondary/20 py-16">
-        <div className="container mx-auto px-4">
-          <h2 className="section-title text-foreground mb-8">
-            Related Products
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {relatedProducts.map((relatedProduct) => (
-              <ProductCard 
-                key={relatedProduct.id} 
-                {...relatedProduct} 
-                price={relatedProduct.priceEstimateMin}
-              />
-            ))}
-          </div>
+      {/* Service Highlights */}
+      <section className="bg-background py-6">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <ServiceHighlights highlights={product.serviceHighlights} />
         </div>
       </section>
+
+      {/* Product Details Section */}
+      <ProductDetails
+        specifications={product.specifications}
+        careInstructions={product.careInstructions}
+        warranty={product.warranty}
+        qualityPromises={product.qualityPromises}
+      />
+
+      {/* Reviews Section */}
+      {product.reviews.length > 0 && (
+        <ReviewsSection
+          reviews={product.reviews}
+          reviewSummary={product.reviewSummary}
+          onSubmitReview={handleSubmitReview}
+        />
+      )}
+
+      {/* FAQs Section */}
+      {product.faqs.length > 0 && <FAQsSection faqs={product.faqs} />}
+
+      {/* Similar Products */}
+      {similarProducts.length > 0 && (
+        <SimilarProducts products={similarProducts} />
+      )}
     </div>
   );
 }
