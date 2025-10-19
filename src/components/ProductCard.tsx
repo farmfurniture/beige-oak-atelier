@@ -5,12 +5,17 @@ import { Badge } from "@/components/ui/badge";
 import AddToCartButton from "@/components/AddToCartButton";
 import WishlistButton from "@/components/WishlistButton";
 import type { Product } from "@/models/Product";
+import { ProductCategory } from "@/models/Product";
 import { formatCurrency } from "@/utils/formatters";
 
-type ProductCardProps = Omit<
+type BaseProductCardProps = Omit<
   Product,
-  "longDescription" | "category" | "materials" | "dimensions" | "leadTimeDays"
+  "longDescription" | "category" | "materials" | "dimensions" | "leadTimeDays" | "price"
 >;
+
+export interface ProductCardProps extends BaseProductCardProps {
+  price?: number; // Will use priceEstimateMin if not provided
+}
 
 const ProductCard = ({
   id,
@@ -21,6 +26,7 @@ const ProductCard = ({
   priceEstimateMin,
   priceEstimateMax,
   tags,
+  price = priceEstimateMin, // Use priceEstimateMin as default if price not provided
 }: ProductCardProps) => {
   return (
     <div className="card-premium group hover-lift hover-glow">
@@ -78,22 +84,22 @@ const ProductCard = ({
         {/* Interactive Elements */}
         <div className="absolute top-4 right-4">
           <WishlistButton
-            product={{ 
+            product={{
               id,
               slug,
               title,
+              shortDescription,
               images,
-              price: priceEstimateMin,
               priceEstimateMin,
               priceEstimateMax,
-              shortDescription,
-              category: "beds",
-              materials: ["Sample Material"],
-              dimensions: { w: 0, h: 0, d: 0 },
+              tags,
+              longDescription: shortDescription,
+              category: ProductCategory.BEDS,
+              materials: ["Wood"],
+              dimensions: { w: 100, h: 100, d: 100 },
               leadTimeDays: 14,
               isCustomAllowed: true,
-              tags: [],
-              longDescription: shortDescription
+              price: price // Use the price prop which defaults to priceEstimateMin
             }}
             className="bg-background/80 backdrop-blur-sm hover:bg-background rounded-full p-2"
           />
