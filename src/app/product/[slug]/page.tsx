@@ -174,14 +174,16 @@ export default function ProductDetail() {
 
   const handleAddToCart = (quantity: number, sizeId: string) => {
     const selectedSize = product.sizeVariants.find((v) => v.id === sizeId);
-    addToCart({
-      id: basicProduct.id,
-      title: basicProduct.title,
-      image: basicProduct.images[0],
-      priceEstimateMin: selectedSize?.price || basicProduct.priceEstimateMin,
-      slug: basicProduct.slug,
-    });
-    toast.success(`Added ${quantity} item(s) to cart`);
+    addToCart(
+      {
+        id: basicProduct.id,
+        title: basicProduct.title,
+        image: basicProduct.images[0],
+        priceEstimateMin: selectedSize?.price || basicProduct.priceEstimateMin,
+        slug: basicProduct.slug,
+      },
+      quantity
+    );
   };
 
   const handleBuyNow = (quantity: number, sizeId: string) => {

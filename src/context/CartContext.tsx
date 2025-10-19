@@ -7,13 +7,16 @@ import type { CartItem } from "@/models/Cart";
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (product: {
-    id: string;
-    title: string;
-    image: string;
-    priceEstimateMin: number;
-    slug: string;
-  }) => void;
+  addToCart: (
+    product: {
+      id: string;
+      title: string;
+      image: string;
+      priceEstimateMin: number;
+      slug: string;
+    },
+    quantity?: number
+  ) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -26,24 +29,33 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
 
-  const addToCart = (product: {
-    id: string;
-    title: string;
-    image: string;
-    priceEstimateMin: number;
-    slug: string;
-  }) => {
+  const addToCart = (
+    product: {
+      id: string;
+      title: string;
+      image: string;
+      priceEstimateMin: number;
+      slug: string;
+    },
+    quantity: number = 1
+  ) => {
     setItems((prev) => {
       const existing = prev.find((item) => item.id === product.id);
       if (existing) {
-        toast.success("Updated quantity in cart");
+        toast.success(
+          quantity > 1
+            ? `Added ${quantity} more items to cart`
+            : "Updated quantity in cart"
+        );
         return prev.map((item) =>
           item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       }
-      toast.success("Added to cart");
+      toast.success(
+        quantity > 1 ? `Added ${quantity} items to cart` : "Added to cart"
+      );
       return [
         ...prev,
         {
@@ -51,7 +63,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           title: product.title,
           image: product.image,
           price: product.priceEstimateMin,
-          quantity: 1,
+          quantity: quantity,
           slug: product.slug,
         },
       ];
