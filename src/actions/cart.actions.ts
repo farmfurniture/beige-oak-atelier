@@ -52,9 +52,18 @@ type ActionResult<T = void> =
  * Add product to cart action
  */
 export async function addToCart(
-  productSlug: string
+  productSlug: string,
+  quantity: number = 1
 ): Promise<ActionResult<{ itemCount: number }>> {
   try {
+    // Validate quantity
+    if (quantity < 1) {
+      return {
+        success: false,
+        error: "Quantity must be at least 1.",
+      };
+    }
+
     // Get product details
     const product = await getProductBySlug(productSlug);
 
@@ -79,7 +88,7 @@ export async function addToCart(
       // Update quantity
       updatedCart = currentCart.map((item, index) =>
         index === existingItemIndex
-          ? { ...item, quantity: item.quantity + 1 }
+          ? { ...item, quantity: item.quantity + quantity }
           : item
       );
     } else {
@@ -89,7 +98,7 @@ export async function addToCart(
         title: product.title,
         image: product.images[0],
         price: product.priceEstimateMin,
-        quantity: 1,
+        quantity: quantity,
         slug: product.slug,
       };
       updatedCart = [...currentCart, newItem];

@@ -8,6 +8,8 @@ export const CartItemSchema = z.object({
   price: z.number().positive(),
   quantity: z.number().int().positive(),
   slug: z.string().min(1),
+  variantId: z.string().optional(), // Size/variant identifier
+  variantLabel: z.string().optional(), // Human-readable variant (e.g., "Queen Size")
 });
 
 export const CartSchema = z.object({
