@@ -181,6 +181,8 @@ export default function ProductDetail() {
         image: basicProduct.images[0],
         priceEstimateMin: selectedSize?.price || basicProduct.priceEstimateMin,
         slug: basicProduct.slug,
+        variantId: sizeId,
+        variantLabel: selectedSize?.label,
       },
       quantity
     );

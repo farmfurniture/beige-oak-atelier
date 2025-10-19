@@ -38,9 +38,7 @@ export default function Cart() {
     <div className="min-h-screen bg-background">
       <div className="bg-secondary/20 border-b border-border">
         <div className="container mx-auto px-4 py-12">
-          <h1 className="section-title text-foreground mb-4">
-            Shopping Cart
-          </h1>
+          <h1 className="section-title text-foreground mb-4">Shopping Cart</h1>
           <p className="text-lg text-muted-foreground">
             {getItemCount()} {getItemCount() === 1 ? "item" : "items"} in your
             cart
@@ -52,68 +50,80 @@ export default function Cart() {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
-            {items.map((item) => (
-              <Card key={item.id} className="p-6">
-                <div className="flex gap-6">
-                  <div className="relative w-32 h-32 flex-shrink-0">
-                    <Image
-                      src={item.image}
-                      alt={item.title}
-                      fill
-                      className="object-cover rounded-lg"
-                    />
-                  </div>
+            {items.map((item) => {
+              // Generate composite key for this item
+              const itemKey = item.variantId
+                ? `${item.id}-${item.variantId}`
+                : item.id;
 
-                  <div className="flex-1 space-y-4">
-                    <div className="flex justify-between">
-                      <div>
-                        <Link href={`/product/${item.slug}`}>
-                          <h3 className="exo-medium text-xl text-foreground hover:text-primary transition-colors">
-                            {item.title}
-                          </h3>
-                        </Link>
-                        <p className="text-lg font-semibold text-primary mt-2">
-                          {formatCurrency(item.price)}
-                        </p>
+              return (
+                <Card key={itemKey} className="p-6">
+                  <div className="flex gap-6">
+                    <div className="relative w-32 h-32 flex-shrink-0">
+                      <Image
+                        src={item.image}
+                        alt={item.title}
+                        fill
+                        className="object-cover rounded-lg"
+                      />
+                    </div>
+
+                    <div className="flex-1 space-y-4">
+                      <div className="flex justify-between">
+                        <div>
+                          <Link href={`/product/${item.slug}`}>
+                            <h3 className="exo-medium text-xl text-foreground hover:text-primary transition-colors">
+                              {item.title}
+                            </h3>
+                          </Link>
+                          {item.variantLabel && (
+                            <p className="text-sm text-muted-foreground mt-1">
+                              Size: {item.variantLabel}
+                            </p>
+                          )}
+                          <p className="text-lg font-semibold text-primary mt-2">
+                            {formatCurrency(item.price)}
+                          </p>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => removeFromCart(itemKey)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-5 w-5" />
+                        </Button>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeFromCart(item.id)}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </Button>
-                    </div>
 
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() =>
-                          updateQuantity(item.id, item.quantity - 1)
-                        }
-                        disabled={item.quantity <= 1}
-                      >
-                        <Minus className="h-4 w-4" />
-                      </Button>
-                      <span className="w-12 text-center font-medium">
-                        {item.quantity}
-                      </span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() =>
-                          updateQuantity(item.id, item.quantity + 1)
-                        }
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() =>
+                            updateQuantity(itemKey, item.quantity - 1)
+                          }
+                          disabled={item.quantity <= 1}
+                        >
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                        <span className="w-12 text-center font-medium">
+                          {item.quantity}
+                        </span>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() =>
+                            updateQuantity(itemKey, item.quantity + 1)
+                          }
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </div>
 
           {/* Order Summary */}
