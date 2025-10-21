@@ -16,6 +16,18 @@ export default function MobileMenu({ navLinks }: MobileMenuProps) {
 
   const isActive = (path: string) => pathname === path;
 
+  // Auto-close menu when viewport crosses desktop breakpoint (1024px)
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024 && isOpen) {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [isOpen]);
+
   // Lock page scroll (and horizontal overflow) while the menu is open
   useEffect(() => {
     const html = document.documentElement;
