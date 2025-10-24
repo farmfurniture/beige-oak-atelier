@@ -57,10 +57,10 @@ export default function MobileMenu({ navLinks }: MobileMenuProps) {
       </Button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden lg:hidden">
+        <div className="fixed inset-0 z-50 overflow-hidden lg:hidden w-[100vw]">
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/70"
+            className="fixed inset-0 w-[100vw] bg-black/70"
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />
