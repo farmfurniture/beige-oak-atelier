@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { env } from "@/config/env.mjs";
+import { signAdminSession } from "@/lib/server/session";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -38,18 +39,18 @@ export async function adminLoginAction(
 
   const { username, password } = parsed.data;
 
-  if (
-    username !== env.ADMIN_USERNAME ||
-    password !== env.ADMIN_PASSWORD
-  ) {
+  if (username !== env.ADMIN_USERNAME || password !== env.ADMIN_PASSWORD) {
     return { error: "Incorrect username or password" };
   }
 
   const cookieStore = cookies();
 
+  // Sign a JWT token instead of using a random UUID
+  const token = await signAdminSession();
+
   cookieStore.set({
     name: "admin_session",
-    value: crypto.randomUUID(),
+    value: token,
     httpOnly: true,
     sameSite: "strict",
     secure: env.NODE_ENV === "production",

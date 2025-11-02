@@ -26,6 +26,7 @@ export const EnvSchema = z.object({
   // Authentication (when you add it)
   NEXTAUTH_SECRET: z.string().optional(),
   NEXTAUTH_URL: z.string().url().optional(),
+  JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters").optional(),
 
   // File storage (when you add it)
   CLOUDINARY_CLOUD_NAME: z.string().optional(),
@@ -54,6 +55,7 @@ const parsedEnv = EnvSchema.safeParse({
   NEXT_PUBLIC_VERCEL_ANALYTICS: process.env.NEXT_PUBLIC_VERCEL_ANALYTICS === "true",
   NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
   NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+  JWT_SECRET: process.env.JWT_SECRET,
   CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,

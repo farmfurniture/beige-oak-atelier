@@ -1,22 +1,58 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { jwtVerify } from "jose";
 
 const ADMIN_LOGIN_PATH = "/admin/login";
 
-export function middleware(request: NextRequest) {
+/**
+ * Verifies the admin session cookie.
+ * Returns true if the cookie is valid and not expired, false otherwise.
+ */
+async function verifyAdminSessionCookie(cookieValue: string): Promise<boolean> {
+  try {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.error("JWT_SECRET not configured");
+      return false;
+    }
+
+    const encodedSecret = new TextEncoder().encode(secret);
+    await jwtVerify(cookieValue, encodedSecret);
+
+    // If jwtVerify doesn't throw, the token is valid
+    return true;
+  } catch (error) {
+    // Token is invalid, expired, or couldn't be verified
+    return false;
+  }
+}
+
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const hasAdminSession = Boolean(request.cookies.get("admin_session"));
+  const adminSessionCookie = request.cookies.get("admin_session")?.value;
   const isAdminRoute = pathname.startsWith("/admin");
   const isAuthRoute = pathname === ADMIN_LOGIN_PATH;
 
-  if (isAdminRoute && !isAuthRoute && !hasAdminSession) {
-    const loginUrl = new URL(ADMIN_LOGIN_PATH, request.url);
-    loginUrl.searchParams.set("redirectTo", pathname);
-    return NextResponse.redirect(loginUrl);
+  // Check if trying to access a protected admin route
+  if (isAdminRoute && !isAuthRoute) {
+    // Verify the session token
+    const isValidSession =
+      adminSessionCookie &&
+      (await verifyAdminSessionCookie(adminSessionCookie));
+
+    if (!isValidSession) {
+      const loginUrl = new URL(ADMIN_LOGIN_PATH, request.url);
+      loginUrl.searchParams.set("redirectTo", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
   }
 
-  if (isAuthRoute && hasAdminSession) {
-    return NextResponse.redirect(new URL("/admin", request.url));
+  // If already authenticated, redirect from login page to dashboard
+  if (isAuthRoute && adminSessionCookie) {
+    const isValidSession = await verifyAdminSessionCookie(adminSessionCookie);
+    if (isValidSession) {
+      return NextResponse.redirect(new URL("/admin", request.url));
+    }
   }
 
   const response = NextResponse.next();
