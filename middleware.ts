@@ -6,7 +6,8 @@ const ADMIN_LOGIN_PATH = "/admin/login";
 
 /**
  * Verifies the admin session cookie.
- * Returns true if the cookie is valid and not expired, false otherwise.
+ * Returns true only if the cookie is a valid admin token with the admin flag set.
+ * This prevents privilege escalation from other JWT tokens that use the same secret.
  */
 async function verifyAdminSessionCookie(cookieValue: string): Promise<boolean> {
   try {
@@ -17,9 +18,13 @@ async function verifyAdminSessionCookie(cookieValue: string): Promise<boolean> {
     }
 
     const encodedSecret = new TextEncoder().encode(secret);
-    await jwtVerify(cookieValue, encodedSecret);
+    const verified = await jwtVerify(cookieValue, encodedSecret);
 
-    // If jwtVerify doesn't throw, the token is valid
+    // Ensure the token has the admin flag set to true
+    if (verified.payload.admin !== true) {
+      return false;
+    }
+
     return true;
   } catch (error) {
     // Token is invalid, expired, or couldn't be verified
