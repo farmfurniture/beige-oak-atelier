@@ -25,10 +25,15 @@ export const firebaseProductsService = {
       const productsRef = collection(db, PRODUCTS_COLLECTION);
       const querySnapshot = await getDocs(productsRef);
 
-      return querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Product[];
+      return querySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          // Add computed price field (salePrice if available, otherwise priceEstimateMin)
+          price: data.salePrice || data.priceEstimateMin,
+        };
+      }) as Product[];
     } catch (error) {
       console.error("Error fetching products:", error);
       throw error;
@@ -44,10 +49,15 @@ export const firebaseProductsService = {
       const q = query(productsRef, where("published", "==", true));
       const querySnapshot = await getDocs(q);
 
-      return querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Product[];
+      return querySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          // Add computed price field (salePrice if available, otherwise priceEstimateMin)
+          price: data.salePrice || data.priceEstimateMin,
+        };
+      }) as Product[];
     } catch (error) {
       console.error("Error fetching published products:", error);
       throw error;
@@ -63,9 +73,12 @@ export const firebaseProductsService = {
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
+        const data = docSnap.data();
         return {
           id: docSnap.id,
-          ...docSnap.data(),
+          ...data,
+          // Add computed price field (salePrice if available, otherwise priceEstimateMin)
+          price: data.salePrice || data.priceEstimateMin,
         } as Product;
       }
       return null;
@@ -86,9 +99,12 @@ export const firebaseProductsService = {
 
       if (!querySnapshot.empty) {
         const doc = querySnapshot.docs[0];
+        const data = doc.data();
         return {
           id: doc.id,
-          ...doc.data(),
+          ...data,
+          // Add computed price field (salePrice if available, otherwise priceEstimateMin)
+          price: data.salePrice || data.priceEstimateMin,
         } as Product;
       }
       return null;
@@ -161,10 +177,15 @@ export const firebaseProductsService = {
       );
       const querySnapshot = await getDocs(q);
 
-      return querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Product[];
+      return querySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          // Add computed price field (salePrice if available, otherwise priceEstimateMin)
+          price: data.salePrice || data.priceEstimateMin,
+        };
+      }) as Product[];
     } catch (error) {
       console.error("Error fetching products by category:", error);
       throw error;
