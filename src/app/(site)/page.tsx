@@ -119,9 +119,7 @@ export default async function Home() {
       <section className="section-padding">
         <div className="container mx-auto">
           <div className="text-center mb-8 space-y-3">
-            <h2 className="section-title text-foreground">
-              Bestsellers
-            </h2>
+            <h2 className="section-title text-foreground">Bestsellers</h2>
             <p className="section-subtitle max-w-2xl mx-auto">
               Our most loved pieces. Shop customer favorites and see why they
               choose Farm Craft.
@@ -130,7 +128,7 @@ export default async function Home() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
             {bestsellerProducts.map((product) => (
-              <ProductCard key={product.id} {...product} />
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
 
@@ -193,7 +191,7 @@ export default async function Home() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredProducts.map((product) => (
-              <ProductCard key={product.id} {...product} />
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
 
@@ -211,9 +209,7 @@ export default async function Home() {
       <section className="section-padding">
         <div className="container mx-auto">
           <div className="text-center mb-8">
-            <h2 className="section-title text-foreground">
-              Client Stories
-            </h2>
+            <h2 className="section-title text-foreground">Client Stories</h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
@@ -231,9 +227,7 @@ export default async function Home() {
                   <p className="font-semibold text-foreground">
                     {testimonial.name}
                   </p>
-                  <p className="artisan-signature">
-                    {testimonial.role}
-                  </p>
+                  <p className="artisan-signature">{testimonial.role}</p>
                 </div>
               </Card>
             ))}
@@ -244,9 +238,7 @@ export default async function Home() {
       {/* CTA Section */}
       <section className="section-padding bg-wine-light text-wine-light-foreground">
         <div className="container mx-auto text-center space-y-6">
-          <h2 className="section-title">
-            Ready to Create Something Special?
-          </h2>
+          <h2 className="section-title">Ready to Create Something Special?</h2>
           <p className="premium-subtitle max-w-2xl mx-auto opacity-90">
             Book a showroom visit or request a custom quote. Our team is ready
             to bring your vision to life.

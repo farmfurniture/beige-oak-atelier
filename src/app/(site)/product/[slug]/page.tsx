@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
@@ -19,9 +19,10 @@ import FAQsSection from "@/components/product/FAQsSection";
 import SimilarProducts from "@/components/product/SimilarProducts";
 
 // Import data
-import seedData from "@/data/seed-data.json";
 import productDetailsData from "@/data/product-details.json";
 import { type ProductDetail } from "@/models/ProductDetail";
+import { firebaseProductsService } from "@/services/firebase-products.service";
+import type { Product } from "@/models/Product";
 
 export default function ProductDetail() {
   const params = useParams();
@@ -29,13 +30,52 @@ export default function ProductDetail() {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { addToCart } = useCart();
 
-  // Get basic product info from seed data
-  const basicProduct = seedData.products.find((p) => p.slug === slug);
+  const [basicProduct, setBasicProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [similarProducts, setSimilarProducts] = useState<Product[]>([]);
+
+  // Fetch product from Firebase
+  useEffect(() => {
+    const loadProduct = async () => {
+      try {
+        setLoading(true);
+        const product = await firebaseProductsService.getProductBySlug(slug);
+        setBasicProduct(product);
+
+        // Load similar products if product was found
+        if (product) {
+          const similar = await firebaseProductsService.getProductsByCategory(
+            product.category
+          );
+          // Filter out current product and limit to 3
+          const filtered = similar
+            .filter((p) => p.id !== product.id)
+            .slice(0, 3);
+          setSimilarProducts(filtered);
+        }
+      } catch (error) {
+        console.error("Error loading product:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProduct();
+  }, [slug]);
 
   // Get detailed product info from product-details.json
   const productDetail = productDetailsData[
     slug as keyof typeof productDetailsData
   ] as ProductDetail | undefined;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg text-muted-foreground">Loading product...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!basicProduct) {
     return (
@@ -133,14 +173,6 @@ export default function ProductDetail() {
       { label: basicProduct.title, href: `/product/${basicProduct.slug}` },
     ] as Array<{ label: string; href: string }>,
   };
-
-  // Get similar products
-  const similarProducts = seedData.products
-    .filter(
-      (p) => p.category === basicProduct.category && p.id !== basicProduct.id
-    )
-    .slice(0, 3)
-    .map((p) => ({ ...p, price: p.priceEstimateMin }));
 
   // Check if product is in wishlist
   const isWishlisted = isInWishlist(basicProduct.id);

@@ -1,33 +1,48 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import AddToCartButton from "@/components/AddToCartButton";
 import WishlistButton from "@/components/WishlistButton";
 import type { Product } from "@/models/Product";
-import { ProductCategory } from "@/models/Product";
 import { formatCurrency } from "@/utils/formatters";
 
-type BaseProductCardProps = Omit<
-  Product,
-  "longDescription" | "category" | "materials" | "dimensions" | "leadTimeDays" | "price"
->;
-
-export interface ProductCardProps extends BaseProductCardProps {
-  price?: number; // Will use priceEstimateMin if not provided
+export interface ProductCardProps {
+  product: Product;
 }
 
-const ProductCard = ({
-  id,
-  slug,
-  title,
-  shortDescription,
-  images,
-  priceEstimateMin,
-  priceEstimateMax,
-  tags,
-  price = priceEstimateMin, // Use priceEstimateMin as default if price not provided
-}: ProductCardProps) => {
+/**
+ * ProductCard - Displays a published product on the storefront
+ *
+ * Only renders if product.published === true
+ * Sends consistent product data to cart and wishlist
+ * Uses salePrice if available, otherwise priceEstimateMin
+ */
+const ProductCard = ({ product }: ProductCardProps) => {
+  // Don't render unpublished products on the storefront
+  if (!product.published) {
+    return null;
+  }
+
+  const {
+    id,
+    slug,
+    title,
+    shortDescription,
+    images,
+    priceEstimateMin,
+    priceEstimateMax,
+    salePrice,
+    originalPrice,
+    tags,
+    longDescription,
+    category,
+    materials,
+    dimensions,
+    leadTimeDays,
+    isCustomAllowed,
+    price, // This is computed by the schema (salePrice || priceEstimateMin)
+  } = product;
+
   return (
     <div className="card-premium group hover-lift hover-glow">
       <div className="relative">
@@ -38,6 +53,7 @@ const ProductCard = ({
               src={images[0]}
               alt={title}
               fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               className="object-cover transition-transform duration-700 group-hover:scale-110"
             />
 
@@ -62,20 +78,36 @@ const ProductCard = ({
             <h3 className="exo-medium text-xl text-foreground group-hover:text-primary transition-colors">
               {title}
             </h3>
-            <p className="craft-detail line-clamp-2">
-              {shortDescription}
-            </p>
+            <p className="craft-detail line-clamp-2">{shortDescription}</p>
 
-            {/* Price Range */}
-            <div className="flex items-baseline space-x-2">
-              <span className="text-sm text-muted-foreground">From</span>
-              <span className="text-lg font-semibold text-primary">
-                {formatCurrency(priceEstimateMin)}
-              </span>
-              {priceEstimateMax > priceEstimateMin && (
-                <span className="text-sm text-muted-foreground">
-                  - {formatCurrency(priceEstimateMax)}
-                </span>
+            {/* Price Range with Sale Price */}
+            <div className="space-y-1">
+              {salePrice && originalPrice && salePrice < originalPrice ? (
+                <>
+                  <div className="flex items-baseline space-x-2">
+                    <span className="text-sm text-muted-foreground line-through">
+                      {formatCurrency(originalPrice)}
+                    </span>
+                    <span className="text-lg font-semibold text-primary">
+                      {formatCurrency(salePrice)}
+                    </span>
+                  </div>
+                  <div className="text-xs text-emerald-600 font-medium">
+                    Sale price
+                  </div>
+                </>
+              ) : (
+                <div className="flex items-baseline space-x-2">
+                  <span className="text-sm text-muted-foreground">From</span>
+                  <span className="text-lg font-semibold text-primary">
+                    {formatCurrency(priceEstimateMin)}
+                  </span>
+                  {priceEstimateMax > priceEstimateMin && (
+                    <span className="text-sm text-muted-foreground">
+                      - {formatCurrency(priceEstimateMax)}
+                    </span>
+                  )}
+                </div>
               )}
             </div>
           </div>
@@ -89,17 +121,22 @@ const ProductCard = ({
               slug,
               title,
               shortDescription,
+              longDescription,
               images,
               priceEstimateMin,
               priceEstimateMax,
+              salePrice,
+              originalPrice,
               tags,
-              longDescription: shortDescription,
-              category: ProductCategory.BEDS,
-              materials: ["Wood"],
-              dimensions: { w: 100, h: 100, d: 100 },
-              leadTimeDays: 14,
-              isCustomAllowed: true,
-              price: price // Use the price prop which defaults to priceEstimateMin
+              category,
+              materials,
+              dimensions,
+              leadTimeDays,
+              isCustomAllowed,
+              offers: product.offers || [],
+              published: product.published,
+              featured: product.featured,
+              price, // Consistent price passed from schema
             }}
             className="bg-background/80 backdrop-blur-sm hover:bg-background rounded-full p-2"
           />
