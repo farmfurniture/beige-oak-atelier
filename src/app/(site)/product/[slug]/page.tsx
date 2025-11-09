@@ -39,7 +39,11 @@ export default function ProductDetail() {
     const loadProduct = async () => {
       try {
         setLoading(true);
-        const product = await firebaseProductsService.getProductBySlug(slug);
+        // Only fetch published products on the public storefront
+        const product = await firebaseProductsService.getProductBySlug(
+          slug,
+          true
+        );
         setBasicProduct(product);
 
         // Load similar products if product was found
@@ -77,7 +81,7 @@ export default function ProductDetail() {
     );
   }
 
-  if (!basicProduct) {
+  if (!basicProduct || !basicProduct.published) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">

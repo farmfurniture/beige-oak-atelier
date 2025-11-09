@@ -90,11 +90,23 @@ export const firebaseProductsService = {
 
   /**
    * Get a product by slug
+   * @param slug - Product slug
+   * @param publishedOnly - If true, only return published products (default: false for backward compatibility)
    */
-  async getProductBySlug(slug: string): Promise<Product | null> {
+  async getProductBySlug(
+    slug: string,
+    publishedOnly: boolean = false
+  ): Promise<Product | null> {
     try {
       const productsRef = collection(db, PRODUCTS_COLLECTION);
-      const q = query(productsRef, where("slug", "==", slug));
+      const constraints = [where("slug", "==", slug)];
+
+      // Add published filter if requested
+      if (publishedOnly) {
+        constraints.push(where("published", "==", true));
+      }
+
+      const q = query(productsRef, ...constraints);
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {

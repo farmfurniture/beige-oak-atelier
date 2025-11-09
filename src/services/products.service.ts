@@ -84,11 +84,16 @@ export const getBestsellerProducts = cache(async (): Promise<Product[]> => {
 
 /**
  * Get single product by slug from Firebase
+ * Only returns published products for the public storefront
  */
 export const getProductBySlug = cache(
   async (slug: string): Promise<Product | null> => {
     try {
-      const product = await firebaseProductsService.getProductBySlug(slug);
+      // Only fetch published products on the public storefront
+      const product = await firebaseProductsService.getProductBySlug(
+        slug,
+        true
+      );
       return product;
     } catch (error) {
       console.error(`Failed to fetch product with slug ${slug}:`, error);
