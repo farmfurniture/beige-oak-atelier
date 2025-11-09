@@ -1,28 +1,59 @@
-﻿import Link from "next/link";
+﻿"use client";
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, CheckCircle2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import ProductCard from "@/components/ProductCard";
-import {
-  getBestsellerProducts,
-  getFeaturedProducts,
-  getProductCategories,
-  getTestimonials,
-} from "@/services/products.service";
+import { firebaseProductsService } from "@/services/firebase-products.service";
+import type { Product } from "@/models/Product";
+import seedData from "@/data/seed-data.json";
 
-// Force dynamic rendering since we use cookies for cart
-export const dynamic = "force-dynamic";
+export default function Home() {
+  const [bestsellerProducts, setBestsellerProducts] = useState<Product[]>([]);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default async function Home() {
-  // Fetch data on the server with proper caching
-  const [bestsellerProducts, featuredProducts, categories, testimonials] =
-    await Promise.all([
-      getBestsellerProducts(),
-      getFeaturedProducts(),
-      getProductCategories(),
-      getTestimonials(),
-    ]);
+  // Fetch data from Firebase on mount
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoading(true);
+        const allProducts =
+          await firebaseProductsService.getPublishedProducts();
+
+        // Filter bestsellers (products with "Bestseller" tag)
+        const bestsellers = allProducts
+          .filter((p) =>
+            p.tags.some((tag) => tag.toLowerCase() === "bestseller")
+          )
+          .slice(0, 3);
+        setBestsellerProducts(bestsellers);
+
+        // Filter featured products (products marked as featured)
+        const featured = allProducts.filter((p) => p.featured);
+        setFeaturedProducts(
+          featured.length > 0 ? featured.slice(0, 4) : allProducts.slice(0, 4)
+        );
+      } catch (error) {
+        console.error("Error loading products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
+
+  const testimonials = seedData.testimonials;
+  const categories = [
+    { name: "Beds", slug: "beds", count: 0 },
+    { name: "Sofas", slug: "sofas", count: 0 },
+    { name: "Couches", slug: "couches", count: 0 },
+    { name: "Custom", slug: "custom", count: 0 },
+  ];
 
   return (
     <div className="min-h-screen">
@@ -126,19 +157,40 @@ export default async function Home() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-            {bestsellerProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="text-center py-16">
+              <p className="text-lg text-muted-foreground">
+                Loading bestsellers...
+              </p>
+            </div>
+          ) : bestsellerProducts.length > 0 ? (
+            <>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                {bestsellerProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
 
-          <div className="text-center">
-            <Button asChild size="lg" className="btn-premium">
-              <Link href="/catalog">
-                Shop All Products <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-          </div>
+              <div className="text-center">
+                <Button asChild size="lg" className="btn-premium">
+                  <Link href="/catalog">
+                    Shop All Products <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-16">
+              <p className="text-lg text-muted-foreground">
+                No bestseller products available yet.
+              </p>
+              <Button asChild size="lg" className="btn-premium mt-4">
+                <Link href="/catalog">
+                  Browse Catalog <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -189,19 +241,40 @@ export default async function Home() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="text-center py-16">
+              <p className="text-lg text-muted-foreground">
+                Loading featured products...
+              </p>
+            </div>
+          ) : featuredProducts.length > 0 ? (
+            <>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {featuredProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
 
-          <div className="text-center mt-8">
-            <Button asChild size="lg" className="btn-outline-premium">
-              <Link href="/catalog">
-                View Full Catalog <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-          </div>
+              <div className="text-center mt-8">
+                <Button asChild size="lg" className="btn-outline-premium">
+                  <Link href="/catalog">
+                    View Full Catalog <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-16">
+              <p className="text-lg text-muted-foreground">
+                No featured products available yet.
+              </p>
+              <Button asChild size="lg" className="btn-outline-premium mt-4">
+                <Link href="/catalog">
+                  View Full Catalog <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 

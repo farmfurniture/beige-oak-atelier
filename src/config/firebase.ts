@@ -3,7 +3,7 @@ import {
   getFirestore,
   enableMultiTabIndexedDbPersistence,
 } from "firebase/firestore";
-import { getAnalytics } from "firebase/analytics";
+import type { Analytics } from "firebase/analytics";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -22,7 +22,7 @@ const app =
 // Initialize Firestore
 export const db = getFirestore(app);
 
-// Enable offline persistence with multi-tab support
+// Enable offline persistence with multi-tab support (client-only)
 if (typeof window !== "undefined") {
   enableMultiTabIndexedDbPersistence(db).catch((err) => {
     if (err.code === "failed-precondition") {
@@ -37,8 +37,13 @@ if (typeof window !== "undefined") {
   });
 }
 
-// Initialize Analytics (only in browser)
-export const analytics =
-  typeof window !== "undefined" ? getAnalytics(app) : null;
+// Initialize Analytics (only in browser) - dynamically imported to avoid SSR issues
+export let analytics: Analytics | null = null;
+
+if (typeof window !== "undefined") {
+  import("firebase/analytics").then(({ getAnalytics }) => {
+    analytics = getAnalytics(app);
+  });
+}
 
 export default app;
