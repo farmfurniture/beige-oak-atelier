@@ -14,6 +14,7 @@ import seedData from "@/data/seed-data.json";
 export default function Home() {
   const [bestsellerProducts, setBestsellerProducts] = useState<Product[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Fetch data from Firebase on mount
@@ -21,11 +22,12 @@ export default function Home() {
     const loadProducts = async () => {
       try {
         setLoading(true);
-        const allProducts =
-          await firebaseProductsService.getPublishedProducts();
+        const products = await firebaseProductsService.getPublishedProducts();
+
+        setAllProducts(products);
 
         // Filter bestsellers (products with "Bestseller" tag)
-        const bestsellers = allProducts
+        const bestsellers = products
           .filter((p) =>
             p.tags.some((tag) => tag.toLowerCase() === "bestseller")
           )
@@ -33,9 +35,9 @@ export default function Home() {
         setBestsellerProducts(bestsellers);
 
         // Filter featured products (products marked as featured)
-        const featured = allProducts.filter((p) => p.featured);
+        const featured = products.filter((p) => p.featured);
         setFeaturedProducts(
-          featured.length > 0 ? featured.slice(0, 4) : allProducts.slice(0, 4)
+          featured.length > 0 ? featured.slice(0, 4) : products.slice(0, 4)
         );
       } catch (error) {
         console.error("Error loading products:", error);
@@ -48,11 +50,18 @@ export default function Home() {
   }, []);
 
   const testimonials = seedData.testimonials;
+
+  // Calculate category counts from fetched products
+  const categoryCount = allProducts.reduce((acc, product) => {
+    acc[product.category] = (acc[product.category] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
   const categories = [
-    { name: "Beds", slug: "beds", count: 0 },
-    { name: "Sofas", slug: "sofas", count: 0 },
-    { name: "Couches", slug: "couches", count: 0 },
-    { name: "Custom", slug: "custom", count: 0 },
+    { name: "Beds", slug: "beds", count: categoryCount.beds || 0 },
+    { name: "Sofas", slug: "sofas", count: categoryCount.sofas || 0 },
+    { name: "Couches", slug: "couches", count: categoryCount.couches || 0 },
+    { name: "Custom", slug: "custom", count: categoryCount.custom || 0 },
   ];
 
   return (
