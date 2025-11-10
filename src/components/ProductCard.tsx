@@ -143,18 +143,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </div>
 
         <div className="p-6 pt-0">
-          <AddToCartButton
-            product={{
-              id,
-              title,
-              slug,
-              images,
-              salePrice,
-              originalPrice,
-              priceEstimateMin,
-            }}
-            className="w-full btn-premium"
-          />
+          <AddToCartButton productId={id} className="w-full btn-premium" />
         </div>
       </div>
     </div>

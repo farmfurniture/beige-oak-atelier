@@ -7,20 +7,12 @@ import { useOptimistic, useTransition } from "react";
 import { toast } from "sonner";
 
 interface AddToCartButtonProps {
-  product: {
-    id: string;
-    title: string;
-    slug: string;
-    images: string[];
-    salePrice?: number;
-    originalPrice?: number;
-    priceEstimateMin: number;
-  };
+  productId: string;
   className?: string;
 }
 
 export default function AddToCartButton({
-  product,
+  productId,
   className,
 }: AddToCartButtonProps) {
   const [isPending, startTransition] = useTransition();
@@ -31,15 +23,8 @@ export default function AddToCartButton({
 
     startTransition(async () => {
       try {
-        const result = await addToCart({
-          id: product.id,
-          title: product.title,
-          slug: product.slug,
-          image: product.images[0],
-          salePrice: product.salePrice,
-          originalPrice: product.originalPrice,
-          priceEstimateMin: product.priceEstimateMin,
-        });
+        // Only send product ID - server fetches trusted pricing
+        const result = await addToCart(productId);
 
         if (result.success) {
           toast.success("Added to cart!");
