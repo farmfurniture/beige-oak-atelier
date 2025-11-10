@@ -216,6 +216,8 @@ export default function ProductDetail() {
         title: basicProduct.title,
         image: basicProduct.images[0],
         priceEstimateMin: selectedSize?.price || basicProduct.priceEstimateMin,
+        salePrice: basicProduct.salePrice,
+        originalPrice: basicProduct.originalPrice,
         slug: basicProduct.slug,
         variantId: sizeId,
         variantLabel: selectedSize?.label,

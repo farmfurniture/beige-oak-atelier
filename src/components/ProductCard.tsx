@@ -143,7 +143,18 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </div>
 
         <div className="p-6 pt-0">
-          <AddToCartButton productSlug={slug} className="w-full btn-premium" />
+          <AddToCartButton
+            product={{
+              id,
+              title,
+              slug,
+              images,
+              salePrice,
+              originalPrice,
+              priceEstimateMin,
+            }}
+            className="w-full btn-premium"
+          />
         </div>
       </div>
     </div>

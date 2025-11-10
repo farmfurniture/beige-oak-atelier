@@ -10,7 +10,6 @@ import {
   type AddToCartPayload,
   type UpdateCartItemPayload,
 } from "@/models/Cart";
-import { getProductBySlug } from "@/services/products.service";
 
 // Cookie configuration
 const CART_COOKIE_NAME = "shopping_cart";
@@ -50,9 +49,18 @@ type ActionResult<T = void> =
 
 /**
  * Add product to cart action
+ * Accepts product data from client to avoid server-side Firebase calls
  */
 export async function addToCart(
-  productSlug: string,
+  productData: {
+    id: string;
+    title: string;
+    slug: string;
+    image: string;
+    salePrice?: number;
+    originalPrice?: number;
+    priceEstimateMin: number;
+  },
   quantity: number = 1
 ): Promise<ActionResult<{ itemCount: number }>> {
   try {
@@ -64,13 +72,16 @@ export async function addToCart(
       };
     }
 
-    // Get product details
-    const product = await getProductBySlug(productSlug);
-
-    if (!product) {
+    // Validate required product data
+    if (
+      !productData.id ||
+      !productData.title ||
+      !productData.slug ||
+      !productData.image
+    ) {
       return {
         success: false,
-        error: "Product not found.",
+        error: "Invalid product data.",
       };
     }
 
@@ -79,7 +90,7 @@ export async function addToCart(
 
     // Check if item already exists
     const existingItemIndex = currentCart.findIndex(
-      (item) => item.id === product.id
+      (item) => item.id === productData.id
     );
 
     let updatedCart: CartItem[];
@@ -93,20 +104,20 @@ export async function addToCart(
       );
     } else {
       // Add new item - use sale price if available, otherwise min estimate
-      const price = product.salePrice ?? product.priceEstimateMin;
+      const price = productData.salePrice ?? productData.priceEstimateMin;
       const originalPrice =
-        product.salePrice && product.originalPrice
-          ? product.originalPrice
+        productData.salePrice && productData.originalPrice
+          ? productData.originalPrice
           : undefined;
 
       const newItem: CartItem = {
-        id: product.id,
-        title: product.title,
-        image: product.images[0],
+        id: productData.id,
+        title: productData.title,
+        image: productData.image,
         price: price,
         originalPrice: originalPrice,
         quantity: quantity,
-        slug: product.slug,
+        slug: productData.slug,
       };
       updatedCart = [...currentCart, newItem];
     }
