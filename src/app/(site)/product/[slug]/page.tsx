@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
@@ -19,9 +19,10 @@ import FAQsSection from "@/components/product/FAQsSection";
 import SimilarProducts from "@/components/product/SimilarProducts";
 
 // Import data
-import seedData from "@/data/seed-data.json";
 import productDetailsData from "@/data/product-details.json";
 import { type ProductDetail } from "@/models/ProductDetail";
+import { firebaseProductsService } from "@/services/firebase-products.service";
+import type { Product } from "@/models/Product";
 
 export default function ProductDetail() {
   const params = useParams();
@@ -29,15 +30,58 @@ export default function ProductDetail() {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { addToCart } = useCart();
 
-  // Get basic product info from seed data
-  const basicProduct = seedData.products.find((p) => p.slug === slug);
+  const [basicProduct, setBasicProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [similarProducts, setSimilarProducts] = useState<Product[]>([]);
+
+  // Fetch product from Firebase
+  useEffect(() => {
+    const loadProduct = async () => {
+      try {
+        setLoading(true);
+        // Only fetch published products on the public storefront
+        const product = await firebaseProductsService.getProductBySlug(
+          slug,
+          true
+        );
+        setBasicProduct(product);
+
+        // Load similar products if product was found
+        if (product) {
+          const similar = await firebaseProductsService.getProductsByCategory(
+            product.category
+          );
+          // Filter out current product and limit to 3
+          const filtered = similar
+            .filter((p) => p.id !== product.id)
+            .slice(0, 3);
+          setSimilarProducts(filtered);
+        }
+      } catch (error) {
+        console.error("Error loading product:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProduct();
+  }, [slug]);
 
   // Get detailed product info from product-details.json
   const productDetail = productDetailsData[
     slug as keyof typeof productDetailsData
   ] as ProductDetail | undefined;
 
-  if (!basicProduct) {
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg text-muted-foreground">Loading product...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!basicProduct || !basicProduct.published) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -134,14 +178,6 @@ export default function ProductDetail() {
     ] as Array<{ label: string; href: string }>,
   };
 
-  // Get similar products
-  const similarProducts = seedData.products
-    .filter(
-      (p) => p.category === basicProduct.category && p.id !== basicProduct.id
-    )
-    .slice(0, 3)
-    .map((p) => ({ ...p, price: p.priceEstimateMin }));
-
   // Check if product is in wishlist
   const isWishlisted = isInWishlist(basicProduct.id);
 
@@ -180,6 +216,8 @@ export default function ProductDetail() {
         title: basicProduct.title,
         image: basicProduct.images[0],
         priceEstimateMin: selectedSize?.price || basicProduct.priceEstimateMin,
+        salePrice: basicProduct.salePrice,
+        originalPrice: basicProduct.originalPrice,
         slug: basicProduct.slug,
         variantId: sizeId,
         variantLabel: selectedSize?.label,

@@ -14,11 +14,14 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import ProductCard from "@/components/ProductCard";
-import seedData from "@/data/seed-data.json";
+import { firebaseProductsService } from "@/services/firebase-products.service";
+import type { Product } from "@/models/Product";
 
 function CatalogContent() {
   const searchParams = useSearchParams();
-  const [filteredProducts, setFilteredProducts] = useState(seedData.products);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
 
   const categoryParam = searchParams.get("category");
@@ -39,8 +42,25 @@ function CatalogContent() {
   const [selectedPriceRange, setSelectedPriceRange] = useState<string>("");
   const [sortBy, setSortBy] = useState("featured");
 
+  // Load products from Firebase on mount
   useEffect(() => {
-    let filtered = [...seedData.products];
+    const loadProducts = async () => {
+      try {
+        setLoading(true);
+        const products = await firebaseProductsService.getPublishedProducts();
+        setAllProducts(products);
+        setFilteredProducts(products);
+      } catch (error) {
+        console.error("Error loading products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProducts();
+  }, []);
+
+  useEffect(() => {
+    let filtered = [...allProducts];
 
     // Category filter
     if (selectedCategories.length > 0) {
@@ -77,7 +97,13 @@ function CatalogContent() {
     }
 
     setFilteredProducts(filtered);
-  }, [selectedCategories, selectedMaterials, selectedPriceRange, sortBy]);
+  }, [
+    selectedCategories,
+    selectedMaterials,
+    selectedPriceRange,
+    sortBy,
+    allProducts,
+  ]);
 
   const toggleCategory = (category: string) => {
     setSelectedCategories((prev) =>
@@ -100,9 +126,7 @@ function CatalogContent() {
       {/* Header */}
       <div className="bg-secondary/20 border-b border-border">
         <div className="container mx-auto px-4 py-12">
-          <h1 className="hero-title text-foreground mb-4">
-            Our Collection
-          </h1>
+          <h1 className="hero-title text-foreground mb-4">Our Collection</h1>
           <p className="text-lg text-muted-foreground max-w-2xl">
             Discover handcrafted furniture designed to elevate your living
             spaces.
@@ -232,10 +256,16 @@ function CatalogContent() {
 
           {/* Products Grid */}
           <div className="flex-1">
-            {filteredProducts.length > 0 ? (
+            {loading ? (
+              <div className="text-center py-16">
+                <p className="text-lg text-muted-foreground">
+                  Loading products...
+                </p>
+              </div>
+            ) : filteredProducts.length > 0 ? (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredProducts.map((product) => (
-                  <ProductCard key={product.id} {...product} />
+                  <ProductCard key={product.id} product={product} />
                 ))}
               </div>
             ) : (

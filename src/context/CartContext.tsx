@@ -13,6 +13,8 @@ interface CartContextType {
       title: string;
       image: string;
       priceEstimateMin: number;
+      salePrice?: number;
+      originalPrice?: number;
       slug: string;
       variantId?: string;
       variantLabel?: string;
@@ -42,6 +44,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       title: string;
       image: string;
       priceEstimateMin: number;
+      salePrice?: number;
+      originalPrice?: number;
       slug: string;
       variantId?: string;
       variantLabel?: string;
@@ -81,6 +85,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         });
       }
 
+      // Use sale price if available, otherwise min estimate
+      const price = product.salePrice ?? product.priceEstimateMin;
+      const originalPrice =
+        product.salePrice && product.originalPrice
+          ? product.originalPrice
+          : undefined;
+
       const variantText = product.variantLabel
         ? ` (${product.variantLabel})`
         : "";
@@ -95,7 +106,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           id: product.id,
           title: product.title,
           image: product.image,
-          price: product.priceEstimateMin,
+          price: price,
+          originalPrice: originalPrice,
           quantity: quantity,
           slug: product.slug,
           variantId: product.variantId,

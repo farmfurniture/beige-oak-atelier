@@ -33,11 +33,10 @@ export default function Wishlist() {
     <div className="min-h-screen bg-background">
       <div className="bg-secondary/20 border-b border-border">
         <div className="container mx-auto px-4 py-12">
-          <h1 className="section-title text-foreground mb-4">
-            My Wishlist
-          </h1>
+          <h1 className="section-title text-foreground mb-4">My Wishlist</h1>
           <p className="text-lg text-muted-foreground">
-            {wishlistItems.length} {wishlistItems.length === 1 ? 'item' : 'items'} saved
+            {wishlistItems.length}{" "}
+            {wishlistItems.length === 1 ? "item" : "items"} saved
           </p>
         </div>
       </div>
@@ -46,7 +45,7 @@ export default function Wishlist() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {wishlistItems.map((product) => (
             <div key={product.id} className="relative">
-              <ProductCard {...product} />
+              <ProductCard product={product} />
               <Button
                 variant="ghost"
                 size="icon"
