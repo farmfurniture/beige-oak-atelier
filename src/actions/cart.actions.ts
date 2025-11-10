@@ -92,12 +92,19 @@ export async function addToCart(
           : item
       );
     } else {
-      // Add new item
+      // Add new item - use sale price if available, otherwise min estimate
+      const price = product.salePrice ?? product.priceEstimateMin;
+      const originalPrice =
+        product.salePrice && product.originalPrice
+          ? product.originalPrice
+          : undefined;
+
       const newItem: CartItem = {
         id: product.id,
         title: product.title,
         image: product.images[0],
-        price: product.priceEstimateMin,
+        price: price,
+        originalPrice: originalPrice,
         quantity: quantity,
         slug: product.slug,
       };

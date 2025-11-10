@@ -81,9 +81,23 @@ export default function Cart() {
                               Size: {item.variantLabel}
                             </p>
                           )}
-                          <p className="text-lg font-semibold text-primary mt-2">
-                            {formatCurrency(item.price)}
-                          </p>
+                          <div className="mt-2">
+                            {item.originalPrice &&
+                            item.originalPrice > item.price ? (
+                              <div className="flex items-center gap-2">
+                                <p className="text-lg font-semibold text-primary">
+                                  {formatCurrency(item.price)}
+                                </p>
+                                <p className="text-sm text-muted-foreground line-through">
+                                  {formatCurrency(item.originalPrice)}
+                                </p>
+                              </div>
+                            ) : (
+                              <p className="text-lg font-semibold text-primary">
+                                {formatCurrency(item.price)}
+                              </p>
+                            )}
+                          </div>
                         </div>
                         <Button
                           variant="ghost"
