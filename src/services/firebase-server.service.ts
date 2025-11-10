@@ -7,7 +7,15 @@ import { Product, ProductSchema } from "@/models/Product";
  */
 
 const FIREBASE_PROJECT_ID = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+const FIREBASE_API_KEY = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
 const FIREBASE_DATABASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
+
+// Validate configuration
+if (!FIREBASE_PROJECT_ID || !FIREBASE_API_KEY) {
+  console.error(
+    "Firebase configuration missing: NEXT_PUBLIC_FIREBASE_PROJECT_ID and NEXT_PUBLIC_FIREBASE_API_KEY are required"
+  );
+}
 
 interface FirestoreDocument {
   name: string;
@@ -61,7 +69,8 @@ export async function getProductById(
   productId: string
 ): Promise<Product | null> {
   try {
-    const url = `${FIREBASE_DATABASE_URL}/products/${productId}`;
+    // Append API key for authentication
+    const url = `${FIREBASE_DATABASE_URL}/products/${productId}?key=${FIREBASE_API_KEY}`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -75,7 +84,19 @@ export async function getProductById(
       if (response.status === 404) {
         return null;
       }
-      throw new Error(`Failed to fetch product: ${response.statusText}`);
+      // Log detailed error for debugging
+      const errorBody = await response.text();
+      console.error(`Firebase REST API error (${response.status}):`, errorBody);
+
+      if (response.status === 403) {
+        console.error(
+          "Permission denied. Check Firebase security rules and API key."
+        );
+      }
+
+      throw new Error(
+        `Failed to fetch product: ${response.status} ${response.statusText}`
+      );
     }
 
     const doc: FirestoreDocument = await response.json();
