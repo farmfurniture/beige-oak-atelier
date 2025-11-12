@@ -66,5 +66,8 @@ if (!parsedEnv.success) {
 
 export const env = parsedEnv.data;
 
-// Type-safe environment variables
-export type Env = z.infer<typeof EnvSchema>;
+/**
+ * Runtime env object exported as `env`.
+ * Note: This file is plain ESM (.mjs) so TypeScript type exports are not allowed here.
+ * If you need type information, rename this file to `.ts` or provide a separate `.d.ts`.
+ */
