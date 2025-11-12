@@ -17,31 +17,33 @@ const Header = async () => {
   const { itemCount } = await getCartData();
 
   return (
-    <header className="w-full bg-background border-b border-border relative">
-      <div className="container mx-auto">
-        <div className="flex h-20 items-center justify-between px-4">
+    <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-border">
+      <div className="container mx-auto px-0">
+        <div className="flex h-14 md:h-16 lg:h-20 items-center justify-between px-4 md:px-6">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <h1 className="brand-name text-2xl md:text-3xl text-primary">
+            <h1 className="brand-name text-xl md:text-2xl lg:text-3xl text-primary">
               FarmCraft
             </h1>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                href={link.path}
-                className="nav-link text-sm font-medium text-muted-foreground hover:text-primary"
-              >
-                {link.name}
-              </Link>
-            ))}
-          </nav>
+          {/* Desktop Navigation and Right Actions */}
+          <div className="flex items-center space-x-6 lg:space-x-8">
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center space-x-6">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  href={link.path}
+                  className="nav-link text-sm font-medium text-muted-foreground hover:text-primary"
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </nav>
 
-          {/* Right Actions */}
-          <div className="flex items-center space-x-4">
+            {/* Right Actions */}
+            <div className="flex items-center space-x-2 md:space-x-4">
             <Button
               variant="ghost"
               size="icon"
@@ -70,6 +72,7 @@ const Header = async () => {
 
             <CartIcon itemCount={itemCount} />
             <MobileMenu navLinks={navLinks} />
+          </div>
           </div>
         </div>
       </div>

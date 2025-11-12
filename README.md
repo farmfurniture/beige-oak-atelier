@@ -1,4 +1,4 @@
-# Bēige & Oak Atelier - Premium Handcrafted Furniture
+# FarmCraft - Premium Handcrafted Furniture
 
 A Next.js e-commerce application for premium handcrafted furniture.
 

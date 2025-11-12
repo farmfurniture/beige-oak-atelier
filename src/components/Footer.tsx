@@ -1,5 +1,5 @@
 ﻿import Link from "next/link";
-import { Facebook, Instagram, Twitter } from "lucide-react";
+import { Facebook, Instagram, Twitter, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FaPinterest } from "react-icons/fa";
@@ -14,7 +14,7 @@ const Footer = () => {
           {/* Brand Column */}
           <div className="space-y-4">
             <h3 className="brand-name text-2xl text-white">
-              Farm Craft
+              FarmCraft
             </h3>
             <p className="tagline text-white/70">
               Made by hand. Loved for years.
@@ -58,6 +58,16 @@ const Footer = () => {
               >
                 <a href="https://pinterest.com" target="_blank" rel="noopener noreferrer">
                   <FaPinterest className="h-4 w-4" />
+                </a>
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-9 w-9 text-[#0A66C2] hover:text-[#0A66C2] hover:bg-white/10"
+                asChild
+              >
+                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
+                  <Linkedin className="h-4 w-4" />
                 </a>
               </Button>
             </div>
@@ -161,7 +171,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-white/20 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
           <p className="text-sm text-white/70">
-            © {currentYear} Farm Craft. All rights reserved.
+            © {currentYear} FarmCraft. All rights reserved.
           </p>
           <div className="flex space-x-6 text-sm">
             <Link

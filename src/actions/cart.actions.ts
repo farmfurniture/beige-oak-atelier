@@ -10,7 +10,7 @@ import {
   type AddToCartPayload,
   type UpdateCartItemPayload,
 } from "@/models/Cart";
-import { getProductById } from "@/services/firebase-server.service";
+import { getProductBySlug } from "@/services/products.service";
 
 // Cookie configuration
 const CART_COOKIE_NAME = "shopping_cart";
@@ -50,46 +50,18 @@ type ActionResult<T = void> =
 
 /**
  * Add product to cart action
- * SECURE: Fetches product data from server to prevent price manipulation
- * Only accepts product ID from client - all pricing is fetched server-side
  */
 export async function addToCart(
-  productId: string,
-  quantity: number = 1
+  productSlug: string
 ): Promise<ActionResult<{ itemCount: number }>> {
   try {
-    // Validate quantity
-    if (quantity < 1) {
-      return {
-        success: false,
-        error: "Quantity must be at least 1.",
-      };
-    }
-
-    // Validate product ID
-    if (!productId || typeof productId !== "string") {
-      return {
-        success: false,
-        error: "Invalid product ID.",
-      };
-    }
-
-    // SECURITY: Fetch product from authoritative source (Firestore via REST API)
-    // This prevents client from manipulating prices
-    const product = await getProductById(productId);
+    // Get product details
+    const product = await getProductBySlug(productSlug);
 
     if (!product) {
       return {
         success: false,
         error: "Product not found.",
-      };
-    }
-
-    // Check if product is published
-    if (!product.published) {
-      return {
-        success: false,
-        error: "Product is not available.",
       };
     }
 
@@ -107,24 +79,17 @@ export async function addToCart(
       // Update quantity
       updatedCart = currentCart.map((item, index) =>
         index === existingItemIndex
-          ? { ...item, quantity: item.quantity + quantity }
+          ? { ...item, quantity: item.quantity + 1 }
           : item
       );
     } else {
-      // Add new item - use TRUSTED pricing from server
-      const price = product.salePrice ?? product.priceEstimateMin;
-      const originalPrice =
-        product.salePrice && product.originalPrice
-          ? product.originalPrice
-          : undefined;
-
+      // Add new item
       const newItem: CartItem = {
         id: product.id,
         title: product.title,
         image: product.images[0],
-        price: price,
-        originalPrice: originalPrice,
-        quantity: quantity,
+        price: product.priceEstimateMin,
+        quantity: 1,
         slug: product.slug,
       };
       updatedCart = [...currentCart, newItem];

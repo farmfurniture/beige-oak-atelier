@@ -1,9 +1,8 @@
 import "server-only";
 import { cache } from "react";
-import { Product } from "@/models/Product";
+import { Product, ProductsSchema, ProductSchema } from "@/models/Product";
 import { Testimonial, TestimonialsSchema } from "@/models/Common";
 import seedData from "@/data/seed-data.json";
-import { firebaseProductsService } from "@/services/firebase-products.service";
 
 // Cache tags for revalidation
 export const CACHE_TAGS = {
@@ -13,21 +12,25 @@ export const CACHE_TAGS = {
 } as const;
 
 /**
- * Get all published products from Firebase with caching
- * Uses React cache() for deduplication during the request lifecycle
+ * Get all products with caching
+ * Uses React cache() for deduplication and Next.js ISR for periodic revalidation
  */
 export const getProducts = cache(async (): Promise<Product[]> => {
   try {
-    // Fetch published products from Firebase
-    const products = await firebaseProductsService.getPublishedProducts();
-    return products;
+    // In a real app, this would be a fetch to your API/database
+    // For now, we'll use the seed data with proper validation
+    const validatedProducts = ProductsSchema.parse(seedData.products);
+
+    // Simulate async operation
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    return validatedProducts;
   } catch (error) {
     console.error("Failed to fetch products:", error);
     if (error instanceof Error) {
       console.error("Error details:", error.message);
     }
-    // Return empty array instead of throwing to prevent page crashes
-    return [];
+    throw new Error("Failed to fetch products");
   }
 });
 
@@ -50,54 +53,51 @@ export const getProductsByCategory = cache(
 );
 
 /**
- * Get featured products from Firebase
- * Returns products marked as featured in the admin panel
+ * Get featured products (first 4 products)
  */
 export const getFeaturedProducts = cache(async (): Promise<Product[]> => {
   try {
     const products = await getProducts();
-    // Filter products marked as featured, or return first 4 if none are marked
-    const featured = products.filter((product) => product.featured);
-    return featured.length > 0 ? featured.slice(0, 4) : products.slice(0, 4);
+    return products.slice(0, 4);
   } catch (error) {
     console.error("Failed to fetch featured products:", error);
-    return [];
+    throw new Error("Failed to fetch featured products");
   }
 });
 
 /**
- * Get bestseller products from Firebase
- * Returns products tagged as "Bestseller"
+ * Get bestseller products
  */
 export const getBestsellerProducts = cache(async (): Promise<Product[]> => {
   try {
     const products = await getProducts();
-    const bestsellers = products.filter((product) =>
-      product.tags.some((tag) => tag.toLowerCase() === "bestseller")
-    );
-    return bestsellers.slice(0, 3);
+    return products
+      .filter((product) => product.tags.includes("Bestseller"))
+      .slice(0, 3);
   } catch (error) {
     console.error("Failed to fetch bestseller products:", error);
-    return [];
+    throw new Error("Failed to fetch bestseller products");
   }
 });
 
 /**
- * Get single product by slug from Firebase
- * Only returns published products for the public storefront
+ * Get single product by slug
  */
 export const getProductBySlug = cache(
   async (slug: string): Promise<Product | null> => {
     try {
-      // Only fetch published products on the public storefront
-      const product = await firebaseProductsService.getProductBySlug(
-        slug,
-        true
-      );
-      return product;
+      const products = await getProducts();
+      const product = products.find((p) => p.slug === slug);
+
+      if (!product) {
+        return null;
+      }
+
+      // Validate single product
+      return ProductSchema.parse(product);
     } catch (error) {
       console.error(`Failed to fetch product with slug ${slug}:`, error);
-      return null;
+      throw new Error(`Failed to fetch product with slug ${slug}`);
     }
   }
 );
