@@ -1,9 +1,8 @@
-﻿import { Toaster } from "@/components/ui/toaster";
+import type { ReactNode } from "react";
+import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/context/AuthContext";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { Providers } from "@/app/providers";
 import "./globals.css";
 
@@ -11,16 +10,12 @@ import "./globals.css";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "FarmCraft - Premium Handcrafted Furniture",
+  title: "Farm Craft - Premium Handcrafted Furniture",
   description:
     "Premium furniture crafted by master artisans. Each piece tells a story of dedication, quality materials, and timeless design.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
@@ -29,11 +24,7 @@ export default function RootLayout({
             <TooltipProvider>
               <Toaster />
               <Sonner />
-              <div className="flex flex-col min-h-screen">
-                <Header />
-                <main className="flex-1">{children}</main>
-                <Footer />
-              </div>
+              {children}
             </TooltipProvider>
           </AuthProvider>
         </Providers>
