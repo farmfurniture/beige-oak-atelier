@@ -7,20 +7,13 @@ import type { CartItem } from "@/models/Cart";
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (
-    product: {
-      id: string;
-      title: string;
-      image: string;
-      priceEstimateMin: number;
-      salePrice?: number;
-      originalPrice?: number;
-      slug: string;
-      variantId?: string;
-      variantLabel?: string;
-    },
-    quantity?: number
-  ) => void;
+  addToCart: (product: {
+    id: string;
+    title: string;
+    image: string;
+    priceEstimateMin: number;
+    slug: string;
+  }) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -33,104 +26,50 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
 
-  // Helper function to generate composite key
-  const getItemKey = (item: CartItem | { id: string; variantId?: string }) => {
-    return item.variantId ? `${item.id}-${item.variantId}` : item.id;
-  };
-
-  const addToCart = (
-    product: {
-      id: string;
-      title: string;
-      image: string;
-      priceEstimateMin: number;
-      salePrice?: number;
-      originalPrice?: number;
-      slug: string;
-      variantId?: string;
-      variantLabel?: string;
-    },
-    quantity: number = 1
-  ) => {
+  const addToCart = (product: {
+    id: string;
+    title: string;
+    image: string;
+    priceEstimateMin: number;
+    slug: string;
+  }) => {
     setItems((prev) => {
-      // Create a composite key for matching: productId + variantId
-      const itemKey = product.variantId
-        ? `${product.id}-${product.variantId}`
-        : product.id;
-
-      // Find existing item by composite key
-      const existing = prev.find((item) => {
-        const existingKey = item.variantId
-          ? `${item.id}-${item.variantId}`
-          : item.id;
-        return existingKey === itemKey;
-      });
-
+      const existing = prev.find((item) => item.id === product.id);
       if (existing) {
-        const variantText = product.variantLabel
-          ? ` (${product.variantLabel})`
-          : "";
-        toast.success(
-          quantity > 1
-            ? `Added ${quantity} more items to cart${variantText}`
-            : `Updated quantity in cart${variantText}`
+        toast.success("Updated quantity in cart");
+        return prev.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
         );
-        return prev.map((item) => {
-          const existingKey = item.variantId
-            ? `${item.id}-${item.variantId}`
-            : item.id;
-          return existingKey === itemKey
-            ? { ...item, quantity: item.quantity + quantity }
-            : item;
-        });
       }
-
-      // Use sale price if available, otherwise min estimate
-      const price = product.salePrice ?? product.priceEstimateMin;
-      const originalPrice =
-        product.salePrice && product.originalPrice
-          ? product.originalPrice
-          : undefined;
-
-      const variantText = product.variantLabel
-        ? ` (${product.variantLabel})`
-        : "";
-      toast.success(
-        quantity > 1
-          ? `Added ${quantity} items to cart${variantText}`
-          : `Added to cart${variantText}`
-      );
+      toast.success("Added to cart");
       return [
         ...prev,
         {
           id: product.id,
           title: product.title,
           image: product.image,
-          price: price,
-          originalPrice: originalPrice,
-          quantity: quantity,
+          price: product.priceEstimateMin,
+          quantity: 1,
           slug: product.slug,
-          variantId: product.variantId,
-          variantLabel: product.variantLabel,
         },
       ];
     });
   };
 
-  const removeFromCart = (compositeId: string) => {
-    setItems((prev) => prev.filter((item) => getItemKey(item) !== compositeId));
+  const removeFromCart = (id: string) => {
+    setItems((prev) => prev.filter((item) => item.id !== id));
     toast.success("Removed from cart");
   };
 
-  const updateQuantity = (compositeId: string, quantity: number) => {
+  const updateQuantity = (id: string, quantity: number) => {
     if (quantity <= 0) {
-      removeFromCart(compositeId);
+      removeFromCart(id);
       return;
     }
     setItems((prev) =>
-      prev.map((item) =>
-        getItemKey(item) === compositeId ? { ...item, quantity } : item
-      )
+      prev.map((item) => (item.id === id ? { ...item, quantity } : item))
     );
   };
 
