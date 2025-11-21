@@ -13,6 +13,10 @@ export const metadata = {
   title: "Farm Craft - Premium Handcrafted Furniture",
   description:
     "Premium furniture crafted by master artisans. Each piece tells a story of dedication, quality materials, and timeless design.",
+  icons: {
+    icon: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

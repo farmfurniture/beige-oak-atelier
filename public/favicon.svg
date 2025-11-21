@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Background -->
+  <rect width="64" height="64" fill="#F5F1E8" rx="12"/>
+  
+  <!-- Wood grain pattern (subtle beige/oak tones) -->
+  <defs>
+    <linearGradient id="woodGrain" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#D4A574;stop-opacity:0.3" />
+      <stop offset="50%" style="stop-color:#C89968;stop-opacity:0.2" />
+      <stop offset="100%" style="stop-color:#B8885C;stop-opacity:0.3" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="64" height="64" fill="url(#woodGrain)" rx="12"/>
+  
+  <!-- Stylized furniture piece - minimalist chair silhouette -->
+  <!-- Chair back -->
+  <rect x="18" y="12" width="28" height="18" fill="none" stroke="#8B6F47" stroke-width="2.5" rx="2"/>
+  
+  <!-- Chair seat -->
+  <rect x="16" y="28" width="32" height="4" fill="#8B6F47" rx="1"/>
+  
+  <!-- Left leg -->
+  <line x1="22" y1="32" x2="20" y2="48" stroke="#8B6F47" stroke-width="2.5" stroke-linecap="round"/>
+  
+  <!-- Right leg -->
+  <line x1="42" y1="32" x2="44" y2="48" stroke="#8B6F47" stroke-width="2.5" stroke-linecap="round"/>
+  
+  <!-- Front cross support -->
+  <line x1="20" y1="42" x2="44" y2="42" stroke="#8B6F47" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+  
+  <!-- Decorative craft mark - small artisan detail -->
+  <circle cx="32" cy="20" r="1.5" fill="#C89968" opacity="0.6"/>
+</svg>

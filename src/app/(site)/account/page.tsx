@@ -22,18 +22,27 @@ export default function Account() {
     firstName: "",
     lastName: "",
     email: "",
-    phone: ""
+    phone: "",
   });
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push('/sign-in');
-    } else if (user) {
+      router.push("/sign-in");
+      return;
+    }
+
+    if (user) {
+      const fullName = (user.displayName ?? "").trim();
+      const [firstName, ...rest] = fullName.length
+        ? fullName.split(" ")
+        : ["", ""];
+      const lastName = rest.join(" ");
+
       setProfileData({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        phone: "(555) 123-4567"
+        firstName: firstName ?? "",
+        lastName: lastName ?? "",
+        email: user.email ?? "",
+        phone: user.phoneNumber ?? "",
       });
     }
   }, [isAuthenticated, isLoading, user, router]);
@@ -305,10 +314,10 @@ export default function Account() {
                   <Button
                     variant="outline"
                     className="w-full justify-start text-destructive hover:text-destructive"
-                    onClick={() => {
-                      signOut();
+                    onClick={async () => {
+                      await signOut();
                       toast.success("Signed out successfully");
-                      router.push('/');
+                      router.push("/");
                     }}
                   >
                     <LogOut className="h-4 w-4 mr-2" />

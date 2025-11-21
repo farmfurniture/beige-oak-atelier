@@ -62,10 +62,50 @@ export async function middleware(request: NextRequest) {
 
   const response = NextResponse.next();
 
-  response.headers.set(
-    "Content-Security-Policy",
-    "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self';"
-  );
+  const cspDirectives = [
+    "default-src 'self'",
+    [
+      "script-src",
+      "'self'",
+      "'unsafe-eval'",
+      "'unsafe-inline'",
+      "https://www.gstatic.com",
+      "https://www.google.com",
+      "https://www.googletagmanager.com",
+      "https://www.recaptcha.net",
+    ].join(" "),
+    ["style-src", "'self'", "'unsafe-inline'", "https://fonts.googleapis.com"].join(
+      " "
+    ),
+    ["img-src", "'self'", "data:", "https:"].join(" "),
+    ["font-src", "'self'", "data:", "https://fonts.gstatic.com"].join(" "),
+    [
+      "connect-src",
+      "'self'",
+      "https://*.googleapis.com",
+      "https://*.firebaseio.com",
+      "https://www.google-analytics.com",
+      "https://www.google.com",
+      "https://www.gstatic.com",
+      "https://www.recaptcha.net",
+    ].join(" "),
+    [
+      "frame-src",
+      "'self'",
+      "https://www.google.com",
+      "https://recaptcha.google.com",
+      "https://www.recaptcha.net",
+    ].join(" "),
+    [
+      "child-src",
+      "'self'",
+      "https://www.google.com",
+      "https://recaptcha.google.com",
+      "https://www.recaptcha.net",
+    ].join(" "),
+  ].join("; ");
+
+  response.headers.set("Content-Security-Policy", cspDirectives);
   response.headers.set("X-Frame-Options", "DENY");
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("Referrer-Policy", "origin-when-cross-origin");

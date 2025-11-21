@@ -1,77 +1,153 @@
 ﻿"use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  type ReactNode,
+} from "react";
+import type {
+  User as FirebaseUser,
+  ConfirmationResult,
+  ApplicationVerifier,
+} from "firebase/auth";
+import {
+  onAuthStateChanged,
+  sendSignInLinkToEmail,
+  signInWithEmailLink,
+  signOut as firebaseSignOut,
+  signInWithPhoneNumber,
+} from "firebase/auth";
+import { auth } from "@/config/firebase-client";
+import { clientEnv } from "@/config/client-env";
 
-interface User {
-  id: string;
+const EMAIL_LINK_STORAGE_KEY = "farmcraft_email_link_data";
+
+export type EmailLinkFlow = "sign-in" | "sign-up";
+
+export type EmailLinkMetadata = {
+  firstName?: string;
+  lastName?: string;
+};
+
+export type PendingEmailLinkData = {
   email: string;
-  firstName: string;
-  lastName: string;
-}
+  flow: EmailLinkFlow;
+  metadata?: EmailLinkMetadata;
+};
 
 interface AuthContextType {
-  user: User | null;
+  user: FirebaseUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (data: { email: string; password: string; firstName: string; lastName: string }) => Promise<void>;
-  signOut: () => void;
+  sendEmailLink: (
+    email: string,
+    flow: EmailLinkFlow,
+    metadata?: EmailLinkMetadata
+  ) => Promise<void>;
+  completeEmailLinkSignIn: (email: string, link?: string) => Promise<void>;
+  getPendingEmailLinkData: () => PendingEmailLinkData | null;
+  clearPendingEmailLinkData: () => void;
+  sendPhoneOtp: (
+    phoneNumber: string,
+    verifier: ApplicationVerifier
+  ) => Promise<ConfirmationResult>;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<FirebaseUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for stored user session
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setIsLoading(false);
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+      setIsLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const signIn = async (email: string, password: string) => {
-    // Mock authentication - in a real app, this would call an API
-    const mockUser: User = {
-      id: '1',
-      email,
-      firstName: 'John',
-      lastName: 'Doe'
-    };
-    setUser(mockUser);
-    localStorage.setItem('user', JSON.stringify(mockUser));
-  };
+  const sendEmailLink = useCallback(
+    async (email: string, flow: EmailLinkFlow, metadata?: EmailLinkMetadata) => {
+      const actionCodeSettings = {
+        url: `${clientEnv.APP_URL}/auth/verify-email?flow=${flow}`,
+        handleCodeInApp: true,
+      };
 
-  const signUp = async (data: { email: string; password: string; firstName: string; lastName: string }) => {
-    // Mock registration - in a real app, this would call an API
-    const mockUser: User = {
-      id: '1',
-      email: data.email,
-      firstName: data.firstName,
-      lastName: data.lastName
-    };
-    setUser(mockUser);
-    localStorage.setItem('user', JSON.stringify(mockUser));
-  };
+      await sendSignInLinkToEmail(auth, email, actionCodeSettings);
 
-  const signOut = () => {
-    setUser(null);
-    localStorage.removeItem('user');
-  };
+      if (typeof window !== "undefined") {
+        const payload: PendingEmailLinkData = { email, flow, metadata };
+        window.localStorage.setItem(
+          EMAIL_LINK_STORAGE_KEY,
+          JSON.stringify(payload)
+        );
+      }
+    },
+    []
+  );
+
+  const completeEmailLinkSignIn = useCallback(
+    async (email: string, link?: string) => {
+      const targetLink =
+        link ?? (typeof window !== "undefined" ? window.location.href : null);
+
+      if (!targetLink) {
+        throw new Error("No verification link detected");
+      }
+
+      await signInWithEmailLink(auth, email, targetLink);
+    },
+    []
+  );
+
+  const getPendingEmailLinkData = useCallback(() => {
+    if (typeof window === "undefined") return null;
+    const raw = window.localStorage.getItem(EMAIL_LINK_STORAGE_KEY);
+    if (!raw) return null;
+
+    try {
+      return JSON.parse(raw) as PendingEmailLinkData;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const clearPendingEmailLinkData = useCallback(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.removeItem(EMAIL_LINK_STORAGE_KEY);
+  }, []);
+
+  const sendPhoneOtp = useCallback(
+    async (phoneNumber: string, verifier: ApplicationVerifier) => {
+      return signInWithPhoneNumber(auth, phoneNumber, verifier);
+    },
+    []
+  );
+
+  const signOutHandler = useCallback(async () => {
+    await firebaseSignOut(auth);
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      isAuthenticated: !!user, 
-      isLoading,
-      signIn, 
-      signUp, 
-      signOut 
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated: !!user,
+        isLoading,
+        sendEmailLink,
+        completeEmailLinkSignIn,
+        getPendingEmailLinkData,
+        clearPendingEmailLinkData,
+        sendPhoneOtp,
+        signOut: signOutHandler,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -79,6 +155,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within AuthProvider');
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
   return context;
 };
