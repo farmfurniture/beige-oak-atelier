@@ -84,3 +84,22 @@ Email authentication uses a "Magic Link" sent to the user's inbox. Clicking the 
 ### Troubleshooting
 *   **Phone Error (400/Invalid Credential):** Usually means the reCAPTCHA key is blocked or the Fraud Protection settings are too strict. Ensure "Block none" is set in Firebase Console.
 *   **Email Link Invalid:** Links are one-time use. If you click it twice, it will fail. Request a new one.
+
+---
+
+## Deployment Checklist
+
+When deploying to production (e.g., Vercel, Netlify, or custom domain), you **must** update your Firebase configuration:
+
+1.  **Authorized Domains:**
+    *   Go to [Firebase Console](https://console.firebase.google.com/) -> Authentication -> Settings -> Authorized Domains.
+    *   Click **Add Domain**.
+    *   Enter your production domain (e.g., `www.your-furniture-store.com`).
+    *   *Note:* `localhost` and `127.0.0.1` are added by default for development.
+
+2.  **Environment Variables:**
+    *   Ensure all `NEXT_PUBLIC_FIREBASE_*` variables are set in your production environment.
+    *   Ensure `FIREBASE_ADMIN_PRIVATE_KEY` and `FIREBASE_ADMIN_CLIENT_EMAIL` are set for server-side operations.
+
+3.  **reCAPTCHA (Phone Auth):**
+    *   If using reCAPTCHA Enterprise, add your production domain to the allowed domains list in the Google Cloud Console (Security -> reCAPTCHA Enterprise).

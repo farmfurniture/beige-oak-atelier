@@ -17,18 +17,9 @@ import {
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { useRecaptchaVerifier } from "@/hooks/useRecaptchaVerifier";
+import { normalizeIndianPhone } from "@/lib/phone-utils";
 
 const PHONE_RECAPTCHA_ID = "sign-in-phone-recaptcha";
-
-const normalizeIndianPhone = (raw: string) => {
-  const trimmed = raw.trim();
-  if (!trimmed) return "";
-  if (trimmed.startsWith("+")) {
-    return trimmed;
-  }
-  const digitsOnly = trimmed.replace(/\D/g, "");
-  return `+91${digitsOnly}`;
-};
 
 export default function SignIn() {
   const router = useRouter();

@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { useRecaptchaVerifier } from "@/hooks/useRecaptchaVerifier";
 import { firebaseUsersService } from "@/services/firebase-users.service";
+import { normalizeIndianPhone } from "@/lib/phone-utils";
 
 const PHONE_RECAPTCHA_ID = "sign-up-phone-recaptcha";
 
@@ -50,16 +51,6 @@ export default function SignUp() {
       ...prev,
       [name]: value,
     }));
-  };
-
-  const normalizeIndianPhone = (raw: string) => {
-    const trimmed = raw.trim();
-    if (!trimmed) return "";
-    if (trimmed.startsWith("+")) {
-      return trimmed;
-    }
-    const digitsOnly = trimmed.replace(/\D/g, "");
-    return `+91${digitsOnly}`;
   };
 
   const handleSend = async (e: React.FormEvent) => {
