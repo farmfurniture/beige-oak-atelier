@@ -56,12 +56,21 @@ export const firebaseUsersService = {
 
     const payload: Record<string, unknown> = {
       uid: profile.uid,
-      email: profile.email?.trim().toLowerCase() ?? null,
-      phone: profile.phone ?? null,
-      firstName: profile.firstName?.trim() ?? null,
-      lastName: profile.lastName?.trim() ?? null,
       updatedAt: now,
     };
+
+    if (profile.email !== undefined) {
+      payload.email = profile.email?.trim().toLowerCase() ?? null;
+    }
+    if (profile.phone !== undefined) {
+      payload.phone = profile.phone ?? null;
+    }
+    if (profile.firstName !== undefined) {
+      payload.firstName = profile.firstName?.trim() ?? null;
+    }
+    if (profile.lastName !== undefined) {
+      payload.lastName = profile.lastName?.trim() ?? null;
+    }
 
     if (!existing.exists()) {
       payload.createdAt = now;
