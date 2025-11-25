@@ -21,28 +21,49 @@ export default function VerifyEmailPage() {
     getPendingEmailLinkData,
     clearPendingEmailLinkData,
   } = useAuth();
+  
+  const flow = searchParams.get("flow");
+  
   const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  
   const [needsEmailInput, setNeedsEmailInput] = useState(false);
+  const [needsProfileInput, setNeedsProfileInput] = useState(false);
+  
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLinkValid, setIsLinkValid] = useState(false);
 
   const handleCompletion = useCallback(
-    async (emailAddress: string, storedData?: PendingEmailLinkData | null) => {
+    async (
+      emailAddress: string, 
+      storedData?: PendingEmailLinkData | null,
+      manualProfile?: { firstName: string; lastName: string }
+    ) => {
       if (!emailAddress) {
         toast.error("Please enter your email address to continue.");
         return;
       }
+      
+      // If we need profile input but it's missing, don't proceed
+      if (needsProfileInput && (!manualProfile?.firstName || !manualProfile?.lastName)) {
+         toast.error("Please enter your name to complete sign up.");
+         return;
+      }
+
       try {
         setIsProcessing(true);
         const currentLink =
           typeof window !== "undefined" ? window.location.href : undefined;
         await completeEmailLinkSignIn(emailAddress, currentLink);
 
-        if (storedData?.metadata) {
-          const fullName = `${storedData.metadata.firstName ?? ""} ${
-            storedData.metadata.lastName ?? ""
-          }`
+        // Determine names: prefer manual input, then stored metadata
+        const finalFirstName = manualProfile?.firstName ?? storedData?.metadata?.firstName;
+        const finalLastName = manualProfile?.lastName ?? storedData?.metadata?.lastName;
+
+        if (finalFirstName || finalLastName) {
+          const fullName = `${finalFirstName ?? ""} ${finalLastName ?? ""}`
             .trim()
             .replace(/\s+/g, " ");
           if (fullName && auth.currentUser) {
@@ -54,8 +75,8 @@ export default function VerifyEmailPage() {
           await firebaseUsersService.createOrUpdateUser({
             uid: auth.currentUser.uid,
             email: auth.currentUser.email ?? emailAddress,
-            firstName: storedData?.metadata?.firstName,
-            lastName: storedData?.metadata?.lastName,
+            firstName: finalFirstName,
+            lastName: finalLastName,
           });
         }
 
@@ -71,7 +92,7 @@ export default function VerifyEmailPage() {
         setIsProcessing(false);
       }
     },
-    [clearPendingEmailLinkData, completeEmailLinkSignIn, router]
+    [clearPendingEmailLinkData, completeEmailLinkSignIn, router, needsProfileInput]
   );
 
   useEffect(() => {
@@ -85,15 +106,27 @@ export default function VerifyEmailPage() {
     setIsLinkValid(true);
 
     const stored = getPendingEmailLinkData();
+    const isSignUp = flow === "sign-up";
+    const hasMetadata = !!stored?.metadata?.firstName;
+
     if (stored?.email) {
       setEmail(stored.email);
-      handleCompletion(stored.email, stored);
+      
+      // If it's a sign-up flow but we lost the metadata (cross-device), ask for it
+      if (isSignUp && !hasMetadata) {
+        setNeedsProfileInput(true);
+      } else {
+        // We have everything (or it's just sign-in), proceed automatically
+        handleCompletion(stored.email, stored);
+      }
     } else {
+      // Missing email (cross-device)
       setNeedsEmailInput(true);
+      if (isSignUp) {
+        setNeedsProfileInput(true);
+      }
     }
-  }, [getPendingEmailLinkData, handleCompletion]);
-
-  const flow = searchParams.get("flow");
+  }, [getPendingEmailLinkData, handleCompletion, flow]);
 
   if (!isLinkValid) {
     return (
@@ -114,6 +147,8 @@ export default function VerifyEmailPage() {
     );
   }
 
+  const showForm = needsEmailInput || needsProfileInput;
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-secondary/10 px-4 py-12">
       <Card className="w-full max-w-md p-8 space-y-6">
@@ -123,7 +158,7 @@ export default function VerifyEmailPage() {
           </h1>
           <p className="text-muted-foreground">
             {flow === "sign-up"
-              ? "Confirm your email to finish creating your account."
+              ? "Confirm your details to finish creating your account."
               : "Confirm your email to sign back in."}
           </p>
         </div>
@@ -134,27 +169,55 @@ export default function VerifyEmailPage() {
           </div>
         )}
 
-        {needsEmailInput ? (
+        {showForm ? (
           <form
             onSubmit={(event) => {
               event.preventDefault();
-              handleCompletion(email);
+              handleCompletion(email, null, { firstName, lastName });
             }}
             className="space-y-4"
           >
-            <div className="space-y-2">
-              <Label htmlFor="email">Confirm your email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                placeholder="your.email@example.com"
-                required
-              />
-            </div>
+            {needsEmailInput && (
+              <div className="space-y-2">
+                <Label htmlFor="email">Confirm your email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="your.email@example.com"
+                  required
+                />
+              </div>
+            )}
+            
+            {needsProfileInput && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input
+                    id="firstName"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="John"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input
+                    id="lastName"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Doe"
+                    required
+                  />
+                </div>
+              </div>
+            )}
+
             <Button type="submit" className="w-full" disabled={isProcessing}>
-              {isProcessing ? "Verifying..." : "Verify email"}
+              {isProcessing ? "Verifying..." : "Verify & Continue"}
             </Button>
           </form>
         ) : (
