@@ -88,6 +88,8 @@ export async function middleware(request: NextRequest) {
       "https://www.google.com",
       "https://www.gstatic.com",
       "https://www.recaptcha.net",
+      "ws:",
+      "wss:",
     ].join(" "),
     [
       "frame-src",
