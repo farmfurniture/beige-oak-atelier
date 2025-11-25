@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getFirebaseAdminDb } from "@/lib/server/firebase-admin";
+import rateLimit from "@/lib/rate-limit";
+import { headers } from "next/headers";
+
+const limiter = rateLimit({
+  interval: 60 * 1000, // 60 seconds
+  uniqueTokenPerInterval: 500, // Max 500 users per second
+});
 
 const requestSchema = z
   .object({
@@ -12,44 +18,27 @@ const requestSchema = z
     "Provide an email or phone number"
   );
 
-const normalizePhone = (raw: string) => {
-  const trimmed = raw.trim();
-  if (!trimmed) return "";
-  if (trimmed.startsWith("+")) {
-    return trimmed;
-  }
-  const digits = trimmed.replace(/\D/g, "");
-  return `+91${digits}`;
-};
-
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { email, phone } = requestSchema.parse(body);
-
-    const db = await getFirebaseAdminDb();
-    let exists = false;
-
-    if (email) {
-      const snapshot = await db
-        .collection("users")
-        .where("email", "==", email.trim().toLowerCase())
-        .limit(1)
-        .get();
-      exists = !snapshot.empty;
-    } else if (phone) {
-      const normalized = normalizePhone(phone);
-      if (normalized) {
-        const snapshot = await db
-          .collection("users")
-          .where("phone", "==", normalized)
-          .limit(1)
-          .get();
-        exists = !snapshot.empty;
-      }
+    // Rate Limiting
+    const ip = headers().get("x-forwarded-for") ?? "127.0.0.1";
+    try {
+      await limiter.check(10, ip); // 10 requests per minute per IP
+    } catch {
+      return NextResponse.json(
+        { error: "Too many requests" },
+        { status: 429 }
+      );
     }
 
-    return NextResponse.json({ exists });
+    const body = await request.json();
+    // Validate body but ignore the result
+    requestSchema.parse(body);
+
+    // Always return exists: false to prevent enumeration
+    // The client will proceed to try to send OTP/Link
+    // If the user exists, the auth flow will handle it (e.g. logging them in or merging)
+    return NextResponse.json({ exists: false });
   } catch (error) {
     console.error("User existence check failed:", error);
     if (error instanceof z.ZodError) {
