@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import rateLimit from "@/lib/rate-limit";
 import { headers } from "next/headers";
+import { getFirebaseAdminDb } from "@/lib/server/firebase-admin";
+import { normalizeIndianPhone } from "@/lib/phone-utils";
 
 const limiter = rateLimit({
   interval: 60 * 1000, // 60 seconds
@@ -32,13 +34,31 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    // Validate body but ignore the result
-    requestSchema.parse(body);
+    const { email, phone } = requestSchema.parse(body);
 
-    // Always return exists: false to prevent enumeration
-    // The client will proceed to try to send OTP/Link
-    // If the user exists, the auth flow will handle it (e.g. logging them in or merging)
-    return NextResponse.json({ exists: false });
+    const db = await getFirebaseAdminDb();
+    let exists = false;
+
+    if (email) {
+      const snapshot = await db
+        .collection("users")
+        .where("email", "==", email.trim().toLowerCase())
+        .limit(1)
+        .get();
+      exists = !snapshot.empty;
+    } else if (phone) {
+      const normalized = normalizeIndianPhone(phone);
+      if (normalized) {
+        const snapshot = await db
+          .collection("users")
+          .where("phone", "==", normalized)
+          .limit(1)
+          .get();
+        exists = !snapshot.empty;
+      }
+    }
+
+    return NextResponse.json({ exists });
   } catch (error) {
     console.error("User existence check failed:", error);
     if (error instanceof z.ZodError) {

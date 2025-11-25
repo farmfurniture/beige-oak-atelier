@@ -53,6 +53,25 @@ export default function SignUp() {
     }));
   };
 
+  const checkUserExists = async (payload: { email?: string; phone?: string }) => {
+    const response = await fetch("/api/users/exists", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const raw = await response.text();
+    const data = raw ? (JSON.parse(raw) as { exists?: boolean; error?: string }) : {};
+
+    if (!response.ok) {
+      throw new Error(data.error || "Unable to verify account status");
+    }
+
+    return Boolean(data.exists);
+  };
+
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -74,6 +93,15 @@ export default function SignUp() {
           setIsSending(false);
           return;
         }
+        const normalizedEmail = formData.email.trim().toLowerCase();
+        const existingUser = await checkUserExists({
+          email: normalizedEmail,
+        });
+        if (existingUser) {
+          toast.error("An account with this email already exists. Please sign in.");
+          setIsSending(false);
+          return;
+        }
         await sendEmailLink(formData.email, "sign-up", {
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -89,6 +117,13 @@ export default function SignUp() {
         return;
       }
       
+      const existingUser = await checkUserExists({ phone: normalizedPhone });
+      if (existingUser) {
+        toast.error("An account with this phone number already exists. Please sign in.");
+        setIsSending(false);
+        return;
+      }
+
       const verifier = await getRecaptchaVerifier();
       const confirmation = await sendPhoneOtp(normalizedPhone, verifier);
       setConfirmationResult(confirmation);
