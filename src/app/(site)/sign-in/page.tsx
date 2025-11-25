@@ -45,25 +45,6 @@ export default function SignIn() {
   const [isVerifying, setIsVerifying] = useState(false);
   const [smsRequested, setSmsRequested] = useState(false);
 
-  const checkUserExists = async (payload: { email?: string; phone?: string }) => {
-    const response = await fetch("/api/users/exists", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    const raw = await response.text();
-    const data = raw ? (JSON.parse(raw) as { exists?: boolean; error?: string }) : {};
-
-    if (!response.ok) {
-      throw new Error(data.error || "Unable to verify account status");
-    }
-
-    return Boolean(data.exists);
-  };
-
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -77,12 +58,6 @@ export default function SignIn() {
           return;
         }
         const normalizedEmail = email.trim().toLowerCase();
-        const existingUser = await checkUserExists({ email: normalizedEmail });
-        if (!existingUser) {
-          toast.error("No account found for this email. Please create one first.");
-          setIsSending(false);
-          return;
-        }
         await sendEmailLink(normalizedEmail, "sign-in");
         toast.success("Check your inbox for a secure login link.");
         return;
@@ -91,13 +66,6 @@ export default function SignIn() {
       const normalizedPhone = normalizeIndianPhone(phone);
       if (!normalizedPhone || normalizedPhone.length < 4) {
         toast.error("Enter a valid Indian mobile number (we auto-prefix +91).");
-        setIsSending(false);
-        return;
-      }
-
-      const existingUser = await checkUserExists({ phone: normalizedPhone });
-      if (!existingUser) {
-        toast.error("No account found for this phone number. Please sign up first.");
         setIsSending(false);
         return;
       }
