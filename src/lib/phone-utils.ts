@@ -2,7 +2,8 @@ export const normalizeIndianPhone = (raw: string) => {
   const trimmed = raw.trim();
   if (!trimmed) return "";
   if (trimmed.startsWith("+")) {
-    return trimmed;
+    // Keep the + but remove any other non-digits (spaces, dashes, parens)
+    return "+" + trimmed.replace(/\D/g, "");
   }
   
   // Remove non-digits
