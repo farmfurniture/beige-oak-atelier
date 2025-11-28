@@ -7,6 +7,7 @@ A Next.js e-commerce application for premium handcrafted furniture.
 - Browse furniture catalog with filtering and sorting
 - Shopping cart functionality
 - Custom order requests
+- Passwordless authentication with Firebase email links and SMS OTP
 - Responsive design with Tailwind CSS
 - Modern UI components with Radix UI
 

@@ -37,6 +37,9 @@ export const EnvSchema = z.object({
   STRIPE_PUBLISHABLE_KEY: z.string().optional(),
   STRIPE_SECRET_KEY: z.string().optional(),
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
+  FIREBASE_ADMIN_PROJECT_ID: z.string().optional(),
+  FIREBASE_ADMIN_CLIENT_EMAIL: z.string().optional(),
+  FIREBASE_ADMIN_PRIVATE_KEY: z.string().optional(),
 });
 
 const parsedEnv = EnvSchema.safeParse({
@@ -62,6 +65,9 @@ const parsedEnv = EnvSchema.safeParse({
   STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY,
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
   STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+  FIREBASE_ADMIN_PROJECT_ID: process.env.FIREBASE_ADMIN_PROJECT_ID,
+  FIREBASE_ADMIN_CLIENT_EMAIL: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
+  FIREBASE_ADMIN_PRIVATE_KEY: process.env.FIREBASE_ADMIN_PRIVATE_KEY,
 });
 
 if (!parsedEnv.success) {
