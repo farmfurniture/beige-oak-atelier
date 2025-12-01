@@ -23,15 +23,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <Providers>
-          <AuthProvider>
+        <AuthProvider>
+          <Providers>
             <TooltipProvider>
               <Toaster />
               <Sonner />
               {children}
             </TooltipProvider>
-          </AuthProvider>
-        </Providers>
+          </Providers>
+        </AuthProvider>
       </body>
     </html>
   );

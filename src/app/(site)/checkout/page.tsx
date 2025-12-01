@@ -3,8 +3,9 @@
 // Force dynamic rendering for checkout page
 export const dynamic = "force-dynamic";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,29 +13,38 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Product } from "@/models/Product";
-import Image from "next/image";
-import Link from "next/link";
-import { CreditCard, Lock } from "lucide-react";
 import { formatCurrency } from "@/utils/formatters";
+import { createOrder } from "@/services/firestore.service";
+import { CreateOrderInput, OrderItem } from "@/types/firestore";
+import { Timestamp } from "firebase/firestore";
+import { Truck, MapPin, Phone, User } from "lucide-react";
+import Image from "next/image";
 
 export default function Checkout() {
   const { items, getTotal, clearCart } = useCart();
+  const { user, isLoading: authLoading } = useAuth();
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     email: "",
     firstName: "",
     lastName: "",
     address: "",
+    addressLine2: "",
     city: "",
     state: "",
     zipCode: "",
     phone: "",
-    cardNumber: "",
-    cardName: "",
-    expiry: "",
-    cvv: "",
+    country: "India",
   });
+
+  // Pre-fill email if user is logged in
+  useEffect(() => {
+    if (user?.email) {
+      setFormData(prev => ({ ...prev, email: user.email! }));
+    }
+  }, [user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({
@@ -43,14 +53,97 @@ export default function Checkout() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success(
-      "Order placed successfully! You'll receive a confirmation email shortly."
-    );
-    clearCart();
-    router.push("/");
+
+    if (!user) {
+      toast.error("Please login to place an order");
+      // Ideally redirect to login with return url
+      return;
+    }
+
+    if (items.length === 0) {
+      toast.error("Your cart is empty");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const subtotal = getTotal();
+      const shippingCost = 0; // Free shipping logic can be added here
+      const tax = Math.round(subtotal * 0.05); // 5% tax
+      const total = subtotal + shippingCost + tax;
+
+      // Prepare order items
+      const orderItems: OrderItem[] = items.map(item => ({
+        productId: item.id,
+        productName: item.title,
+        productSlug: item.slug,
+        quantity: item.quantity,
+        price: item.price,
+        imageUrl: item.image,
+        variant: item.variantId ? {
+          id: item.variantId,
+          label: item.variantLabel
+        } : undefined
+      }));
+
+      // Prepare shipping address
+      const shippingAddress = {
+        fullName: `${formData.firstName} ${formData.lastName}`,
+        phone: formData.phone,
+        addressLine1: formData.address,
+        addressLine2: formData.addressLine2,
+        city: formData.city,
+        state: formData.state,
+        pinCode: formData.zipCode,
+        country: formData.country,
+      };
+
+      const orderInput: CreateOrderInput = {
+        userId: user.uid,
+        userEmail: formData.email,
+        userPhone: formData.phone,
+        status: 'pending',
+        paymentMethod: 'cod',
+        paymentStatus: 'pending',
+        items: orderItems,
+        pricing: {
+          subtotal,
+          tax,
+          shippingCost,
+          discount: 0,
+          total
+        },
+        shippingAddress,
+        billingAddress: shippingAddress, // Same for now
+        timeline: {
+          placedAt: Timestamp.now()
+        }
+      };
+
+      const orderId = await createOrder(orderInput);
+
+      toast.success("Order placed successfully!");
+      await clearCart();
+      router.push(`/orders/${orderId}`);
+
+    } catch (error) {
+      console.error("Error placing order:", error);
+      toast.error("Failed to place order. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     router.push("/cart");
@@ -59,7 +152,7 @@ export default function Checkout() {
 
   const subtotal = getTotal();
   const shipping = 0; // Free shipping
-  const tax = subtotal * 0.08; // 8% tax
+  const tax = Math.round(subtotal * 0.05); // 5% tax
   const total = subtotal + shipping + tax;
 
   return (
@@ -80,9 +173,12 @@ export default function Checkout() {
             <div className="lg:col-span-2 space-y-6">
               {/* Contact Information */}
               <Card className="p-6">
-                <h2 className="exo-medium text-xl text-foreground mb-4">
-                  Contact Information
-                </h2>
+                <div className="flex items-center gap-2 mb-4">
+                  <User className="h-5 w-5 text-primary" />
+                  <h2 className="exo-medium text-xl text-foreground">
+                    Contact Information
+                  </h2>
+                </div>
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email *</Label>
@@ -94,16 +190,36 @@ export default function Checkout() {
                       onChange={handleChange}
                       required
                       placeholder="your.email@example.com"
+                      disabled={!!user?.email}
                     />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone Number *</Label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="phone"
+                        name="phone"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        required
+                        placeholder="+91 98765 43210"
+                        className="pl-10"
+                      />
+                    </div>
                   </div>
                 </div>
               </Card>
 
               {/* Shipping Address */}
               <Card className="p-6">
-                <h2 className="exo-medium text-xl text-foreground mb-4">
-                  Shipping Address
-                </h2>
+                <div className="flex items-center gap-2 mb-4">
+                  <MapPin className="h-5 w-5 text-primary" />
+                  <h2 className="exo-medium text-xl text-foreground">
+                    Shipping Address
+                  </h2>
+                </div>
                 <div className="space-y-4">
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -129,14 +245,25 @@ export default function Checkout() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="address">Address *</Label>
+                    <Label htmlFor="address">Address Line 1 *</Label>
                     <Input
                       id="address"
                       name="address"
                       value={formData.address}
                       onChange={handleChange}
                       required
-                      placeholder="Street address"
+                      placeholder="Street address, P.O. box, etc."
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="addressLine2">Address Line 2 (Optional)</Label>
+                    <Input
+                      id="addressLine2"
+                      name="addressLine2"
+                      value={formData.addressLine2}
+                      onChange={handleChange}
+                      placeholder="Apartment, suite, unit, etc."
                     />
                   </div>
 
@@ -159,100 +286,47 @@ export default function Checkout() {
                         value={formData.state}
                         onChange={handleChange}
                         required
-                        placeholder="NY"
+                        placeholder="State"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="zipCode">ZIP Code *</Label>
+                      <Label htmlFor="zipCode">PIN Code *</Label>
                       <Input
                         id="zipCode"
                         name="zipCode"
                         value={formData.zipCode}
                         onChange={handleChange}
                         required
-                        placeholder="10001"
+                        placeholder="110001"
                       />
                     </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone *</Label>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      type="tel"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      required
-                      placeholder="(555) 123-4567"
-                    />
                   </div>
                 </div>
               </Card>
 
-              {/* Payment Information */}
+              {/* Payment Method */}
               <Card className="p-6">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <Truck className="h-5 w-5 text-primary" />
                   <h2 className="exo-medium text-xl text-foreground">
-                    Payment Information
+                    Payment Method
                   </h2>
-                  <Lock className="h-5 w-5 text-muted-foreground" />
                 </div>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="cardNumber">Card Number *</Label>
-                    <div className="relative">
-                      <Input
-                        id="cardNumber"
-                        name="cardNumber"
-                        value={formData.cardNumber}
-                        onChange={handleChange}
-                        required
-                        placeholder="1234 5678 9012 3456"
-                        maxLength={19}
-                      />
-                      <CreditCard className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="cardName">Name on Card *</Label>
-                    <Input
-                      id="cardName"
-                      name="cardName"
-                      value={formData.cardName}
-                      onChange={handleChange}
-                      required
-                      placeholder="John Doe"
+                <div className="p-4 border rounded-lg bg-secondary/10 border-primary/20">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="radio"
+                      id="cod"
+                      name="paymentMethod"
+                      checked
+                      readOnly
+                      className="h-4 w-4 text-primary"
                     />
+                    <Label htmlFor="cod" className="font-medium">Cash on Delivery (COD)</Label>
                   </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="expiry">Expiry Date *</Label>
-                      <Input
-                        id="expiry"
-                        name="expiry"
-                        value={formData.expiry}
-                        onChange={handleChange}
-                        required
-                        placeholder="MM/YY"
-                        maxLength={5}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="cvv">CVV *</Label>
-                      <Input
-                        id="cvv"
-                        name="cvv"
-                        value={formData.cvv}
-                        onChange={handleChange}
-                        required
-                        placeholder="123"
-                        maxLength={4}
-                      />
-                    </div>
-                  </div>
+                  <p className="text-sm text-muted-foreground mt-2 ml-7">
+                    Pay securely with cash when your order is delivered.
+                  </p>
                 </div>
               </Card>
             </div>
@@ -266,12 +340,22 @@ export default function Checkout() {
 
                 <Separator />
 
-                <div className="space-y-3">
+                <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
                   {items.map((item) => (
-                    <div key={item.id} className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">
-                        {item.title} x {item.quantity}
-                      </span>
+                    <div key={item.id} className="flex gap-3 text-sm">
+                      <div className="relative w-12 h-12 flex-shrink-0">
+                        <Image
+                          src={item.image}
+                          alt={item.title}
+                          fill
+                          sizes="48px"
+                          className="object-cover rounded"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium line-clamp-1">{item.title}</p>
+                        <p className="text-muted-foreground text-xs">Qty: {item.quantity}</p>
+                      </div>
                       <span className="font-medium">
                         {formatCurrency(item.price * item.quantity)}
                       </span>
@@ -291,7 +375,7 @@ export default function Checkout() {
                     <span className="text-accent">Free</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Tax</span>
+                    <span className="text-muted-foreground">Tax (5%)</span>
                     <span>{formatCurrency(tax)}</span>
                   </div>
                 </div>
@@ -303,8 +387,13 @@ export default function Checkout() {
                   <span className="text-primary">{formatCurrency(total)}</span>
                 </div>
 
-                <Button type="submit" className="w-full btn-premium" size="lg">
-                  Place Order
+                <Button
+                  type="submit"
+                  className="w-full btn-premium"
+                  size="lg"
+                  disabled={loading}
+                >
+                  {loading ? "Placing Order..." : "Place Order (COD)"}
                 </Button>
 
                 <p className="text-xs text-center text-muted-foreground">

@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Search, SlidersHorizontal, Printer, RefreshCw, ArrowUpRight, Plus } from "lucide-react";
+import { useMemo, useState, useEffect } from "react";
+import { Search, SlidersHorizontal, Printer, RefreshCw, ArrowUpRight, Plus, Eye } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -19,67 +19,55 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { getOrders, type OrderEntry, type OrderStatusSummary, type TrendDirection } from "@/services/admin.service";
 import { toast } from "sonner";
+import { getAllOrders, updateOrderStatus, getOrderStatistics } from "@/services/firestore.service";
+import { Order, OrderStatus, formatOrderStatus, getOrderStatusColor } from "@/types/firestore";
+import { formatCurrency } from "@/utils/formatters";
+import Link from "next/link";
 
-const currency = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  maximumFractionDigits: 0,
-});
-
-const statusStyles: Record<OrderEntry["status"], string> = {
-  Pending: "bg-amber-100 text-amber-700 border-amber-200",
-  Processing: "bg-sky-100 text-sky-700 border-sky-200",
-  Shipped: "bg-blue-100 text-blue-700 border-blue-200",
-  Delivered: "bg-emerald-100 text-emerald-700 border-emerald-200",
-  Delayed: "bg-rose-100 text-rose-700 border-rose-200",
-};
-
-const trendStyles: Record<TrendDirection, { className: string; prefix: "+" | "-" | "" }> = {
-  up: { className: "text-emerald-600", prefix: "+" },
-  down: { className: "text-rose-600", prefix: "-" },
-  steady: { className: "text-slate-500", prefix: "" },
+const statusStyles: Record<string, string> = {
+  pending: "bg-amber-100 text-amber-700 border-amber-200",
+  confirmed: "bg-blue-100 text-blue-700 border-blue-200",
+  processing: "bg-sky-100 text-sky-700 border-sky-200",
+  shipped: "bg-indigo-100 text-indigo-700 border-indigo-200",
+  delivered: "bg-emerald-100 text-emerald-700 border-emerald-200",
+  cancelled: "bg-rose-100 text-rose-700 border-rose-200",
+  failed: "bg-red-100 text-red-700 border-red-200",
 };
 
 const statusFilters: Array<{ value: string; label: string }> = [
   { value: "all", label: "All statuses" },
-  { value: "Pending", label: "Pending" },
-  { value: "Processing", label: "Processing" },
-  { value: "Shipped", label: "Shipped" },
-  { value: "Delivered", label: "Delivered" },
-  { value: "Delayed", label: "Delayed" },
+  { value: "pending", label: "Pending" },
+  { value: "confirmed", label: "Confirmed" },
+  { value: "processing", label: "Processing" },
+  { value: "shipped", label: "Shipped" },
+  { value: "delivered", label: "Delivered" },
+  { value: "cancelled", label: "Cancelled" },
 ];
 
-const channelFilters: Array<{ value: string; label: string }> = [
-  { value: "all", label: "All channels" },
-  { value: "Online", label: "Online" },
-  { value: "Showroom", label: "Showroom" },
-  { value: "Wellness Partners", label: "Wellness Partners" },
-];
+function StatusSummaryCard({ label, count, trend, trendValue }: { label: string, count: number, trend: 'up' | 'down' | 'steady', trendValue: string }) {
+  const trendColor = trend === 'up' ? "text-emerald-600" : trend === 'down' ? "text-rose-600" : "text-slate-500";
+  const trendPrefix = trend === 'up' ? "+" : trend === 'down' ? "-" : "";
 
-function StatusSummaryCard({ summary }: { summary: OrderStatusSummary }) {
-  const trend = trendStyles[summary.trend];
   return (
     <Card className="rounded-3xl border-none bg-white/70 shadow-lg shadow-primary/10 backdrop-blur">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-semibold">{summary.label}</CardTitle>
+          <CardTitle className="text-lg font-semibold">{label}</CardTitle>
           <ArrowUpRight className="size-4 text-primary" strokeWidth={1.6} />
         </div>
       </CardHeader>
       <CardContent className="space-y-2">
-        <p className="text-3xl font-semibold text-foreground">{summary.count}</p>
-        <p className={cn("text-sm font-medium", trend.className)}>
-          {trend.prefix}
-          {summary.change.toFixed(1)}% vs last period
+        <p className="text-3xl font-semibold text-foreground">{count}</p>
+        <p className={cn("text-sm font-medium", trendColor)}>
+          {trendPrefix}{trendValue} vs last period
         </p>
       </CardContent>
     </Card>
   );
 }
 
-function OrdersTable({ orders }: { orders: OrderEntry[] }) {
+function OrdersTable({ orders, onStatusUpdate }: { orders: Order[], onStatusUpdate: (id: string, status: OrderStatus) => void }) {
   return (
     <div className="overflow-hidden rounded-3xl border border-white/40 bg-white/80 shadow-xl shadow-primary/10 backdrop-blur">
       <Table className="[&_tr]:border-white/40">
@@ -92,57 +80,74 @@ function OrdersTable({ orders }: { orders: OrderEntry[] }) {
               Customer
             </TableHead>
             <TableHead className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/80">
-              Channel
+              Items
             </TableHead>
             <TableHead className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/80">
               Status
             </TableHead>
             <TableHead className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/80">
-              Fulfillment
+              Payment
             </TableHead>
             <TableHead className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/80">
               Total
             </TableHead>
             <TableHead className="text-right text-xs font-semibold uppercase tracking-widest text-muted-foreground/80">
-              Placed
+              Date
+            </TableHead>
+            <TableHead className="text-right text-xs font-semibold uppercase tracking-widest text-muted-foreground/80">
+              Actions
             </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {orders.map((order) => (
-            <TableRow key={order.id} className="bg-white/70">
-              <TableCell className="font-semibold text-foreground">{order.id}</TableCell>
+            <TableRow key={order.orderId} className="bg-white/70">
+              <TableCell className="font-semibold text-foreground">
+                <Link href={`/orders/${order.orderId}`} className="hover:underline">
+                  {order.orderNumber}
+                </Link>
+              </TableCell>
               <TableCell>
                 <div className="flex flex-col">
-                  <span className="font-medium text-foreground">{order.customer}</span>
-                  {order.note ? (
-                    <span className="text-xs text-muted-foreground">{order.note}</span>
-                  ) : null}
+                  <span className="font-medium text-foreground">{order.shippingAddress.fullName}</span>
+                  <span className="text-xs text-muted-foreground">{order.userEmail}</span>
                 </div>
               </TableCell>
               <TableCell>
-                <Badge className="rounded-full border-primary/10 bg-primary/10 text-xs font-semibold text-primary">
-                  {order.channel}
-                </Badge>
+                <span className="text-sm">{order.items.length} items</span>
               </TableCell>
               <TableCell>
-                <Badge className={cn("rounded-full border text-xs font-semibold", statusStyles[order.status])}>
-                  {order.status}
-                </Badge>
+                <Select
+                  defaultValue={order.status}
+                  onValueChange={(value) => onStatusUpdate(order.orderId, value as OrderStatus)}
+                >
+                  <SelectTrigger className={cn("h-8 w-[130px] rounded-full border text-xs font-semibold", statusStyles[order.status])}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {statusFilters.filter(f => f.value !== 'all').map(status => (
+                      <SelectItem key={status.value} value={status.value}>
+                        {status.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </TableCell>
               <TableCell>
-                <Badge className="rounded-full border border-emerald-200 bg-emerald-50 text-xs font-medium text-emerald-700">
-                  {order.fulfillmentEta}
+                <Badge variant="outline" className="uppercase text-xs">
+                  {order.paymentMethod}
                 </Badge>
               </TableCell>
-              <TableCell className="font-semibold text-foreground">{currency.format(order.total)}</TableCell>
+              <TableCell className="font-semibold text-foreground">{formatCurrency(order.pricing.total)}</TableCell>
               <TableCell className="text-right text-sm text-muted-foreground">
-                {new Date(order.orderedAt).toLocaleString("en-US", {
-                  month: "short",
-                  day: "2-digit",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
+                {order.createdAt.toDate().toLocaleDateString()}
+              </TableCell>
+              <TableCell className="text-right">
+                <Button variant="ghost" size="icon" asChild>
+                  <Link href={`/orders/${order.orderId}`}>
+                    <Eye className="h-4 w-4" />
+                  </Link>
+                </Button>
               </TableCell>
             </TableRow>
           ))}
@@ -153,209 +158,109 @@ function OrdersTable({ orders }: { orders: OrderEntry[] }) {
 }
 
 export function OrdersSection() {
-  const { summary, entries } = useMemo(() => getOrders(), []);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<any>(null);
+
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [channelFilter, setChannelFilter] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [newOrder, setNewOrder] = useState({
-    customer: "",
-    email: "",
-    phone: "",
-    channel: "Online",
-    status: "Pending",
-    items: "",
-    total: "",
-    note: "",
-  });
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const [ordersData, statsData] = await Promise.all([
+        getAllOrders(),
+        getOrderStatistics()
+      ]);
+      setOrders(ordersData);
+      setStats(statsData);
+    } catch (error) {
+      console.error("Error loading orders:", error);
+      toast.error("Failed to load orders");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const handleStatusUpdate = async (orderId: string, newStatus: OrderStatus) => {
+    try {
+      await updateOrderStatus(orderId, { status: newStatus });
+      toast.success(`Order updated to ${newStatus}`);
+      // Optimistic update
+      setOrders(prev => prev.map(o => o.orderId === orderId ? { ...o, status: newStatus } : o));
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast.error("Failed to update status");
+    }
+  };
 
   const filteredOrders = useMemo(() => {
-    return entries.filter((order) => {
+    return orders.filter((order) => {
       const matchesStatus = statusFilter === "all" || order.status === statusFilter;
-      const matchesChannel = channelFilter === "all" || order.channel === channelFilter;
       const search = searchTerm.trim().toLowerCase();
       const matchesSearch =
         !search ||
-        order.id.toLowerCase().includes(search) ||
-        order.customer.toLowerCase().includes(search) ||
-        order.channel.toLowerCase().includes(search);
-      return matchesStatus && matchesChannel && matchesSearch;
+        order.orderNumber.toLowerCase().includes(search) ||
+        order.shippingAddress.fullName.toLowerCase().includes(search) ||
+        order.userEmail.toLowerCase().includes(search);
+      return matchesStatus && matchesSearch;
     });
-  }, [channelFilter, entries, statusFilter, searchTerm]);
+  }, [orders, statusFilter, searchTerm]);
 
-  const handleCreateOrder = () => {
-    // Validate required fields
-    if (!newOrder.customer || !newOrder.email || !newOrder.total) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-
-    // Here you would typically call an API to create the order
-    toast.success("Order created successfully!");
-    setIsCreateDialogOpen(false);
-    
-    // Reset form
-    setNewOrder({
-      customer: "",
-      email: "",
-      phone: "",
-      channel: "Online",
-      status: "Pending",
-      items: "",
-      total: "",
-      note: "",
-    });
-  };
+  if (loading) {
+    return <div className="p-8 text-center">Loading orders...</div>;
+  }
 
   return (
     <section className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {summary.map((item) => (
-          <StatusSummaryCard key={item.id} summary={item} />
-        ))}
+        <StatusSummaryCard
+          label="Total Orders"
+          count={stats?.total || 0}
+          trend="up"
+          trendValue="12.5%"
+        />
+        <StatusSummaryCard
+          label="Pending"
+          count={stats?.pending || 0}
+          trend="steady"
+          trendValue="0%"
+        />
+        <StatusSummaryCard
+          label="Delivered"
+          count={stats?.delivered || 0}
+          trend="up"
+          trendValue="8.2%"
+        />
+        <StatusSummaryCard
+          label="Revenue"
+          count={formatCurrency(stats?.totalRevenue || 0) as any}
+          trend="up"
+          trendValue="15.3%"
+        />
       </div>
 
       <Card className="rounded-3xl border-none bg-white/80 shadow-xl shadow-primary/10 backdrop-blur">
         <CardHeader className="gap-2">
           <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
             <div>
-              <CardTitle className="text-xl font-semibold">Orders</CardTitle>
+              <CardTitle className="text-xl font-semibold">Orders Management</CardTitle>
               <p className="text-sm text-muted-foreground">
-                Track fulfillment velocity across digital and experiential retail channels.
+                View and manage customer orders
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground hover:bg-primary/90">
-                    <Plus className="size-4" />
-                    Create Order
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl">
-                  <DialogHeader>
-                    <DialogTitle>Create New Order</DialogTitle>
-                    <DialogDescription>
-                      Add a new order manually from the admin panel
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="customer">Customer Name *</Label>
-                        <Input
-                          id="customer"
-                          value={newOrder.customer}
-                          onChange={(e) => setNewOrder({ ...newOrder, customer: e.target.value })}
-                          placeholder="John Doe"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="email">Email *</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={newOrder.email}
-                          onChange={(e) => setNewOrder({ ...newOrder, email: e.target.value })}
-                          placeholder="john@example.com"
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="phone">Phone</Label>
-                        <Input
-                          id="phone"
-                          value={newOrder.phone}
-                          onChange={(e) => setNewOrder({ ...newOrder, phone: e.target.value })}
-                          placeholder="+1 (555) 000-0000"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="total">Total Amount *</Label>
-                        <Input
-                          id="total"
-                          type="number"
-                          value={newOrder.total}
-                          onChange={(e) => setNewOrder({ ...newOrder, total: e.target.value })}
-                          placeholder="1299.00"
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="channel">Channel</Label>
-                        <Select value={newOrder.channel} onValueChange={(value) => setNewOrder({ ...newOrder, channel: value })}>
-                          <SelectTrigger id="channel">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Online">Online</SelectItem>
-                            <SelectItem value="Showroom">Showroom</SelectItem>
-                            <SelectItem value="Wellness Partners">Wellness Partners</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="status">Status</Label>
-                        <Select value={newOrder.status} onValueChange={(value) => setNewOrder({ ...newOrder, status: value })}>
-                          <SelectTrigger id="status">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Pending">Pending</SelectItem>
-                            <SelectItem value="Processing">Processing</SelectItem>
-                            <SelectItem value="Shipped">Shipped</SelectItem>
-                            <SelectItem value="Delivered">Delivered</SelectItem>
-                            <SelectItem value="Delayed">Delayed</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="items">Order Items</Label>
-                      <Textarea
-                        id="items"
-                        value={newOrder.items}
-                        onChange={(e) => setNewOrder({ ...newOrder, items: e.target.value })}
-                        placeholder="e.g., 1x Beige Oak Bed Frame, 2x Premium Pillows"
-                        rows={3}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="note">Order Note</Label>
-                      <Textarea
-                        id="note"
-                        value={newOrder.note}
-                        onChange={(e) => setNewOrder({ ...newOrder, note: e.target.value })}
-                        placeholder="Any special instructions or notes..."
-                        rows={2}
-                      />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button onClick={handleCreateOrder}>
-                      Create Order
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
               <Button
                 variant="outline"
                 className="rounded-full border-primary/20 bg-white/70 px-5 text-sm font-medium text-primary hover:bg-primary/10"
+                onClick={loadData}
               >
-                <RefreshCw className="size-4" />
-                Update status
-              </Button>
-              <Button
-                variant="outline"
-                className="rounded-full border-primary/20 bg-white/70 px-5 text-sm font-medium text-primary hover:bg-primary/10"
-              >
-                <Printer className="size-4" />
-                Print docs
+                <RefreshCw className="size-4 mr-2" />
+                Refresh
               </Button>
             </div>
           </div>
@@ -366,7 +271,7 @@ export function OrdersSection() {
               <Search className="mr-2 size-4 text-muted-foreground" />
               <Input
                 className="border-none bg-transparent text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
-                placeholder="Search orders, guests, or channels..."
+                placeholder="Search by Order #, Name, or Email..."
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
               />
@@ -384,29 +289,10 @@ export function OrdersSection() {
                   ))}
                 </SelectContent>
               </Select>
-              <Select value={channelFilter} onValueChange={setChannelFilter}>
-                <SelectTrigger className="w-full min-w-[200px] rounded-full border-white/60 bg-white/70 text-sm font-medium text-muted-foreground shadow-inner shadow-white/40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {channelFilters.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button
-                variant="ghost"
-                className="rounded-full border border-dashed border-white/50 bg-white/70 px-4 text-sm font-medium text-muted-foreground hover:bg-white"
-              >
-                <SlidersHorizontal className="size-4" />
-                Advanced
-              </Button>
             </div>
           </div>
 
-          <OrdersTable orders={filteredOrders} />
+          <OrdersTable orders={filteredOrders} onStatusUpdate={handleStatusUpdate} />
         </CardContent>
       </Card>
     </section>

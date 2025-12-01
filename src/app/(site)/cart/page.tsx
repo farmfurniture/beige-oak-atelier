@@ -12,8 +12,18 @@ import { Card } from "@/components/ui/card";
 import { formatCurrency } from "@/utils/formatters";
 
 export default function Cart() {
-  const { items, updateQuantity, removeFromCart, getTotal, getItemCount } =
+  const { items, updateQuantity, removeFromCart, getTotal, getItemCount, loading } =
     useCart();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg text-muted-foreground">Loading your cart...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (
@@ -83,7 +93,7 @@ export default function Cart() {
                           )}
                           <div className="mt-2">
                             {item.originalPrice &&
-                            item.originalPrice > item.price ? (
+                              item.originalPrice > item.price ? (
                               <div className="flex items-center gap-2">
                                 <p className="text-lg font-semibold text-primary">
                                   {formatCurrency(item.price)}

@@ -43,6 +43,7 @@ export default function ProductImageGallery({
           src={images[selectedImageIndex]}
           alt={`${productTitle} - View ${selectedImageIndex + 1}`}
           fill
+          sizes="(max-width: 1024px) 100vw, 50vw"
           className="object-cover"
           priority
         />
@@ -114,6 +115,7 @@ export default function ProductImageGallery({
                 src={image}
                 alt={`${productTitle} thumbnail ${index + 1}`}
                 fill
+                sizes="80px"
                 className="object-cover"
               />
             </button>

@@ -14,10 +14,15 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { formatCurrency } from "@/utils/formatters";
+import { getUserOrders } from "@/services/firestore.service";
+import { Order, formatOrderStatus, getOrderStatusColor } from "@/types/firestore";
 
 export default function Account() {
   const router = useRouter();
   const { user, isAuthenticated, isLoading, signOut } = useAuth();
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+
   const [profileData, setProfileData] = useState({
     firstName: "",
     lastName: "",
@@ -44,6 +49,22 @@ export default function Account() {
         email: user.email ?? "",
         phone: user.phoneNumber ?? "",
       });
+
+      // Fetch orders
+      const fetchOrders = async () => {
+        setLoadingOrders(true);
+        try {
+          const userOrders = await getUserOrders(user.uid);
+          setOrders(userOrders);
+        } catch (error) {
+          console.error("Error fetching orders:", error);
+          toast.error("Failed to load order history");
+        } finally {
+          setLoadingOrders(false);
+        }
+      };
+
+      fetchOrders();
     }
   }, [isAuthenticated, isLoading, user, router]);
 
@@ -73,23 +94,6 @@ export default function Account() {
     e.preventDefault();
     toast.success("Profile updated successfully!");
   };
-
-  const orders = [
-    {
-      id: "ORD-001",
-      date: "2024-01-15",
-      status: "Delivered",
-      total: 4200,
-      items: 2
-    },
-    {
-      id: "ORD-002",
-      date: "2024-02-20",
-      status: "In Production",
-      total: 6800,
-      items: 1
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -161,6 +165,7 @@ export default function Account() {
                     type="email"
                     value={profileData.email}
                     onChange={handleChange}
+                    disabled
                   />
                 </div>
 
@@ -195,45 +200,49 @@ export default function Account() {
               <h2 className="exo-semibold text-2xl text-foreground mb-6">
                 Order History
               </h2>
-              {orders.map((order) => (
-                <Card key={order.id} className="p-6">
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-3">
-                        <h3 className="font-semibold text-foreground">
-                          Order #{order.id}
-                        </h3>
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          order.status === "Delivered" 
-                            ? "bg-green-100 text-green-700" 
-                            : "bg-blue-100 text-blue-700"
-                        }`}>
-                          {order.status}
-                        </span>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Placed on {new Date(order.date).toLocaleDateString()}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {order.items} {order.items === 1 ? 'item' : 'items'}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <p className="text-sm text-muted-foreground">Total</p>
-                        <p className="text-xl font-bold text-primary">
-                          {formatCurrency(order.total)}
+
+              {loadingOrders ? (
+                <div className="text-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                  <p className="text-muted-foreground">Loading orders...</p>
+                </div>
+              ) : orders.length > 0 ? (
+                orders.map((order) => (
+                  <Card key={order.orderId} className="p-6">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-3">
+                          <h3 className="font-semibold text-foreground">
+                            Order #{order.orderNumber}
+                          </h3>
+                          <span className={`text-xs px-2 py-1 rounded-full bg-${getOrderStatusColor(order.status)}-100 text-${getOrderStatusColor(order.status)}-700 capitalize`}>
+                            {formatOrderStatus(order.status)}
+                          </span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          Placed on {order.createdAt.toDate().toLocaleDateString()}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
                         </p>
                       </div>
-                      <Button variant="outline">
-                        View Details
-                      </Button>
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <p className="text-sm text-muted-foreground">Total</p>
+                          <p className="text-xl font-bold text-primary">
+                            {formatCurrency(order.pricing.total)}
+                          </p>
+                        </div>
+                        <Button variant="outline" asChild>
+                          <Link href={`/orders/${order.orderId}`}>
+                            View Details
+                          </Link>
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                </Card>
-              ))}
-
-              {orders.length === 0 && (
+                  </Card>
+                ))
+              ) : (
                 <Card className="p-12 text-center">
                   <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-foreground mb-2">
