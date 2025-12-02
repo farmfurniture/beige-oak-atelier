@@ -7,7 +7,7 @@ export const EnvSchema = z.object({
   ADMIN_PASSWORD: z.string().min(1, "ADMIN_PASSWORD is required"),
 
   // Database (when you add one)
-  DATABASE_URL: z.string().url().optional(),
+  DATABASE_URL: z.string().url().optional().or(z.literal("")).transform(val => val === "" ? undefined : val),
 
   // Email service (when you add one)
   SMTP_HOST: z.string().optional(),
@@ -25,7 +25,7 @@ export const EnvSchema = z.object({
 
   // Authentication (when you add it)
   NEXTAUTH_SECRET: z.string().optional(),
-  NEXTAUTH_URL: z.string().url().optional(),
+  NEXTAUTH_URL: z.string().url().optional().or(z.literal("")).transform(val => val === "" ? undefined : val),
   JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters").optional(),
 
   // File storage (when you add it)
