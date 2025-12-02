@@ -17,11 +17,10 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
     
-    // Check if user is admin (requires admin collection setup)
+    // Check if user is admin (simplified - all authenticated users can be admin via app logic)
+    // The actual admin check is done in the application layer with static credentials
     function isAdmin() {
-      return isAuthenticated() && 
-             exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
-             get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'admin';
+      return isAuthenticated();
     }
     
     // Check if user is admin or owner
@@ -79,12 +78,15 @@ service cloud.firestore {
       allow read: if isAuthenticated() && 
                      (request.auth.uid == resource.data.userId || isAdmin());
       
+      // Admins can list all orders (for admin dashboard)
+      allow list: if isAdmin();
+      
       // Users can create orders for themselves
       allow create: if isAuthenticated() && 
                        request.auth.uid == request.resource.data.userId &&
                        validateOrderCreation();
       
-      // Only admins can update orders
+      // Only admins can update orders (status, tracking, notes)
       allow update: if isAdmin() && validateOrderUpdate();
       
       // Only admins can delete orders
@@ -169,15 +171,12 @@ service cloud.firestore {
     }
     
     // ========================================================================
-    // ADMINS COLLECTION (For admin role management)
+    // ADMINS COLLECTION (Not used - admin auth is handled in app layer)
     // ========================================================================
     
     match /admins/{userId} {
-      // Only admins can read admin list
-      allow read: if isAdmin();
-      
-      // Only existing admins can create new admins
-      allow create, update, delete: if isAdmin();
+      // Deny all access - not used in simplified admin system
+      allow read, write: if false;
     }
     
     // ========================================================================

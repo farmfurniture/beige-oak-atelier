@@ -20,7 +20,9 @@ const app =
   getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
 // Initialize Firestore
-export const db = getFirestore(app);
+const firestore = getFirestore(app);
+export const db = firestore;
+export { firestore }; // Alternative export name
 
 // Enable offline persistence with multi-tab support (client-only)
 if (typeof window !== "undefined") {

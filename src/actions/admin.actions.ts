@@ -66,3 +66,27 @@ export async function adminLogoutAction(): Promise<void> {
 
   cookieStore.delete("admin_session");
 }
+
+export async function deleteUserAction(userId: string) {
+  try {
+    const { getAuth } = await import("firebase-admin/auth");
+    const { getFirebaseAdminApp, getFirebaseAdminDb } = await import(
+      "@/lib/server/firebase-admin"
+    );
+
+    const app = await getFirebaseAdminApp();
+    const auth = getAuth(app);
+    const db = await getFirebaseAdminDb();
+
+    // Delete from Firebase Auth
+    await auth.deleteUser(userId);
+
+    // Delete from Firestore
+    await db.collection("users").doc(userId).delete();
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    return { success: false, error: "Failed to delete user" };
+  }
+}

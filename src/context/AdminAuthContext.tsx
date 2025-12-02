@@ -1,12 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
-import { adminLogoutAction } from "@/actions/admin.actions";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { isAdminSessionValid, clearAdminSession } from "@/config/admin-config";
 
 type AdminAuthContextValue = {
   isAuthenticated: boolean;
-  logout: () => Promise<void>;
+  logout: () => void;
 };
 
 const AdminAuthContext = createContext<AdminAuthContextValue | undefined>(undefined);
@@ -23,11 +23,29 @@ export function AdminAuthProvider({
   const [isAuthenticated, setIsAuthenticated] = useState(initialIsAuthenticated);
   const router = useRouter();
 
-  const logout = useCallback(async () => {
-    await adminLogoutAction();
+  // Check authentication on mount
+  useEffect(() => {
+    const checkAuth = () => {
+      const isValid = isAdminSessionValid();
+      setIsAuthenticated(isValid);
+      
+      if (!isValid && typeof window !== 'undefined' && window.location.pathname.startsWith('/admin') && window.location.pathname !== '/admin/login') {
+        router.replace("/admin/login");
+      }
+    };
+
+    checkAuth();
+    
+    // Check every minute
+    const interval = setInterval(checkAuth, 60000);
+    
+    return () => clearInterval(interval);
+  }, [router]);
+
+  const logout = useCallback(() => {
+    clearAdminSession();
     setIsAuthenticated(false);
     router.replace("/admin/login");
-    router.refresh();
   }, [router]);
 
   const value = useMemo<AdminAuthContextValue>(

@@ -36,13 +36,27 @@ export async function signAdminSession(): Promise<string> {
 /**
  * Verifies an admin session JWT token.
  * Returns the payload if valid, null if invalid or expired.
+ * If no token is provided, reads from cookies.
  */
 export async function verifyAdminSession(
-  token: string
+  token?: string
 ): Promise<AdminSessionPayload | null> {
   try {
+    let sessionToken = token;
+
+    // If no token provided, try to read from cookies
+    if (!sessionToken) {
+      const { cookies } = await import("next/headers");
+      const cookieStore = cookies();
+      sessionToken = cookieStore.get("admin_session")?.value;
+    }
+
+    if (!sessionToken) {
+      return null;
+    }
+
     const secret = getSecret();
-    const verified = await jwtVerify(token, secret);
+    const verified = await jwtVerify(sessionToken, secret);
 
     // Ensure the token has the admin flag
     if (!verified.payload.admin) {

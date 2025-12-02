@@ -365,15 +365,33 @@ export async function getAllOrders(filters?: OrderFilters): Promise<Order[]> {
             constraints.push(where('orderNumber', '==', filters.orderNumber));
         }
 
-        // Always order by createdAt
-        constraints.push(orderBy('createdAt', 'desc'));
-
-        const q = query(ordersRef, ...constraints);
-        const querySnapshot = await getDocs(q);
-
-        return querySnapshot.docs.map((doc) => doc.data() as Order);
-    } catch (error) {
+        // Try with orderBy first
+        try {
+            constraints.push(orderBy('createdAt', 'desc'));
+            const q = query(ordersRef, ...constraints);
+            const querySnapshot = await getDocs(q);
+            return querySnapshot.docs.map((doc) => doc.data() as Order);
+        } catch (indexError: any) {
+            // If index is missing, fetch without orderBy and sort client-side
+            if (indexError?.code === 'failed-precondition') {
+                console.warn('Firestore index missing, sorting client-side');
+                const q = query(ordersRef);
+                const querySnapshot = await getDocs(q);
+                const orders = querySnapshot.docs.map((doc) => doc.data() as Order);
+                
+                // Sort client-side
+                return orders.sort((a, b) => {
+                    const aTime = a.createdAt?.toMillis() || 0;
+                    const bTime = b.createdAt?.toMillis() || 0;
+                    return bTime - aTime;
+                });
+            }
+            throw indexError;
+        }
+    } catch (error: any) {
         console.error('Error getting all orders:', error);
+        console.error('Error code:', error?.code);
+        console.error('Error message:', error?.message);
         throw error;
     }
 }
