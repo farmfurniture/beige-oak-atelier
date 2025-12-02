@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { User, Package, Heart, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ export default function Account() {
   const { user, isAuthenticated, isLoading, signOut } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
+  const [ordersError, setOrdersError] = useState<string | null>(null);
 
   const [profileData, setProfileData] = useState({
     firstName: "",
@@ -29,6 +30,41 @@ export default function Account() {
     email: "",
     phone: "",
   });
+
+  // Fetch orders with retry mechanism
+  const fetchOrders = useCallback(async (userId: string, attempt: number = 0) => {
+    setLoadingOrders(true);
+    setOrdersError(null);
+    
+    console.log(`Fetching orders for user ${userId}, attempt ${attempt + 1}`);
+    
+    try {
+      const userOrders = await getUserOrders(userId);
+      console.log(`Successfully loaded ${userOrders.length} orders`);
+      setOrders(userOrders);
+      setOrdersError(null);
+    } catch (error: any) {
+      console.error("Error fetching orders:", error);
+      console.error("Error code:", error?.code);
+      console.error("Error message:", error?.message);
+      
+      const errorMessage = error?.message || "Failed to load order history";
+      setOrdersError(errorMessage);
+      
+      // Retry logic with exponential backoff (max 3 attempts)
+      if (attempt < 2) {
+        const delay = Math.min(1000 * Math.pow(2, attempt), 5000);
+        console.log(`Retrying in ${delay}ms...`);
+        setTimeout(() => {
+          fetchOrders(userId, attempt + 1);
+        }, delay);
+      } else {
+        toast.error("Unable to load orders. Please refresh the page.");
+      }
+    } finally {
+      setLoadingOrders(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -50,21 +86,8 @@ export default function Account() {
         phone: user.phoneNumber ?? "",
       });
 
-      // Fetch orders
-      const fetchOrders = async () => {
-        setLoadingOrders(true);
-        try {
-          const userOrders = await getUserOrders(user.uid);
-          setOrders(userOrders);
-        } catch (error) {
-          console.error("Error fetching orders:", error);
-          toast.error("Failed to load order history");
-        } finally {
-          setLoadingOrders(false);
-        }
-      };
-
-      fetchOrders();
+      // Fetch orders on mount
+      fetchOrders(user.uid);
     }
   }, [isAuthenticated, isLoading, user, router]);
 
@@ -197,15 +220,42 @@ export default function Account() {
           {/* Orders Tab */}
           <TabsContent value="orders">
             <div className="space-y-4">
-              <h2 className="exo-semibold text-2xl text-foreground mb-6">
-                Order History
-              </h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="exo-semibold text-2xl text-foreground">
+                  Order History
+                </h2>
+                {!loadingOrders && user && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fetchOrders(user.uid)}
+                  >
+                    Refresh
+                  </Button>
+                )}
+              </div>
 
               {loadingOrders ? (
                 <div className="text-center py-12">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
                   <p className="text-muted-foreground">Loading orders...</p>
                 </div>
+              ) : ordersError ? (
+                <Card className="p-12 text-center border-destructive/50">
+                  <Package className="h-16 w-16 text-destructive mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                    Failed to Load Orders
+                  </h3>
+                  <p className="text-muted-foreground mb-6">
+                    {ordersError}
+                  </p>
+                  <Button 
+                    onClick={() => user && fetchOrders(user.uid)} 
+                    className="btn-premium"
+                  >
+                    Try Again
+                  </Button>
+                </Card>
               ) : orders.length > 0 ? (
                 orders.map((order) => (
                   <Card key={order.orderId} className="p-6">

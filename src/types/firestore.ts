@@ -281,7 +281,7 @@ export function calculatePricing(
   shippingCost: number = 50,
   couponDiscount: number = 0
 ): OrderPricing {
-  const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const subtotal = (items as Array<CartItem | OrderItem>).reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const tax = Math.round(subtotal * 0.05); // 5% tax
   const discount = couponDiscount;
   const total = subtotal + tax + shippingCost - discount;

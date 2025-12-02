@@ -280,19 +280,64 @@ export async function getUserOrders(
     limitCount: number = 50
 ): Promise<Order[]> {
     try {
-        const ordersRef = collection(db, 'orders');
-        const q = query(
-            ordersRef,
-            where('userId', '==', userId),
-            orderBy('createdAt', 'desc'),
-            limit(limitCount)
-        );
+        if (!userId) {
+            throw new Error('User ID is required');
+        }
 
-        const querySnapshot = await getDocs(q);
-        return querySnapshot.docs.map((doc) => doc.data() as Order);
-    } catch (error) {
+        const ordersRef = collection(db, 'orders');
+        
+        // Try with composite index first
+        try {
+            const q = query(
+                ordersRef,
+                where('userId', '==', userId),
+                orderBy('createdAt', 'desc'),
+                limit(limitCount)
+            );
+
+            const querySnapshot = await getDocs(q);
+            const orders = querySnapshot.docs.map((doc) => doc.data() as Order);
+            
+            console.log(`Successfully fetched ${orders.length} orders for user ${userId}`);
+            return orders;
+        } catch (indexError: any) {
+            // If index is missing, fall back to client-side sorting
+            if (indexError?.code === 'failed-precondition') {
+                console.warn('Composite index not available, using client-side sorting');
+                
+                const q = query(
+                    ordersRef,
+                    where('userId', '==', userId)
+                );
+
+                const querySnapshot = await getDocs(q);
+                const orders = querySnapshot.docs
+                    .map((doc) => doc.data() as Order)
+                    .sort((a, b) => {
+                        const aTime = a.createdAt?.toMillis() || 0;
+                        const bTime = b.createdAt?.toMillis() || 0;
+                        return bTime - aTime; // Descending order
+                    })
+                    .slice(0, limitCount);
+                
+                console.log(`Successfully fetched ${orders.length} orders for user ${userId} (client-side sorted)`);
+                return orders;
+            }
+            throw indexError;
+        }
+    } catch (error: any) {
         console.error('Error getting user orders:', error);
-        throw error;
+        
+        // Provide more specific error messages
+        if (error?.code === 'permission-denied') {
+            throw new Error('You do not have permission to view orders');
+        } else if (error?.code === 'unavailable') {
+            throw new Error('Service temporarily unavailable. Please try again.');
+        } else if (error?.code === 'failed-precondition') {
+            throw new Error('Database index required. Please contact support.');
+        } else {
+            throw new Error(error?.message || 'Failed to fetch orders');
+        }
     }
 }
 
