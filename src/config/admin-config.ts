@@ -23,16 +23,28 @@ export function validateAdminCredentials(email: string, password: string): boole
  * Check if admin session is valid
  */
 export function isAdminSessionValid(): boolean {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === 'undefined') {
+    console.log('[Admin Auth] Running on server, returning false');
+    return false;
+  }
   
   const session = localStorage.getItem('admin_session');
-  if (!session) return false;
+  if (!session) {
+    console.log('[Admin Auth] No session found in localStorage');
+    return false;
+  }
   
   try {
     const { timestamp } = JSON.parse(session);
     const now = Date.now();
-    return (now - timestamp) < ADMIN_CONFIG.sessionDuration;
-  } catch {
+    const isValid = (now - timestamp) < ADMIN_CONFIG.sessionDuration;
+    const timeLeft = ADMIN_CONFIG.sessionDuration - (now - timestamp);
+    const hoursLeft = Math.floor(timeLeft / (1000 * 60 * 60));
+    
+    console.log('[Admin Auth] Session valid:', isValid, '| Time left:', hoursLeft, 'hours');
+    return isValid;
+  } catch (error) {
+    console.error('[Admin Auth] Error parsing session:', error);
     return false;
   }
 }
