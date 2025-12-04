@@ -74,8 +74,8 @@ export default function StickyNavigation() {
         isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
       )}
     >
-      <div className="container mx-auto px-0 md:px-4">
-        <div className="flex items-center justify-start md:justify-center gap-2 overflow-x-auto scrollbar-hide py-3 px-4 md:px-0">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+        <div className="flex items-center justify-start md:justify-center gap-2 overflow-x-auto scrollbar-hide py-3">
           {navItems.map((item) => (
             <button
               key={item.id}

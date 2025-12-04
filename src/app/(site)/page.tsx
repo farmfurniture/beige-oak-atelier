@@ -216,17 +216,17 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {categories.map((category) => (
               <Link
                 key={category.slug}
                 href={`/catalog?category=${category.slug}`}
-                className="card-premium group hover-lift p-8 text-center space-y-3"
+                className="card-premium group hover-lift p-6 md:p-8 text-center space-y-2 md:space-y-3"
               >
-                <h3 className="exo-semibold text-2xl text-foreground group-hover:text-primary transition-colors">
+                <h3 className="exo-semibold text-xl md:text-2xl text-foreground group-hover:text-primary transition-colors">
                   {category.name}
                 </h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs md:text-sm text-muted-foreground">
                   {category.count}{" "}
                   {category.count === 1 ? "Collection" : "Collections"}
                 </p>
@@ -318,22 +318,22 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="section-padding bg-wine-light text-wine-light-foreground">
+      <section className="section-padding bg-secondary text-primary-foreground">
         <div className="container mx-auto text-center space-y-6">
-          <h2 className="section-title">Ready to Create Something Special?</h2>
+          <h2 className="section-title text-black">Ready to Create Something Special?</h2>
           <p className="premium-subtitle max-w-2xl mx-auto opacity-90">
             Book a showroom visit or request a custom quote. Our team is ready
             to bring your vision to life.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button asChild size="lg" className="btn-premium text-base">
+            <Button asChild size="lg" className="bg-background text-primary hover:bg-background/90 text-base font-semibold">
               <Link href="/showroom">Book Showroom Visit</Link>
             </Button>
             <Button
               asChild
               size="lg"
               variant="outline"
-              className="text-base border-2 border-wine-light-foreground text-wine-light-foreground hover:bg-wine-light-foreground hover:text-wine-light"
+              className="text-base border-2 border-primary-foreground text-black hover:bg-primary-foreground hover:text-primary"
             >
               <Link href="/custom-order">Start Custom Project</Link>
             </Button>

@@ -9,7 +9,7 @@ const Footer = () => {
 
   return (
     <footer className="bg-primary border-t border-primary/20">
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand Column */}
           <div className="space-y-4">
@@ -20,9 +20,9 @@ const Footer = () => {
               Made by hand. Loved for years.
             </p>
             <div className="flex space-x-3">
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="ghost"
+                size="icon"
                 className="h-9 w-9 text-[#E4405F] hover:text-[#E4405F] hover:bg-white/10"
                 asChild
               >
@@ -30,9 +30,9 @@ const Footer = () => {
                   <Instagram className="h-4 w-4" />
                 </a>
               </Button>
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="ghost"
+                size="icon"
                 className="h-9 w-9 text-[#1877F2] hover:text-[#1877F2] hover:bg-white/10"
                 asChild
               >
@@ -40,9 +40,9 @@ const Footer = () => {
                   <Facebook className="h-4 w-4" />
                 </a>
               </Button>
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="ghost"
+                size="icon"
                 className="h-9 w-9 text-[#1DA1F2] hover:text-[#1DA1F2] hover:bg-white/10"
                 asChild
               >
@@ -50,9 +50,9 @@ const Footer = () => {
                   <Twitter className="h-4 w-4" />
                 </a>
               </Button>
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="ghost"
+                size="icon"
                 className="h-9 w-9 text-[#E60023] hover:text-[#E60023] hover:bg-white/10"
                 asChild
               >

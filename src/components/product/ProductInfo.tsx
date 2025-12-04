@@ -66,11 +66,11 @@ export default function ProductInfo({
   const hasMoreOffers = offers.length > 1;
 
   return (
-    <div className="space-y-8">
+    <div className="w-full max-w-full space-y-8">
       {/* Header Section */}
       <div className="space-y-4">
         <div className="flex items-start justify-between gap-4">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground tracking-tight leading-tight">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground tracking-tight leading-tight">
             {title}
           </h1>
         </div>
@@ -89,9 +89,9 @@ export default function ProductInfo({
       </div>
 
       {/* Pricing Section */}
-      <div className="space-y-2 bg-secondary/10 p-6 rounded-2xl border border-border/50">
+      <div className="space-y-2 bg-secondary/10 p-4 md:p-6 rounded-2xl border border-border/50">
         <div className="flex items-baseline gap-3 flex-wrap">
-          <span className="text-4xl md:text-5xl font-bold text-primary tracking-tight">
+          <span className="text-3xl md:text-4xl font-bold text-primary tracking-tight">
             {formatINR(displayPrice)}
           </span>
           <span className="text-xl text-muted-foreground line-through decoration-2 decoration-muted-foreground/50">
@@ -116,8 +116,8 @@ export default function ProductInfo({
           </div>
           <div className="grid gap-2">
             {visibleOffers.map((offer) => (
-              <div 
-                key={offer.id} 
+              <div
+                key={offer.id}
                 className="group flex items-start gap-3 p-3 rounded-xl border border-border bg-background hover:border-primary/20 hover:shadow-sm transition-all"
               >
                 <div className="mt-1 p-1.5 rounded-full bg-primary/10 text-primary">
@@ -154,17 +154,39 @@ export default function ProductInfo({
       <div className="h-px bg-border" />
 
       {/* Configuration Section */}
-      <div className="grid gap-6">
-        {/* Size Selector */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-foreground">
-              Select Size
-            </label>
-            <span className="text-xs text-muted-foreground">
-              {sizeVariants.length} options available
-            </span>
+      <div className="flex flex-col md:flex-row gap-5 md:items-end">
+        {/* Quantity Selector */}
+        <div className="space-y-3 w-full md:w-auto">
+          <label className="text-sm font-medium text-foreground block">
+            Quantity
+          </label>
+          <div className="flex items-center border border-border rounded-xl bg-background shadow-sm">
+            <button
+              onClick={decrementQuantity}
+              className="w-12 h-12 flex items-center justify-center hover:bg-secondary/50 hover:text-primary transition-colors rounded-l-xl disabled:opacity-50"
+              aria-label="Decrease quantity"
+              disabled={quantity <= 1}
+            >
+              <Minus className="h-4 w-4" />
+            </button>
+            <div className="w-12 h-12 flex items-center justify-center border-x border-border font-semibold text-lg">
+              {quantity}
+            </div>
+            <button
+              onClick={incrementQuantity}
+              className="w-12 h-12 flex items-center justify-center hover:bg-secondary/50 hover:text-primary transition-colors rounded-r-xl"
+              aria-label="Increase quantity"
+            >
+              <Plus className="h-4 w-4" />
+            </button>
           </div>
+        </div>
+
+        {/* Size Selector */}
+        <div className="space-y-3 flex-1">
+          <label className="text-sm font-medium text-foreground block">
+            Select Size
+          </label>
           <Select value={selectedSizeId} onValueChange={setSelectedSizeId}>
             <SelectTrigger className="w-full h-12 rounded-xl border-border bg-background hover:border-primary/50 transition-colors">
               <SelectValue />
@@ -188,45 +210,15 @@ export default function ProductInfo({
             </SelectContent>
           </Select>
         </div>
-
-        {/* Quantity Selector */}
-        <div className="space-y-3">
-          <label className="text-sm font-medium text-foreground">
-            Quantity
-          </label>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center border border-border rounded-xl bg-background shadow-sm">
-              <button
-                onClick={decrementQuantity}
-                className="w-12 h-12 flex items-center justify-center hover:bg-secondary/50 hover:text-primary transition-colors rounded-l-xl disabled:opacity-50"
-                aria-label="Decrease quantity"
-                disabled={quantity <= 1}
-              >
-                <Minus className="h-4 w-4" />
-              </button>
-              <div className="w-12 h-12 flex items-center justify-center border-x border-border font-semibold text-lg">
-                {quantity}
-              </div>
-              <button
-                onClick={incrementQuantity}
-                className="w-12 h-12 flex items-center justify-center hover:bg-secondary/50 hover:text-primary transition-colors rounded-r-xl"
-                aria-label="Increase quantity"
-              >
-                <Plus className="h-4 w-4" />
-              </button>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {quantity > 1 ? `${quantity} items` : `${quantity} item`} selected
-            </p>
-          </div>
-        </div>
       </div>
 
+
+
       {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-3 pt-4">
+      <div className="w-full flex flex-col sm:flex-row gap-3 pt-4">
         <Button
           onClick={() => onAddToCart(quantity, selectedSizeId)}
-          className="flex-1 h-14 text-base font-semibold rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
+          className="w-full flex-1 h-14 text-base font-semibold rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
           size="lg"
           variant="default"
         >
@@ -237,7 +229,7 @@ export default function ProductInfo({
           <Button
             onClick={() => onBuyNow(quantity, selectedSizeId)}
             variant="outline"
-            className="flex-1 h-14 text-base font-semibold rounded-xl border-2 hover:bg-secondary/50 transition-all"
+            className="w-full flex-1 h-14 text-base font-semibold rounded-xl border-2 hover:bg-secondary/50 transition-all"
             size="lg"
           >
             Buy Now

@@ -65,7 +65,7 @@ export default function ReviewsSection({
 
   return (
     <section id="reviews" className="py-12 bg-secondary/10 scroll-mt-20">
-      <div className="container mx-auto px-4">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-8">
           Customer Reviews
         </h2>
@@ -88,8 +88,8 @@ export default function ReviewsSection({
                         i < Math.floor(reviewSummary.averageRating)
                           ? "fill-yellow-400 text-yellow-400"
                           : i < reviewSummary.averageRating
-                          ? "fill-yellow-200 text-yellow-400"
-                          : "fill-none text-gray-300"
+                            ? "fill-yellow-200 text-yellow-400"
+                            : "fill-none text-gray-300"
                       )}
                     />
                   ))}
@@ -107,7 +107,7 @@ export default function ReviewsSection({
               {[5, 4, 3, 2, 1].map((rating) => {
                 const count =
                   reviewSummary.distribution[
-                    rating as keyof typeof reviewSummary.distribution
+                  rating as keyof typeof reviewSummary.distribution
                   ];
                 const percentage = (count / reviewSummary.totalReviews) * 100;
 

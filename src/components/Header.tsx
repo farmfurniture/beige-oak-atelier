@@ -18,8 +18,8 @@ const Header = async () => {
 
   return (
     <header className="w-full bg-background border-b border-border relative">
-      <div className="container mx-auto">
-        <div className="flex h-20 items-center justify-between px-4">
+      <div className="container mx-auto max-w-[1400px]">
+        <div className="flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <h1 className="brand-name text-2xl md:text-3xl text-primary">
@@ -27,47 +27,60 @@ const Header = async () => {
             </h1>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                href={link.path}
-                className="nav-link text-sm font-medium text-muted-foreground hover:text-primary"
-              >
-                {link.name}
-              </Link>
-            ))}
-          </nav>
+          {/* Desktop Navigation + Icons - All on Right */}
+          <div className="hidden lg:flex items-center gap-6">
+            {/* Navigation Links */}
+            <nav className="flex items-center gap-6">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  href={link.path}
+                  className="nav-link text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </nav>
 
-          {/* Right Actions */}
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hidden md:flex"
-              asChild
-            >
-              <Link href="/search">
-                <Search className="h-5 w-5" />
-              </Link>
-            </Button>
+            {/* Divider */}
+            <div className="h-6 w-px bg-border" />
+
+            {/* Action Icons */}
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                asChild
+              >
+                <Link href="/search">
+                  <Search className="h-5 w-5" />
+                </Link>
+              </Button>
+              <Button variant="ghost" size="icon" asChild>
+                <Link href="/wishlist">
+                  <Heart className="h-5 w-5" />
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                asChild
+              >
+                <Link href="/account">
+                  <User className="h-5 w-5" />
+                </Link>
+              </Button>
+              <CartIcon itemCount={itemCount} />
+            </div>
+          </div>
+
+          {/* Mobile Actions */}
+          <div className="flex lg:hidden items-center space-x-4">
             <Button variant="ghost" size="icon" asChild>
               <Link href="/wishlist">
                 <Heart className="h-5 w-5" />
               </Link>
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hidden md:flex"
-              asChild
-            >
-              <Link href="/account">
-                <User className="h-5 w-5" />
-              </Link>
-            </Button>
-
             <CartIcon itemCount={itemCount} />
             <MobileMenu navLinks={navLinks} />
           </div>

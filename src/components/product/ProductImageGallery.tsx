@@ -36,9 +36,9 @@ export default function ProductImageGallery({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="w-full max-w-full space-y-4">
       {/* Main Image Container */}
-      <div className="relative aspect-[4/3] bg-secondary/20 rounded-2xl overflow-hidden group">
+      <div className="relative aspect-[4/3] bg-secondary/20 rounded-2xl overflow-hidden group w-full">
         <Image
           src={images[selectedImageIndex]}
           alt={`${productTitle} - View ${selectedImageIndex + 1}`}
@@ -99,13 +99,13 @@ export default function ProductImageGallery({
 
       {/* Thumbnail Navigation */}
       {images.length > 1 && (
-        <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 w-full">
           {images.map((image, index) => (
             <button
               key={index}
               onClick={() => setSelectedImageIndex(index)}
               className={cn(
-                "relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300",
+                "relative flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border-2 transition-all duration-300",
                 selectedImageIndex === index
                   ? "border-primary ring-2 ring-primary/20"
                   : "border-border hover:border-primary/50"

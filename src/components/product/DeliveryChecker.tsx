@@ -59,7 +59,7 @@ export default function DeliveryChecker({ onCheck }: DeliveryCheckerProps) {
   };
 
   return (
-    <div className="border border-border/60 rounded-2xl p-6 bg-secondary/5">
+    <div className="w-full max-w-full border border-border/60 rounded-2xl p-4 md:p-6 bg-secondary/5">
       <div className="flex items-center gap-2 mb-4">
         <MapPin className="h-5 w-5 text-primary" />
         <h3 className="text-base font-semibold text-foreground">
@@ -67,8 +67,8 @@ export default function DeliveryChecker({ onCheck }: DeliveryCheckerProps) {
         </h3>
       </div>
 
-      <div className="flex gap-3">
-        <div className="relative flex-1">
+      <div className="w-full flex gap-2 md:gap-3">
+        <div className="relative flex-1 min-w-0">
           <Input
             type="text"
             placeholder="Enter Pincode"
@@ -79,13 +79,13 @@ export default function DeliveryChecker({ onCheck }: DeliveryCheckerProps) {
               setResult(null);
             }}
             maxLength={6}
-            className="h-12 rounded-xl border-border bg-background pl-4 text-base shadow-sm transition-all focus:ring-2 focus:ring-primary/20"
+            className="w-full h-12 rounded-xl border-border bg-background pl-4 text-base shadow-sm transition-all focus:ring-2 focus:ring-primary/20"
           />
         </div>
         <Button
           onClick={handleCheck}
           disabled={isChecking || pincode.length !== 6}
-          className="h-12 px-6 rounded-xl font-semibold bg-primary hover:bg-primary/90 shadow-sm transition-all min-w-[100px]"
+          className="h-12 px-4 md:px-6 rounded-xl font-semibold bg-primary hover:bg-primary/90 shadow-sm transition-all min-w-[80px] md:min-w-[100px] flex-shrink-0"
         >
           {isChecking ? <Loader2 className="h-5 w-5 animate-spin" /> : "Check"}
         </Button>

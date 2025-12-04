@@ -18,7 +18,7 @@ export default function ServiceHighlights({
   highlights,
 }: ServiceHighlightsProps) {
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="w-full max-w-full grid grid-cols-2 gap-2 md:gap-3">
       {highlights.map((highlight) => {
         const IconComponent =
           iconMap[highlight.icon as keyof typeof iconMap] || Shield;
@@ -26,7 +26,7 @@ export default function ServiceHighlights({
         return (
           <div
             key={highlight.id}
-            className="flex flex-col items-center text-center p-4 rounded-xl bg-secondary/10 border border-border/50 hover:border-primary/20 hover:bg-secondary/20 transition-all"
+            className="flex flex-col items-center text-center p-3 md:p-4 rounded-xl bg-secondary/10 border border-border/50 hover:border-primary/20 hover:bg-secondary/20 transition-all"
           >
             <div className="w-10 h-10 rounded-full bg-background shadow-sm flex items-center justify-center mb-2 text-primary">
               <IconComponent className="h-5 w-5" />

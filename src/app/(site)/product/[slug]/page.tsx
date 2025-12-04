@@ -104,7 +104,7 @@ export default function ProductDetail() {
     discount: Math.round(
       ((basicProduct.priceEstimateMax - basicProduct.priceEstimateMin) /
         basicProduct.priceEstimateMax) *
-        100
+      100
     ),
     savings: basicProduct.priceEstimateMax - basicProduct.priceEstimateMin,
     reviews: [],
@@ -260,15 +260,15 @@ export default function ProductDetail() {
       <StickyNavigation />
 
       {/* Hero/Product Overview Section */}
-      <section id="product" className="bg-background py-8 scroll-mt-20">
-        <div className="container mx-auto px-4 max-w-7xl">
+      <section id="product" className="bg-background py-6 md:py-8 lg:py-10 scroll-mt-20">
+        <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
           {/* Breadcrumbs */}
           <BreadcrumbNavigation items={product.breadcrumbs} />
 
           {/* Two-Column Layout */}
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+          <div className="w-full grid lg:grid-cols-2 gap-6 lg:gap-8 xl:gap-10">
             {/* Left Column: Image Gallery */}
-            <div className="lg:sticky lg:top-24 lg:h-fit">
+            <div className="w-full max-w-full min-w-0 lg:sticky lg:top-24 lg:h-fit">
               <ProductImageGallery
                 images={product.images}
                 productTitle={product.title}
@@ -279,7 +279,7 @@ export default function ProductDetail() {
             </div>
 
             {/* Right Column: Product Info */}
-            <div className="space-y-8">
+            <div className="w-full max-w-full min-w-0 space-y-6 md:space-y-8">
               <ProductInfo
                 title={product.title}
                 rating={product.reviewSummary.averageRating}
@@ -296,7 +296,7 @@ export default function ProductDetail() {
               />
 
               {/* Delivery & Services Group */}
-              <div className="space-y-4">
+              <div className="w-full space-y-4">
                 <DeliveryChecker onCheck={handleDeliveryCheck} />
                 <ServiceHighlights highlights={product.serviceHighlights} />
               </div>
