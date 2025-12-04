@@ -268,16 +268,18 @@ export default function ProductDetail() {
           {/* Two-Column Layout */}
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
             {/* Left Column: Image Gallery */}
-            <ProductImageGallery
-              images={product.images}
-              productTitle={product.title}
-              onWishlistClick={handleWishlistClick}
-              onShareClick={handleShareClick}
-              isWishlisted={isWishlisted}
-            />
+            <div className="lg:sticky lg:top-24 lg:h-fit">
+              <ProductImageGallery
+                images={product.images}
+                productTitle={product.title}
+                onWishlistClick={handleWishlistClick}
+                onShareClick={handleShareClick}
+                isWishlisted={isWishlisted}
+              />
+            </div>
 
             {/* Right Column: Product Info */}
-            <div className="space-y-6">
+            <div className="space-y-8">
               <ProductInfo
                 title={product.title}
                 rating={product.reviewSummary.averageRating}
@@ -293,17 +295,13 @@ export default function ProductDetail() {
                 onBuyNow={handleBuyNow}
               />
 
-              {/* Delivery Checker */}
-              <DeliveryChecker onCheck={handleDeliveryCheck} />
+              {/* Delivery & Services Group */}
+              <div className="space-y-4">
+                <DeliveryChecker onCheck={handleDeliveryCheck} />
+                <ServiceHighlights highlights={product.serviceHighlights} />
+              </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Service Highlights */}
-      <section className="bg-background py-6">
-        <div className="container mx-auto px-4 max-w-7xl">
-          <ServiceHighlights highlights={product.serviceHighlights} />
         </div>
       </section>
 

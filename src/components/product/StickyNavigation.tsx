@@ -74,14 +74,14 @@ export default function StickyNavigation() {
         isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
       )}
     >
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-center gap-2 overflow-x-auto scrollbar-hide py-3">
+      <div className="container mx-auto px-0 md:px-4">
+        <div className="flex items-center justify-start md:justify-center gap-2 overflow-x-auto scrollbar-hide py-3 px-4 md:px-0">
           {navItems.map((item) => (
             <button
               key={item.id}
               onClick={() => scrollToSection(item.href)}
               className={cn(
-                "px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap",
+                "px-4 md:px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap flex-shrink-0",
                 "hover:bg-secondary/50",
                 activeSection === item.id
                   ? "bg-primary text-primary-foreground shadow-sm"

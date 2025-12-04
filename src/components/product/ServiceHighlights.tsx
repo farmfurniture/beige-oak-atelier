@@ -18,30 +18,28 @@ export default function ServiceHighlights({
   highlights,
 }: ServiceHighlightsProps) {
   return (
-    <section className="py-8">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {highlights.map((highlight) => {
-          const IconComponent =
-            iconMap[highlight.icon as keyof typeof iconMap] || Shield;
+    <div className="grid grid-cols-2 gap-3">
+      {highlights.map((highlight) => {
+        const IconComponent =
+          iconMap[highlight.icon as keyof typeof iconMap] || Shield;
 
-          return (
-            <div
-              key={highlight.id}
-              className="flex flex-col items-center text-center p-6 rounded-lg bg-secondary/20 border border-border hover:border-primary/30 transition-colors"
-            >
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
-                <IconComponent className="h-6 w-6 text-primary" />
-              </div>
-              <h4 className="font-semibold text-foreground text-sm mb-1">
-                {highlight.title}
-              </h4>
-              <p className="text-xs text-muted-foreground">
-                {highlight.description}
-              </p>
+        return (
+          <div
+            key={highlight.id}
+            className="flex flex-col items-center text-center p-4 rounded-xl bg-secondary/10 border border-border/50 hover:border-primary/20 hover:bg-secondary/20 transition-all"
+          >
+            <div className="w-10 h-10 rounded-full bg-background shadow-sm flex items-center justify-center mb-2 text-primary">
+              <IconComponent className="h-5 w-5" />
             </div>
-          );
-        })}
-      </div>
-    </section>
+            <h4 className="font-semibold text-foreground text-xs mb-0.5">
+              {highlight.title}
+            </h4>
+            <p className="text-[10px] text-muted-foreground leading-tight">
+              {highlight.description}
+            </p>
+          </div>
+        );
+      })}
+    </div>
   );
 }

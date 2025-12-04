@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, X, Loader2 } from "lucide-react";
+import { Check, X, Loader2, MapPin, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -59,61 +59,74 @@ export default function DeliveryChecker({ onCheck }: DeliveryCheckerProps) {
   };
 
   return (
-    <div className="border border-border rounded-lg p-4 bg-background">
-      <h3 className="text-sm font-semibold text-foreground mb-3">
-        Check Delivery Code
-      </h3>
+    <div className="border border-border/60 rounded-2xl p-6 bg-secondary/5">
+      <div className="flex items-center gap-2 mb-4">
+        <MapPin className="h-5 w-5 text-primary" />
+        <h3 className="text-base font-semibold text-foreground">
+          Check Delivery Availability
+        </h3>
+      </div>
 
-      <div className="flex gap-2">
-        <Input
-          type="text"
-          placeholder="Enter pincode"
-          value={pincode}
-          onChange={(e) => {
-            const value = e.target.value.replace(/\D/g, "").slice(0, 6);
-            setPincode(value);
-            setResult(null);
-          }}
-          maxLength={6}
-          className="flex-1"
-        />
+      <div className="flex gap-3">
+        <div className="relative flex-1">
+          <Input
+            type="text"
+            placeholder="Enter Pincode"
+            value={pincode}
+            onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, "").slice(0, 6);
+              setPincode(value);
+              setResult(null);
+            }}
+            maxLength={6}
+            className="h-12 rounded-xl border-border bg-background pl-4 text-base shadow-sm transition-all focus:ring-2 focus:ring-primary/20"
+          />
+        </div>
         <Button
           onClick={handleCheck}
           disabled={isChecking || pincode.length !== 6}
-          className="px-6 bg-primary hover:bg-primary/90"
+          className="h-12 px-6 rounded-xl font-semibold bg-primary hover:bg-primary/90 shadow-sm transition-all min-w-[100px]"
         >
-          {isChecking ? <Loader2 className="h-4 w-4 animate-spin" /> : "Check"}
+          {isChecking ? <Loader2 className="h-5 w-5 animate-spin" /> : "Check"}
         </Button>
       </div>
 
       {result && (
         <div
           className={cn(
-            "mt-3 flex items-start gap-2 text-sm p-3 rounded-md",
+            "mt-4 flex items-start gap-3 p-4 rounded-xl border animate-in fade-in slide-in-from-top-2 duration-300",
             result.available
-              ? "bg-green-50 text-green-800 border border-green-200"
-              : "bg-red-50 text-red-800 border border-red-200"
+              ? "bg-emerald-50/50 border-emerald-100 text-emerald-900 dark:bg-emerald-900/10 dark:border-emerald-900/20 dark:text-emerald-200"
+              : "bg-red-50/50 border-red-100 text-red-900 dark:bg-red-900/10 dark:border-red-900/20 dark:text-red-200"
           )}
         >
-          {result.available ? (
-            <Check className="h-4 w-4 flex-shrink-0 mt-0.5" />
-          ) : (
-            <X className="h-4 w-4 flex-shrink-0 mt-0.5" />
-          )}
-          <div className="flex-1">
-            <p className="font-medium">{result.message}</p>
+          <div className={cn(
+            "p-1.5 rounded-full shrink-0",
+            result.available ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30" : "bg-red-100 text-red-600 dark:bg-red-900/30"
+          )}>
+            {result.available ? (
+              <Check className="h-4 w-4" />
+            ) : (
+              <X className="h-4 w-4" />
+            )}
+          </div>
+          <div className="flex-1 space-y-1">
+            <p className="font-semibold text-sm">{result.message}</p>
             {result.available && result.estimatedDays && (
-              <p className="text-xs mt-1 opacity-80">
-                Expected delivery in {result.estimatedDays} business days
+              <p className="text-sm opacity-90 flex items-center gap-1.5">
+                <Truck className="h-3.5 w-3.5" />
+                Estimated delivery by <span className="font-medium">{result.estimatedDays} business days</span>
               </p>
             )}
           </div>
         </div>
       )}
 
-      <p className="text-xs text-muted-foreground mt-2">
-        Enter your pincode to check product availability and delivery options
-      </p>
+      {!result && (
+        <p className="text-xs text-muted-foreground mt-3 ml-1">
+          Enter your pincode to see estimated delivery date and shipping charges.
+        </p>
+      )}
     </div>
   );
 }

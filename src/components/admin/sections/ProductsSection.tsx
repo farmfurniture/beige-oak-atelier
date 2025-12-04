@@ -173,7 +173,7 @@ function AdminProductRow({
   onDelete: (id: string) => void;
 }) {
   return (
-    <div className="grid gap-3 rounded-2xl border border-white/40 bg-white/70 px-4 py-3 shadow-inner shadow-primary/10 grid-cols-[2fr_1fr_1fr_1fr]">
+    <div className="grid gap-3 rounded-2xl border border-white/40 bg-white/70 px-4 py-3 shadow-inner shadow-primary/10 grid-cols-[1.5fr_1fr_1.5fr_1fr]">
       <div className="space-y-1">
         <p className="text-sm font-semibold text-foreground">{product.title}</p>
         <p className="text-xs text-muted-foreground">{product.slug}</p>
@@ -209,7 +209,7 @@ function AdminProductRow({
       </div>
       <div className="space-y-1">
         <p className="text-xs text-muted-foreground">Details</p>
-        <div className="flex gap-1 flex-wrap">
+        <div className="flex gap-1 flex-nowrap overflow-hidden">
           {product.images && product.images.length > 0 && (
             <Badge variant="secondary" className="text-xs">
               {product.images.length} img

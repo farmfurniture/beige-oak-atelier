@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Star, ChevronDown, ChevronUp, Minus, Plus } from "lucide-react";
+import { Star, ChevronDown, ChevronUp, Minus, Plus, ShoppingBag, Zap, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -66,72 +66,68 @@ export default function ProductInfo({
   const hasMoreOffers = offers.length > 1;
 
   return (
-    <div className="space-y-6">
-      {/* Product Title */}
-      <div>
-        <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
-          {title}
-        </h1>
+    <div className="space-y-8">
+      {/* Header Section */}
+      <div className="space-y-4">
+        <div className="flex items-start justify-between gap-4">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground tracking-tight leading-tight">
+            {title}
+          </h1>
+        </div>
 
-        {/* Rating */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className={cn(
-                  "h-5 w-5",
-                  i < Math.floor(rating)
-                    ? "fill-yellow-400 text-yellow-400"
-                    : i < rating
-                    ? "fill-yellow-200 text-yellow-400"
-                    : "fill-none text-gray-300"
-                )}
-              />
-            ))}
+        {/* Rating & Reviews */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-0.5 bg-secondary/30 px-2 py-1 rounded-md">
+            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+            <span className="text-sm font-semibold ml-1">{rating.toFixed(1)}</span>
           </div>
-          <span className="text-sm font-medium text-foreground">
-            {rating.toFixed(1)}
-          </span>
-          <span className="text-sm text-muted-foreground">
-            ({reviewCount.toLocaleString("en-IN")} reviews)
+          <div className="h-4 w-px bg-border" />
+          <span className="text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer underline decoration-dotted">
+            {reviewCount.toLocaleString("en-IN")} Reviews
           </span>
         </div>
       </div>
 
-      {/* Pricing */}
-      <div className="flex items-baseline gap-3 flex-wrap">
-        <span className="text-4xl font-bold text-foreground">
-          {formatINR(displayPrice)}
-        </span>
-        <span className="text-2xl text-muted-foreground line-through">
-          {formatINR(displayOriginalPrice)}
-        </span>
-        <Badge variant="destructive" className="text-base px-3 py-1">
-          {discount}% off
-        </Badge>
+      {/* Pricing Section */}
+      <div className="space-y-2 bg-secondary/10 p-6 rounded-2xl border border-border/50">
+        <div className="flex items-baseline gap-3 flex-wrap">
+          <span className="text-4xl md:text-5xl font-bold text-primary tracking-tight">
+            {formatINR(displayPrice)}
+          </span>
+          <span className="text-xl text-muted-foreground line-through decoration-2 decoration-muted-foreground/50">
+            {formatINR(displayOriginalPrice)}
+          </span>
+          <Badge variant="destructive" className="text-sm px-2.5 py-0.5 font-semibold uppercase tracking-wide">
+            {discount}% OFF
+          </Badge>
+        </div>
+        <p className="text-sm font-medium text-emerald-600 flex items-center gap-1.5">
+          <Tag className="h-4 w-4" />
+          You save {formatINR(savings)} on this purchase
+        </p>
       </div>
-      <p className="text-sm text-green-600 font-medium">
-        (Save {formatINR(savings)})
-      </p>
 
-      {/* Offers */}
+      {/* Offers Section */}
       {offers.length > 0 && (
-        <div className="border border-border rounded-lg p-4 bg-secondary/20">
-          <h3 className="text-sm font-semibold text-foreground mb-3">
-            Save Extra with Better Offers
-          </h3>
-          <div className="space-y-3">
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <Zap className="h-4 w-4 text-amber-500 fill-amber-500" />
+            <span>Available Offers</span>
+          </div>
+          <div className="grid gap-2">
             {visibleOffers.map((offer) => (
-              <div key={offer.id} className="flex gap-2">
-                <div className="flex-shrink-0 mt-0.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+              <div 
+                key={offer.id} 
+                className="group flex items-start gap-3 p-3 rounded-xl border border-border bg-background hover:border-primary/20 hover:shadow-sm transition-all"
+              >
+                <div className="mt-1 p-1.5 rounded-full bg-primary/10 text-primary">
+                  <Tag className="h-3.5 w-3.5" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-foreground">
+                  <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
                     {offer.title}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                  <p className="text-xs text-muted-foreground leading-relaxed mt-0.5">
                     {offer.description}
                   </p>
                 </div>
@@ -139,62 +135,38 @@ export default function ProductInfo({
             ))}
           </div>
           {hasMoreOffers && (
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => setShowAllOffers(!showAllOffers)}
-              className="text-sm text-primary font-medium mt-3 flex items-center gap-1 hover:underline"
+              className="text-xs font-medium text-muted-foreground hover:text-primary h-auto p-0 hover:bg-transparent"
             >
               {showAllOffers ? (
-                <>
-                  View Less
-                  <ChevronUp className="h-4 w-4" />
-                </>
+                <span className="flex items-center gap-1">Show Less <ChevronUp className="h-3 w-3" /></span>
               ) : (
-                <>
-                  + View More ({offers.length - 1} more offers)
-                  <ChevronDown className="h-4 w-4" />
-                </>
+                <span className="flex items-center gap-1">+{offers.length - 1} More Offers <ChevronDown className="h-3 w-3" /></span>
               )}
-            </button>
+            </Button>
           )}
         </div>
       )}
 
-      {/* Size and Quantity Selector */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Quantity */}
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-2">
-            Qty
-          </label>
-          <div className="flex items-center border border-border rounded-lg w-fit">
-            <button
-              onClick={decrementQuantity}
-              className="p-3 hover:bg-secondary/50 transition-colors"
-              aria-label="Decrease quantity"
-            >
-              <Minus className="h-4 w-4" />
-            </button>
-            <span className="px-6 py-3 font-medium">{quantity}</span>
-            <button
-              onClick={incrementQuantity}
-              className="p-3 hover:bg-secondary/50 transition-colors"
-              aria-label="Increase quantity"
-            >
-              <Plus className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
+      <div className="h-px bg-border" />
 
-        {/* Size */}
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-foreground mb-2">
-            Size{" "}
-            <span className="text-muted-foreground">
-              ({sizeVariants.length} Standard Options)
+      {/* Configuration Section */}
+      <div className="grid gap-6">
+        {/* Size Selector */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium text-foreground">
+              Select Size
+            </label>
+            <span className="text-xs text-muted-foreground">
+              {sizeVariants.length} options available
             </span>
-          </label>
+          </div>
           <Select value={selectedSizeId} onValueChange={setSelectedSizeId}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full h-12 rounded-xl border-border bg-background hover:border-primary/50 transition-colors">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -203,32 +175,72 @@ export default function ProductInfo({
                   key={variant.id}
                   value={variant.id}
                   disabled={!variant.available}
+                  className="py-3"
                 >
-                  {variant.label} | {variant.dimensions} | {variant.height}
+                  <div className="flex items-center justify-between w-full gap-4">
+                    <span className="font-medium">{variant.label}</span>
+                    <span className="text-muted-foreground text-xs">
+                      {variant.dimensions} | {variant.height}
+                    </span>
+                  </div>
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
+
+        {/* Quantity Selector */}
+        <div className="space-y-3">
+          <label className="text-sm font-medium text-foreground">
+            Quantity
+          </label>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center border border-border rounded-xl bg-background shadow-sm">
+              <button
+                onClick={decrementQuantity}
+                className="w-12 h-12 flex items-center justify-center hover:bg-secondary/50 hover:text-primary transition-colors rounded-l-xl disabled:opacity-50"
+                aria-label="Decrease quantity"
+                disabled={quantity <= 1}
+              >
+                <Minus className="h-4 w-4" />
+              </button>
+              <div className="w-12 h-12 flex items-center justify-center border-x border-border font-semibold text-lg">
+                {quantity}
+              </div>
+              <button
+                onClick={incrementQuantity}
+                className="w-12 h-12 flex items-center justify-center hover:bg-secondary/50 hover:text-primary transition-colors rounded-r-xl"
+                aria-label="Increase quantity"
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {quantity > 1 ? `${quantity} items` : `${quantity} item`} selected
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3 pt-4">
         <Button
           onClick={() => onAddToCart(quantity, selectedSizeId)}
-          className="flex-1 h-12 text-base font-semibold bg-primary hover:bg-primary/90"
+          className="flex-1 h-14 text-base font-semibold rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
           size="lg"
+          variant="default"
         >
-          ADD TO CART
+          <ShoppingBag className="mr-2 h-5 w-5" />
+          Add to Cart
         </Button>
         {onBuyNow && (
           <Button
             onClick={() => onBuyNow(quantity, selectedSizeId)}
             variant="outline"
-            className="flex-1 h-12 text-base font-semibold"
+            className="flex-1 h-14 text-base font-semibold rounded-xl border-2 hover:bg-secondary/50 transition-all"
             size="lg"
           >
-            BUY NOW
+            Buy Now
           </Button>
         )}
       </div>
