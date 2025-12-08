@@ -21,10 +21,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { getAllOrders, updateOrderStatus, getOrderStatistics } from "@/services/firestore.service";
 import { Order, OrderStatus, PaymentStatus, formatOrderStatus, formatPaymentStatus, getOrderStatusColor } from "@/types/firestore";
 import { formatCurrency } from "@/utils/formatters";
 import Link from "next/link";
+import { fetchAdminOrders, updateAdminOrderStatus } from "@/services/admin-api.service";
 
 const statusStyles: Record<string, string> = {
   pending: "bg-amber-100 text-amber-700 border-amber-200",
@@ -193,29 +193,42 @@ export function OrdersSection() {
   const loadData = async () => {
     try {
       setLoading(true);
-      console.log('Loading orders...');
-      
-      const [ordersData, statsData] = await Promise.all([
-        getAllOrders(),
-        getOrderStatistics()
-      ]);
-      
+      console.log('Loading orders via admin API...');
+
+      const ordersData = await fetchAdminOrders();
+
       console.log('Orders loaded:', ordersData.length);
-      console.log('Stats loaded:', statsData);
-      
+
       setOrders(ordersData);
+
+      // Calculate stats from orders
+      const statsData = {
+        total: ordersData.length,
+        pending: ordersData.filter(o => o.status === 'pending').length,
+        confirmed: ordersData.filter(o => o.status === 'confirmed').length,
+        processing: ordersData.filter(o => o.status === 'processing').length,
+        shipped: ordersData.filter(o => o.status === 'shipped').length,
+        delivered: ordersData.filter(o => o.status === 'delivered').length,
+        cancelled: ordersData.filter(o => o.status === 'cancelled').length,
+        failed: ordersData.filter(o => o.status === 'failed').length,
+        totalRevenue: ordersData
+          .filter(o => o.paymentStatus === 'paid')
+          .reduce((sum, o) => sum + o.pricing.total, 0),
+      };
+
+      console.log('Stats calculated:', statsData);
       setStats(statsData);
-      
+
       if (ordersData.length === 0) {
         toast.info("No orders found in database");
       }
     } catch (error: any) {
       console.error("Error loading orders:", error);
-      console.error("Error code:", error?.code);
       console.error("Error message:", error?.message);
-      
-      if (error?.code === 'permission-denied') {
-        toast.error("Permission denied. Please ensure you are an admin.");
+
+      if (error?.message?.includes('Unauthorized')) {
+        toast.error("Session expired. Please login again.");
+        window.location.href = '/admin/login';
       } else {
         toast.error("Failed to load orders: " + (error?.message || 'Unknown error'));
       }
@@ -230,7 +243,7 @@ export function OrdersSection() {
 
   const handleStatusUpdate = async (orderId: string, newStatus: OrderStatus) => {
     try {
-      await updateOrderStatus(orderId, { status: newStatus });
+      await updateAdminOrderStatus(orderId, newStatus);
       toast.success(`Order updated to ${newStatus}`);
       // Optimistic update
       setOrders(prev => prev.map(o => o.orderId === orderId ? { ...o, status: newStatus } : o));
@@ -244,10 +257,10 @@ export function OrdersSection() {
     return orders.filter((order) => {
       // Status filter
       const matchesStatus = statusFilter === "all" || order.status === statusFilter;
-      
+
       // Payment filter
       const matchesPayment = paymentFilter === "all" || order.paymentStatus === paymentFilter;
-      
+
       // Search filter
       const search = searchTerm.trim().toLowerCase();
       const matchesSearch =
@@ -255,12 +268,12 @@ export function OrdersSection() {
         order.orderNumber.toLowerCase().includes(search) ||
         order.shippingAddress.fullName.toLowerCase().includes(search) ||
         order.userEmail.toLowerCase().includes(search);
-      
+
       // Date range filter
       let matchesDate = true;
       const orderDate = order.createdAt.toDate();
       const now = new Date();
-      
+
       if (dateRangeFilter === "today") {
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         matchesDate = orderDate >= today;
@@ -276,7 +289,7 @@ export function OrdersSection() {
         end.setHours(23, 59, 59, 999); // Include the entire end date
         matchesDate = orderDate >= start && orderDate <= end;
       }
-      
+
       return matchesStatus && matchesPayment && matchesSearch && matchesDate;
     });
   }, [orders, statusFilter, paymentFilter, searchTerm, dateRangeFilter, startDate, endDate]);
@@ -302,7 +315,7 @@ export function OrdersSection() {
             <p className="text-muted-foreground">
               There are no orders in the database yet, or you don't have permission to view them.
             </p>
-            
+
             <div className="space-y-2">
               <p className="font-semibold">Possible reasons:</p>
               <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground ml-4">

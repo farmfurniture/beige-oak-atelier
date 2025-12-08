@@ -37,7 +37,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { ImageUpload } from "@/components/admin/ImageUpload";
-import { firebaseProductsService } from "@/services/firebase-products.service";
+import { fetchAdminProducts, updateAdminProduct, createAdminProduct, deleteAdminProduct } from "@/services/admin-api.service";
 
 type LowStockAlert = {
   sku: string;
@@ -278,7 +278,7 @@ export function ProductsSection() {
     featured: false,
   });
 
-  // Load products from Firebase on mount
+  // Load products via admin API on mount
   useEffect(() => {
     loadProducts();
   }, []);
@@ -286,13 +286,18 @@ export function ProductsSection() {
   const loadProducts = async () => {
     try {
       setLoading(true);
-      console.log("Loading products from Firebase...");
-      const fetchedProducts = await firebaseProductsService.getAllProducts();
+      console.log("Loading products via admin API...");
+      const fetchedProducts = await fetchAdminProducts();
       console.log("Fetched products:", fetchedProducts);
       setProducts(fetchedProducts);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error loading products:", error);
-      toast.error("Failed to load products");
+      if (error?.message?.includes('Unauthorized')) {
+        toast.error("Session expired. Please login again.");
+        window.location.href = '/admin/login';
+      } else {
+        toast.error("Failed to load products");
+      }
     } finally {
       setLoading(false);
     }
@@ -358,9 +363,9 @@ export function ProductsSection() {
       materials:
         typeof productForm.materials === "string"
           ? productForm.materials
-              .split(",")
-              .map((m: string) => m.trim())
-              .filter(Boolean)
+            .split(",")
+            .map((m: string) => m.trim())
+            .filter(Boolean)
           : productForm.materials,
       dimensions: {
         w: Number(productForm.dimensionsW),
@@ -372,9 +377,9 @@ export function ProductsSection() {
       tags:
         typeof productForm.tags === "string"
           ? productForm.tags
-              .split(",")
-              .map((t: string) => t.trim())
-              .filter(Boolean)
+            .split(",")
+            .map((t: string) => t.trim())
+            .filter(Boolean)
           : productForm.tags,
       images: productForm.images,
       offers: productForm.offers || [],
@@ -385,19 +390,16 @@ export function ProductsSection() {
 
     try {
       if (editingProduct) {
-        // Update existing product in Firebase
-        await firebaseProductsService.updateProduct(
-          editingProduct.id,
-          newProduct
-        );
+        // Update existing product via admin API
+        await updateAdminProduct(editingProduct.id, newProduct);
         toast.success("Product updated!");
       } else {
-        // Create new product in Firebase
-        await firebaseProductsService.createProduct(newProduct);
+        // Create new product via admin API
+        await createAdminProduct(newProduct);
         toast.success("Product added!");
       }
 
-      // Reload products from Firebase
+      // Reload products via admin API
       await loadProducts();
 
       setIsAddProductOpen(false);
@@ -460,12 +462,17 @@ export function ProductsSection() {
 
   const handleDeleteProduct = async (id: string) => {
     try {
-      await firebaseProductsService.deleteProduct(id);
+      await deleteAdminProduct(id);
       toast.success("Product deleted");
       await loadProducts();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting product:", error);
-      toast.error("Failed to delete product");
+      if (error?.message?.includes('Unauthorized')) {
+        toast.error("Session expired. Please login again.");
+        window.location.href = '/admin/login';
+      } else {
+        toast.error("Failed to delete product");
+      }
     }
   };
 
