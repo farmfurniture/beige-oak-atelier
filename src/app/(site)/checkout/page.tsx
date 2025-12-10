@@ -75,7 +75,7 @@ export default function Checkout() {
       const tax = Math.round(subtotal * 0.05); // 5% tax
       const total = subtotal + shippingCost + tax;
 
-      // Prepare order items
+      // Prepare order items with polishType included in variant
       const orderItems: OrderItem[] = items.map(item => ({
         productId: item.id,
         productName: item.title,
@@ -83,9 +83,10 @@ export default function Checkout() {
         quantity: item.quantity,
         price: item.price,
         imageUrl: item.image,
-        variant: item.variantId ? {
+        variant: (item.variantId || item.polishType) ? {
           id: item.variantId,
-          label: item.variantLabel
+          label: item.variantLabel,
+          polishType: item.polishType,
         } : undefined
       }));
 

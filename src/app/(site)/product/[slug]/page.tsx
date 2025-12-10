@@ -11,8 +11,8 @@ import StickyNavigation from "@/components/product/StickyNavigation";
 import BreadcrumbNavigation from "@/components/product/BreadcrumbNavigation";
 import ProductImageGallery from "@/components/product/ProductImageGallery";
 import ProductInfo from "@/components/product/ProductInfo";
-import DeliveryChecker from "@/components/product/DeliveryChecker";
-import ServiceHighlights from "@/components/product/ServiceHighlights";
+
+
 import ProductDetails from "@/components/product/ProductDetails";
 import ReviewsSection from "@/components/product/ReviewsSection";
 import FAQsSection from "@/components/product/FAQsSection";
@@ -208,8 +208,17 @@ export default function ProductDetail() {
     }
   };
 
-  const handleAddToCart = (quantity: number, sizeId: string) => {
-    const selectedSize = product.sizeVariants.find((v) => v.id === sizeId);
+  // Polish Type Options (matching ProductInfo.tsx)
+  const POLISH_TYPES = [
+    { id: "walnut-honey-glossy", label: "Walnut Honey glossy finish" },
+    { id: "walnut-honey-matte", label: "Walnut Honey matte finish" },
+    { id: "walnut-natural-glossy", label: "Walnut Natural gloss finish" },
+    { id: "walnut-natural-matte", label: "Walnut Natural matte finish" },
+  ];
+
+  const handleAddToCart = (quantity: number, sizeId: string, polishType: string) => {
+    const selectedSize = product.sizeVariants.find((v: any) => v.id === sizeId);
+    const selectedPolish = POLISH_TYPES.find((p) => p.id === polishType);
     addToCart(
       {
         id: basicProduct.id,
@@ -221,32 +230,20 @@ export default function ProductDetail() {
         slug: basicProduct.slug,
         variantId: sizeId,
         variantLabel: selectedSize?.label,
+        polishType: polishType,
+        polishTypeLabel: selectedPolish?.label,
       },
       quantity
     );
   };
 
-  const handleBuyNow = (quantity: number, sizeId: string) => {
-    handleAddToCart(quantity, sizeId);
+  const handleBuyNow = (quantity: number, sizeId: string, polishType: string) => {
+    handleAddToCart(quantity, sizeId, polishType);
     // Redirect to checkout
     window.location.href = "/checkout";
   };
 
-  const handleDeliveryCheck = async (pincode: string) => {
-    // Mock delivery check - replace with actual API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // Simulate delivery availability
-    const available = parseInt(pincode) % 2 === 0;
-
-    return {
-      available,
-      message: available
-        ? "Delivery available"
-        : "Delivery not available in this area",
-      estimatedDays: available ? 7 : undefined,
-    };
-  };
 
   const handleSubmitReview = (reviewData: any) => {
     // Handle review submission - replace with actual API call
@@ -295,11 +292,7 @@ export default function ProductDetail() {
                 onBuyNow={handleBuyNow}
               />
 
-              {/* Delivery & Services Group */}
-              <div className="w-full space-y-4">
-                <DeliveryChecker onCheck={handleDeliveryCheck} />
-                <ServiceHighlights highlights={product.serviceHighlights} />
-              </div>
+
             </div>
           </div>
         </div>

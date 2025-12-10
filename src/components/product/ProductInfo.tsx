@@ -14,6 +14,14 @@ import {
 } from "@/components/ui/select";
 import { type Offer, type SizeVariant } from "@/models/ProductDetail";
 
+// Polish Type Options
+const POLISH_TYPES = [
+  { id: "walnut-honey-glossy", label: "Walnut Honey glossy finish" },
+  { id: "walnut-honey-matte", label: "Walnut Honey matte finish" },
+  { id: "walnut-natural-glossy", label: "Walnut Natural gloss finish" },
+  { id: "walnut-natural-matte", label: "Walnut Natural matte finish" },
+];
+
 interface ProductInfoProps {
   title: string;
   rating: number;
@@ -25,8 +33,8 @@ interface ProductInfoProps {
   offers: Offer[];
   sizeVariants: SizeVariant[];
   defaultSizeId: string;
-  onAddToCart: (quantity: number, sizeId: string) => void;
-  onBuyNow?: (quantity: number, sizeId: string) => void;
+  onAddToCart: (quantity: number, sizeId: string, polishType: string) => void;
+  onBuyNow?: (quantity: number, sizeId: string, polishType: string) => void;
 }
 
 export default function ProductInfo({
@@ -45,6 +53,7 @@ export default function ProductInfo({
 }: ProductInfoProps) {
   const [quantity, setQuantity] = useState(1);
   const [selectedSizeId, setSelectedSizeId] = useState(defaultSizeId);
+  const [selectedPolishType, setSelectedPolishType] = useState(POLISH_TYPES[0].id);
   const [showAllOffers, setShowAllOffers] = useState(false);
 
   const selectedSize = sizeVariants.find((v) => v.id === selectedSizeId);
@@ -154,61 +163,87 @@ export default function ProductInfo({
       <div className="h-px bg-border" />
 
       {/* Configuration Section */}
-      <div className="flex flex-col md:flex-row gap-5 md:items-end">
-        {/* Quantity Selector */}
-        <div className="space-y-3 w-full md:w-auto">
-          <label className="text-sm font-medium text-foreground block">
-            Quantity
-          </label>
-          <div className="flex items-center border border-border rounded-xl bg-background shadow-sm">
-            <button
-              onClick={decrementQuantity}
-              className="w-12 h-12 flex items-center justify-center hover:bg-secondary/50 hover:text-primary transition-colors rounded-l-xl disabled:opacity-50"
-              aria-label="Decrease quantity"
-              disabled={quantity <= 1}
-            >
-              <Minus className="h-4 w-4" />
-            </button>
-            <div className="w-12 h-12 flex items-center justify-center border-x border-border font-semibold text-lg">
-              {quantity}
+      <div className="flex flex-col gap-5">
+        {/* First Row: Quantity and Size */}
+        <div className="flex flex-col md:flex-row gap-5 md:items-end">
+          {/* Quantity Selector */}
+          <div className="space-y-3 w-full md:w-auto">
+            <label className="text-sm font-medium text-foreground block">
+              Quantity
+            </label>
+            <div className="flex items-center border border-border rounded-xl bg-background shadow-sm">
+              <button
+                onClick={decrementQuantity}
+                className="w-6 h-12 flex items-center justify-center hover:bg-secondary/50 hover:text-primary transition-colors rounded-l-xl disabled:opacity-50"
+                aria-label="Decrease quantity"
+                disabled={quantity <= 1}
+              >
+                <Minus className="h-4 w-4" />
+              </button>
+              <div className="w-6 h-6 flex items-center justify-center border-x border-border font-semibold text-lg">
+                {quantity}
+              </div>
+              <button
+                onClick={incrementQuantity}
+                className="w-6 h-6 flex items-center justify-center hover:bg-secondary/50 hover:text-primary transition-colors rounded-r-xl"
+                aria-label="Increase quantity"
+              >
+                <Plus className="h-4 w-4" />
+              </button>
             </div>
-            <button
-              onClick={incrementQuantity}
-              className="w-12 h-12 flex items-center justify-center hover:bg-secondary/50 hover:text-primary transition-colors rounded-r-xl"
-              aria-label="Increase quantity"
-            >
-              <Plus className="h-4 w-4" />
-            </button>
           </div>
-        </div>
 
-        {/* Size Selector */}
-        <div className="space-y-3 flex-1">
-          <label className="text-sm font-medium text-foreground block">
-            Select Size
-          </label>
-          <Select value={selectedSizeId} onValueChange={setSelectedSizeId}>
-            <SelectTrigger className="w-full h-12 rounded-xl border-border bg-background hover:border-primary/50 transition-colors">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {sizeVariants.map((variant) => (
-                <SelectItem
-                  key={variant.id}
-                  value={variant.id}
-                  disabled={!variant.available}
-                  className="py-3"
-                >
-                  <div className="flex items-center justify-between w-full gap-4">
-                    <span className="font-medium">{variant.label}</span>
-                    <span className="text-muted-foreground text-xs">
-                      {variant.dimensions} | {variant.height}
-                    </span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {/* Size Selector */}
+          <div className="space-y-3 flex-1">
+            <label className="text-sm font-medium text-foreground block">
+              Select Size
+            </label>
+            <Select value={selectedSizeId} onValueChange={setSelectedSizeId}>
+              <SelectTrigger className="w-full h-12 rounded-xl border-border bg-background hover:border-primary/50 transition-colors">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {sizeVariants.map((variant) => (
+                  <SelectItem
+                    key={variant.id}
+                    value={variant.id}
+                    disabled={!variant.available}
+                    className="py-3"
+                  >
+                    <div className="flex items-center justify-between w-full gap-4">
+                      <span className="font-medium">{variant.label}</span>
+                      <span className="text-muted-foreground text-xs">
+                        {variant.dimensions} | {variant.height}
+                      </span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Polish Type Selector */}
+          <div className="space-y-3 flex-1">
+            <label className="text-sm font-medium text-foreground block">
+              Polish Type
+            </label>
+            <Select value={selectedPolishType} onValueChange={setSelectedPolishType}>
+              <SelectTrigger className="w-full h-12 rounded-xl border-border bg-background hover:border-primary/50 transition-colors">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {POLISH_TYPES.map((polishType) => (
+                  <SelectItem
+                    key={polishType.id}
+                    value={polishType.id}
+                    className="py-3"
+                  >
+                    <span className="font-medium">{polishType.label}</span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
@@ -217,7 +252,7 @@ export default function ProductInfo({
       {/* Action Buttons */}
       <div className="w-full flex flex-col sm:flex-row gap-3 pt-4">
         <Button
-          onClick={() => onAddToCart(quantity, selectedSizeId)}
+          onClick={() => onAddToCart(quantity, selectedSizeId, selectedPolishType)}
           className="w-full flex-1 h-14 text-base font-semibold rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
           size="lg"
           variant="default"
@@ -227,7 +262,7 @@ export default function ProductInfo({
         </Button>
         {onBuyNow && (
           <Button
-            onClick={() => onBuyNow(quantity, selectedSizeId)}
+            onClick={() => onBuyNow(quantity, selectedSizeId, selectedPolishType)}
             variant="outline"
             className="w-full flex-1 h-14 text-base font-semibold rounded-xl border-2 hover:bg-secondary/50 transition-all"
             size="lg"
@@ -239,3 +274,4 @@ export default function ProductInfo({
     </div>
   );
 }
+

@@ -11,6 +11,8 @@ export const CartItemSchema = z.object({
   slug: z.string().min(1),
   variantId: z.string().optional(), // Size/variant identifier
   variantLabel: z.string().optional(), // Human-readable variant (e.g., "Queen Size")
+  polishType: z.string().optional(), // Polish type identifier
+  polishTypeLabel: z.string().optional(), // Human-readable polish type (e.g., "Walnut Honey glossy finish")
 });
 
 export const CartSchema = z.object({

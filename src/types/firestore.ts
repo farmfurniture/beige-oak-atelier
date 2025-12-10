@@ -11,9 +11,12 @@ import { Timestamp } from 'firebase/firestore';
 // ============================================================================
 
 export interface ProductVariant {
+  id?: string;
+  label?: string;
   size?: string;
   color?: string;
   weight?: string;
+  polishType?: string;
   [key: string]: string | undefined; // Allow additional variant properties
 }
 
@@ -45,26 +48,26 @@ export interface Cart {
 // ORDER TYPES
 // ============================================================================
 
-export type OrderStatus = 
-  | 'pending' 
-  | 'confirmed' 
-  | 'processing' 
-  | 'shipped' 
-  | 'delivered' 
-  | 'cancelled' 
+export type OrderStatus =
+  | 'pending'
+  | 'confirmed'
+  | 'processing'
+  | 'shipped'
+  | 'delivered'
+  | 'cancelled'
   | 'failed';
 
-export type PaymentMethod = 
-  | 'cod' 
-  | 'online' 
-  | 'upi' 
-  | 'card' 
+export type PaymentMethod =
+  | 'cod'
+  | 'online'
+  | 'upi'
+  | 'card'
   | 'wallet';
 
-export type PaymentStatus = 
-  | 'pending' 
-  | 'paid' 
-  | 'failed' 
+export type PaymentStatus =
+  | 'pending'
+  | 'paid'
+  | 'failed'
   | 'refunded';
 
 export interface OrderItem {
@@ -285,7 +288,7 @@ export function calculatePricing(
   const tax = Math.round(subtotal * 0.05); // 5% tax
   const discount = couponDiscount;
   const total = subtotal + tax + shippingCost - discount;
-  
+
   return {
     subtotal,
     tax,
@@ -373,6 +376,6 @@ export function canUpdateOrderStatus(currentStatus: OrderStatus, newStatus: Orde
     cancelled: [],
     failed: ['pending'],
   };
-  
+
   return validTransitions[currentStatus]?.includes(newStatus) || false;
 }

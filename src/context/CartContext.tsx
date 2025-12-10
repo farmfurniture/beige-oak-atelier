@@ -20,6 +20,8 @@ interface CartContextType {
       slug: string;
       variantId?: string;
       variantLabel?: string;
+      polishType?: string;
+      polishTypeLabel?: string;
     },
     quantity?: number
   ) => Promise<void>;
@@ -60,6 +62,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
               slug: item.productSlug,
               variantId: item.variant?.id,
               variantLabel: item.variant?.label,
+              polishType: item.variant?.polishType,
+              polishTypeLabel: item.variant?.polishType,
             }));
             setItems(mappedItems);
           } else {
@@ -67,7 +71,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           }
         } catch (error) {
           console.error("Error loading cart from Firestore:", error);
-          // Don't show error toast - just use local state
           setItems([]);
         } finally {
           setLoading(false);
@@ -103,6 +106,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       slug: string;
       variantId?: string;
       variantLabel?: string;
+      polishType?: string;
+      polishTypeLabel?: string;
     },
     quantity: number = 1
   ) => {
@@ -123,6 +128,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       slug: product.slug,
       variantId: product.variantId,
       variantLabel: product.variantLabel,
+      polishType: product.polishType,
+      polishTypeLabel: product.polishTypeLabel,
     };
 
     const updatedItems = (() => {
@@ -159,11 +166,16 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           quantity: quantity,
           price: price,
           imageUrl: product.image,
-          variant: product.variantId ? { id: product.variantId, label: product.variantLabel } : undefined,
+          variant: product.variantId ? {
+            id: product.variantId,
+            label: product.variantLabel,
+            polishType: product.polishTypeLabel || product.polishType,
+          } : (product.polishType ? {
+            polishType: product.polishTypeLabel || product.polishType,
+          } : undefined),
         });
       } catch (error) {
         console.error("Error syncing cart to Firestore:", error);
-        // Don't show error toast - cart still works locally
       }
     } else {
       // Save to localStorage for guest users
