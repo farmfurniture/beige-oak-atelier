@@ -148,9 +148,9 @@ export default function Contact() {
                   <div>
                     <h3 className="font-semibold text-foreground mb-1">Address</h3>
                     <p className="text-muted-foreground">
-                      123 Furniture Lane<br />
-                      Design District<br />
-                      New York, NY 10001
+                      Khewat No. 119/16//67/16/15<br />
+                      Sirsi Loharu Road<br />
+                      Bhiwani – 127201, Haryana, India
                     </p>
                   </div>
                 </Card>
@@ -171,8 +171,8 @@ export default function Contact() {
                   <div>
                     <h3 className="font-semibold text-foreground mb-1">Email</h3>
                     <p className="text-muted-foreground">
-                      info@beigeandoak.com<br />
-                      sales@beigeandoak.com
+                      info@farmscraft.com<br />
+                      sales@farmscraft.com
                     </p>
                   </div>
                 </Card>

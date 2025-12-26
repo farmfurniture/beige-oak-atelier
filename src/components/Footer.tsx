@@ -19,6 +19,7 @@ const Footer = () => {
             <p className="tagline text-white/70">
               Made by hand. Loved for years.
             </p>
+            {/* Social media links - Add your real social media URLs here 
             <div className="flex space-x-3">
               <Button
                 variant="ghost"
@@ -26,7 +27,7 @@ const Footer = () => {
                 className="h-9 w-9 text-[#E4405F] hover:text-[#E4405F] hover:bg-white/10"
                 asChild
               >
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                <a href="https://instagram.com/YOUR_HANDLE" target="_blank" rel="noopener noreferrer">
                   <Instagram className="h-4 w-4" />
                 </a>
               </Button>
@@ -36,7 +37,7 @@ const Footer = () => {
                 className="h-9 w-9 text-[#1877F2] hover:text-[#1877F2] hover:bg-white/10"
                 asChild
               >
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+                <a href="https://facebook.com/YOUR_PAGE" target="_blank" rel="noopener noreferrer">
                   <Facebook className="h-4 w-4" />
                 </a>
               </Button>
@@ -46,7 +47,7 @@ const Footer = () => {
                 className="h-9 w-9 text-[#1DA1F2] hover:text-[#1DA1F2] hover:bg-white/10"
                 asChild
               >
-                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+                <a href="https://twitter.com/YOUR_HANDLE" target="_blank" rel="noopener noreferrer">
                   <Twitter className="h-4 w-4" />
                 </a>
               </Button>
@@ -56,11 +57,12 @@ const Footer = () => {
                 className="h-9 w-9 text-[#E60023] hover:text-[#E60023] hover:bg-white/10"
                 asChild
               >
-                <a href="https://pinterest.com" target="_blank" rel="noopener noreferrer">
+                <a href="https://pinterest.com/YOUR_HANDLE" target="_blank" rel="noopener noreferrer">
                   <FaPinterest className="h-4 w-4" />
                 </a>
               </Button>
             </div>
+            */}
           </div>
 
           {/* Shop Links */}
@@ -175,12 +177,6 @@ const Footer = () => {
               className="text-white/70 hover:text-white transition-colors"
             >
               Terms of Service
-            </Link>
-            <Link
-              href="/shipping"
-              className="text-white/70 hover:text-white transition-colors"
-            >
-              Shipping & Returns
             </Link>
           </div>
         </div>
