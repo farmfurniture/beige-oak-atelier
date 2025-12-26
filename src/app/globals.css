@@ -1,0 +1,300 @@
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Premium Furniture Design System - Wine & White */
+
+@layer base {
+  :root {
+    /* Wine & White Premium Palette */
+    --background: 345 50% 97%;
+    /* Light Wine White #FBF7F8 */
+    --foreground: 345 40% 20%;
+    /* Deep Wine #4A2C32 */
+
+    --card: 0 0% 100%;
+    /* Pure White */
+    --card-foreground: 345 40% 20%;
+
+    --popover: 345 50% 97%;
+    --popover-foreground: 345 40% 20%;
+
+    --primary: 345 81% 13%;
+    /* Dark Wine #3E060D */
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 345 30% 92%;
+    /* Light Wine Background #F5E8EB */
+    --secondary-foreground: 345 40% 20%;
+
+    --muted: 345 25% 94%;
+    /* Very Light Wine #F8F1F3 */
+    --muted-foreground: 345 20% 50%;
+
+    --accent: 345 81% 13%;
+    /* Dark Wine Accent #3E060D */
+    --accent-foreground: 0 0% 98%;
+
+    --wine: 345 81% 13%;
+    /* Primary Wine Color #3E060D */
+    --wine-foreground: 0 0% 98%;
+
+    --wine-light: 345 50% 85%;
+    /* Light Wine for CTA #E8CDD4 */
+    --wine-light-foreground: 345 40% 25%;
+
+    --forest: 345 81% 13%;
+    /* Dark Wine hover #3E060D */
+    --forest-foreground: 0 0% 98%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 345 20% 86%;
+    /* Light Wine Border */
+    --input: 345 20% 86%;
+    --ring: 345 81% 13%;
+
+    --radius: 0.75rem;
+    /* 12px rounded corners */
+  }
+
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    overflow-x: hidden;
+    max-width: 100vw;
+    width: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    overflow-x: hidden;
+    max-width: 100vw;
+    width: 100%;
+  }
+
+  /* Prevent overflow in all containers */
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Prevent text overflow */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  span,
+  div {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Exo 2', sans-serif;
+    font-style: italic;
+    font-weight: 600;
+  }
+}
+
+@layer components {
+
+  /* Premium Button Variants */
+  .btn-premium {
+    @apply bg-primary text-primary-foreground hover:bg-wine hover:bg-opacity-90 transition-all duration-300 px-8 py-4 rounded-xl font-medium shadow-sm hover:shadow-lg;
+  }
+
+  .btn-outline-premium {
+    @apply border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 px-8 py-4 rounded-xl font-medium;
+  }
+
+  .btn-ghost-premium {
+    @apply text-primary hover:bg-secondary/50 transition-all duration-300 px-6 py-3 rounded-lg font-medium;
+  }
+
+  /* Premium Card Styles */
+  .card-premium {
+    @apply bg-card rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden;
+  }
+
+  /* Text Gradient */
+  .text-gradient-premium {
+    @apply bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent;
+  }
+
+  /* Premium Section Spacing */
+  .section-padding {
+    @apply py-12 md:py-16 lg:py-20 px-4 md:px-6 lg:px-8;
+  }
+
+  /* Roboto Italic Typography Classes */
+  .roboto-italic-light {
+    @apply font-roboto italic font-light;
+  }
+
+  .roboto-italic-normal {
+    @apply font-roboto italic font-normal;
+  }
+
+  .roboto-italic-medium {
+    @apply font-roboto italic font-medium;
+  }
+
+  /* Specific Use Cases for Roboto Italic */
+  .tagline {
+    @apply roboto-italic-light text-lg md:text-xl text-muted-foreground;
+  }
+
+  .product-description {
+    @apply roboto-italic-normal text-base text-muted-foreground;
+  }
+
+  .testimonial-quote {
+    @apply roboto-italic-normal text-lg md:text-xl leading-relaxed;
+  }
+
+  .artisan-signature {
+    @apply roboto-italic-medium text-sm text-primary;
+  }
+
+  .craft-detail {
+    @apply roboto-italic-light text-sm text-muted-foreground;
+  }
+
+  .premium-subtitle {
+    @apply roboto-italic-medium text-base md:text-lg text-foreground/80;
+  }
+
+  /* Hero Section Specific */
+  .hero-title {
+    @apply font-exo italic font-bold text-5xl md:text-6xl lg:text-7xl leading-tight;
+  }
+
+  .hero-subtitle {
+    @apply roboto-italic-normal text-lg md:text-xl max-w-xl;
+  }
+
+  /* Section Headings */
+  .section-title {
+    @apply font-exo italic font-semibold text-4xl md:text-5xl;
+  }
+
+  .section-subtitle {
+    @apply roboto-italic-light text-base md:text-lg text-muted-foreground;
+  }
+
+  /* Navigation and UI */
+  .nav-link {
+    @apply roboto-italic-light transition-colors;
+  }
+
+  /* Brand Elements */
+  .brand-name {
+    @apply font-exo font-bold;
+  }
+
+  .brand-tagline {
+    @apply roboto-italic-light text-sm;
+  }
+
+  /* Exo 2 Heading Classes */
+  .exo-light {
+    @apply font-exo font-normal;
+  }
+
+  .exo-medium {
+    @apply font-exo font-medium;
+  }
+
+  .exo-semibold {
+    @apply font-exo font-semibold;
+  }
+
+  .exo-bold {
+    @apply font-exo font-bold;
+  }
+}
+
+@layer utilities {
+
+  /* Premium Animations */
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.8s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.5s ease-out forwards;
+  }
+
+  /* Premium Hover Effects */
+  .hover-lift {
+    @apply transition-transform duration-300 hover:-translate-y-2;
+  }
+
+  .hover-glow {
+    @apply transition-shadow duration-300 hover:shadow-2xl;
+  }
+}
