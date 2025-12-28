@@ -93,7 +93,7 @@ export default function Contact() {
                     type="tel"
                     value={formData.phone}
                     onChange={handleChange}
-                    placeholder="(555) 123-4567"
+                    placeholder="8572884333"
                   />
                 </div>
 
@@ -160,8 +160,8 @@ export default function Contact() {
                   <div>
                     <h3 className="font-semibold text-foreground mb-1">Phone</h3>
                     <p className="text-muted-foreground">
-                      (555) 123-4567<br />
-                      Mon-Fri: 9am - 6pm EST
+                      +91 8572884333<br />
+                      Mon-Sat: 10am - 7pm IST
                     </p>
                   </div>
                 </Card>

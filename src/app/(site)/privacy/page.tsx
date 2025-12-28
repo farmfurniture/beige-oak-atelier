@@ -170,6 +170,9 @@ export default function PrivacyPolicy() {
                 Bhiwani – 127201, Haryana, India
               </p>
               <p className="text-muted-foreground mt-2">
+                Phone: +91 8572884333
+              </p>
+              <p className="text-muted-foreground mt-2">
                 Website:{" "}
                 <a href="https://www.farmscraft.com" className="text-accent hover:underline">
                   www.farmscraft.com
