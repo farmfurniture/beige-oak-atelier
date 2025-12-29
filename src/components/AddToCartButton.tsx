@@ -2,43 +2,49 @@
 
 import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { addToCart } from "@/actions/cart.actions";
-import { useOptimistic, useTransition } from "react";
-import { toast } from "sonner";
+import { useCart } from "@/context/CartContext";
+import { useState } from "react";
 
 interface AddToCartButtonProps {
-  productId: string;
+  product: {
+    id: string;
+    title: string;
+    image: string;
+    priceEstimateMin: number;
+    salePrice?: number;
+    originalPrice?: number;
+    slug: string;
+  };
   className?: string;
 }
 
 export default function AddToCartButton({
-  productId,
+  product,
   className,
 }: AddToCartButtonProps) {
-  const [isPending, startTransition] = useTransition();
+  const { addToCart } = useCart();
+  const [isPending, setIsPending] = useState(false);
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    startTransition(async () => {
-      try {
-        // Only send product ID - server fetches trusted pricing
-        const result = await addToCart(productId);
-
-        if (result.success) {
-          toast.success("Added to cart!");
-        } else {
-          // Handle error case - TypeScript should narrow this correctly
-          toast.error(
-            "error" in result ? result.error : "Failed to add to cart"
-          );
-        }
-      } catch (error) {
-        console.error("Add to cart error:", error);
-        toast.error("Failed to add to cart");
-      }
-    });
+    setIsPending(true);
+    try {
+      await addToCart({
+        id: product.id,
+        title: product.title,
+        image: product.image,
+        priceEstimateMin: product.priceEstimateMin,
+        salePrice: product.salePrice,
+        originalPrice: product.originalPrice,
+        slug: product.slug,
+      });
+    } catch (error) {
+      console.error("Add to cart error:", error);
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return (
@@ -52,3 +58,4 @@ export default function AddToCartButton({
     </Button>
   );
 }
+

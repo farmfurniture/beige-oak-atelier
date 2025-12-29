@@ -35,12 +35,12 @@ export default function About() {
                 Made by Hand, Loved for Years
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                Bēige & Oak was founded with a simple belief: furniture should be more than just functional. 
+                Bēige & Oak was founded with a simple belief: furniture should be more than just functional.
                 It should tell a story, reflect craftsmanship, and stand the test of time.
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                For over two decades, we've been creating pieces that blend traditional joinery techniques 
-                with contemporary design. Each item is handcrafted by skilled artisans who pour their expertise 
+                For over two decades, we've been creating pieces that blend traditional joinery techniques
+                with contemporary design. Each item is handcrafted by skilled artisans who pour their expertise
                 and passion into every detail.
               </p>
             </div>
@@ -96,7 +96,6 @@ export default function About() {
           </div>
         </div>
       </section>
-
       {/* CTA Section */}
       <section className="section-padding">
         <div className="container mx-auto text-center space-y-6">
@@ -108,7 +107,7 @@ export default function About() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Button asChild size="lg" className="btn-premium">
-              <Link href="/showroom">Visit Showroom</Link>
+              <Link href="/contact">Visit Showroom</Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="btn-outline-premium">
               <Link href="/catalog">Browse Collection</Link>

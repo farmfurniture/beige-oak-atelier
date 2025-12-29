@@ -18,7 +18,7 @@ export default function AdminLoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email || !password) {
       toast.error("Please enter email and password");
       return;
@@ -26,30 +26,24 @@ export default function AdminLoginPage() {
 
     setLoading(true);
 
-    // Simulate a small delay for better UX
-    await new Promise(resolve => setTimeout(resolve, 300));
-
+    console.log('[Login] Validating credentials for:', email);
     if (validateAdminCredentials(email, password)) {
-      // Create session
+      // Create session - stores 'true' in localStorage
       createAdminSession();
-      
-      // Verify session was created
-      const sessionCreated = localStorage.getItem('admin_session');
-      console.log('[Login] Session created:', !!sessionCreated);
-      
-      if (sessionCreated) {
-        toast.success("Login successful!");
-        
-        // Wait a bit to ensure session is saved
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        // Redirect to admin orders
+
+      // Debug: Check if localStorage was set
+      const stored = localStorage.getItem('admin_logged_in');
+      console.log('[Login] Session created. localStorage value:', stored);
+
+      toast.success("Login successful!");
+
+      // Small delay before redirect
+      setTimeout(() => {
+        console.log('[Login] Redirecting to /admin/orders');
         window.location.href = "/admin/orders";
-      } else {
-        toast.error("Failed to create session");
-        setLoading(false);
-      }
+      }, 100);
     } else {
+      console.log('[Login] Invalid credentials');
       toast.error("Invalid credentials");
       setLoading(false);
     }

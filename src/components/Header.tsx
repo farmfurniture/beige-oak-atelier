@@ -3,7 +3,6 @@ import { Search, Heart, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MobileMenu from "@/components/MobileMenu";
 import CartIcon from "@/components/CartIcon";
-import { getCartData } from "@/actions/cart.actions";
 
 const navLinks = [
   { name: "Home", path: "/" },
@@ -12,17 +11,14 @@ const navLinks = [
   { name: "Contact", path: "/contact" },
 ];
 
-const Header = async () => {
-  // Get cart data on the server
-  const { itemCount } = await getCartData();
-
+const Header = () => {
   return (
     <header className="w-full bg-background border-b border-border relative">
-      <div className="container mx-auto max-w-[1400px]">
-        <div className="flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-4 lg:px-8">
+        <div className="flex h-14 sm:h-16 lg:h-20 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <h1 className="brand-name text-2xl md:text-3xl text-primary">
+          <Link href="/" className="flex items-center">
+            <h1 className="brand-name text-xl sm:text-2xl md:text-3xl text-primary">
               FarmCraft
             </h1>
           </Link>
@@ -70,18 +66,18 @@ const Header = async () => {
                   <User className="h-5 w-5" />
                 </Link>
               </Button>
-              <CartIcon itemCount={itemCount} />
+              <CartIcon />
             </div>
           </div>
 
           {/* Mobile Actions */}
-          <div className="flex lg:hidden items-center space-x-4">
-            <Button variant="ghost" size="icon" asChild>
+          <div className="flex lg:hidden items-center gap-1">
+            <Button variant="ghost" size="icon" className="h-9 w-9" asChild>
               <Link href="/wishlist">
                 <Heart className="h-5 w-5" />
               </Link>
             </Button>
-            <CartIcon itemCount={itemCount} />
+            <CartIcon />
             <MobileMenu navLinks={navLinks} />
           </div>
         </div>
@@ -91,3 +87,4 @@ const Header = async () => {
 };
 
 export default Header;
+

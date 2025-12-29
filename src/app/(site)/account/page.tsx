@@ -10,12 +10,25 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { formatCurrency } from "@/utils/formatters";
 import { getUserOrders } from "@/services/firestore.service";
 import { Order, formatOrderStatus, getOrderStatusColor } from "@/types/firestore";
+import { updateProfile } from "firebase/auth";
+import { firebaseUsersService } from "@/services/firebase-users.service";
 
 export default function Account() {
   const router = useRouter();
@@ -23,6 +36,7 @@ export default function Account() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [ordersError, setOrdersError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const [profileData, setProfileData] = useState({
     firstName: "",
@@ -35,9 +49,9 @@ export default function Account() {
   const fetchOrders = useCallback(async (userId: string, attempt: number = 0) => {
     setLoadingOrders(true);
     setOrdersError(null);
-    
+
     console.log(`Fetching orders for user ${userId}, attempt ${attempt + 1}`);
-    
+
     try {
       const userOrders = await getUserOrders(userId);
       console.log(`Successfully loaded ${userOrders.length} orders`);
@@ -47,10 +61,10 @@ export default function Account() {
       console.error("Error fetching orders:", error);
       console.error("Error code:", error?.code);
       console.error("Error message:", error?.message);
-      
+
       const errorMessage = error?.message || "Failed to load order history";
       setOrdersError(errorMessage);
-      
+
       // Retry logic with exponential backoff (max 3 attempts)
       if (attempt < 2) {
         const delay = Math.min(1000 * Math.pow(2, attempt), 5000);
@@ -113,9 +127,37 @@ export default function Account() {
     }));
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Profile updated successfully!");
+
+    if (!user) {
+      toast.error("You must be logged in to update your profile");
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      // Update Firebase Auth displayName
+      const fullName = `${profileData.firstName} ${profileData.lastName}`.trim();
+      await updateProfile(user, { displayName: fullName });
+
+      // Update Firestore user document
+      await firebaseUsersService.createOrUpdateUser({
+        uid: user.uid,
+        email: profileData.email || null,
+        phone: profileData.phone || null,
+        firstName: profileData.firstName,
+        lastName: profileData.lastName,
+      });
+
+      toast.success("Profile updated successfully!");
+    } catch (error: any) {
+      console.error("Error updating profile:", error);
+      toast.error(error?.message || "Failed to update profile. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -133,21 +175,21 @@ export default function Account() {
 
       <div className="container mx-auto px-4 py-12">
         <Tabs defaultValue="profile" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
-            <TabsTrigger value="profile" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
+          <TabsList className="grid w-full grid-cols-4 h-auto p-1 gap-1">
+            <TabsTrigger value="profile" className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2.5 px-2 sm:px-4 text-xs sm:text-sm">
+              <User className="h-5 w-5 sm:h-4 sm:w-4 shrink-0" />
               <span className="hidden sm:inline">Profile</span>
             </TabsTrigger>
-            <TabsTrigger value="orders" className="flex items-center gap-2">
-              <Package className="h-4 w-4" />
+            <TabsTrigger value="orders" className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2.5 px-2 sm:px-4 text-xs sm:text-sm">
+              <Package className="h-5 w-5 sm:h-4 sm:w-4 shrink-0" />
               <span className="hidden sm:inline">Orders</span>
             </TabsTrigger>
-            <TabsTrigger value="wishlist" className="flex items-center gap-2">
-              <Heart className="h-4 w-4" />
+            <TabsTrigger value="wishlist" className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2.5 px-2 sm:px-4 text-xs sm:text-sm">
+              <Heart className="h-5 w-5 sm:h-4 sm:w-4 shrink-0" />
               <span className="hidden sm:inline">Wishlist</span>
             </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
+            <TabsTrigger value="settings" className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2.5 px-2 sm:px-4 text-xs sm:text-sm">
+              <Settings className="h-5 w-5 sm:h-4 sm:w-4 shrink-0" />
               <span className="hidden sm:inline">Settings</span>
             </TabsTrigger>
           </TabsList>
@@ -206,10 +248,10 @@ export default function Account() {
                 <Separator />
 
                 <div className="flex gap-4">
-                  <Button type="submit" className="btn-premium">
-                    Save Changes
+                  <Button type="submit" className="btn-premium" disabled={isSaving}>
+                    {isSaving ? "Saving..." : "Save Changes"}
                   </Button>
-                  <Button type="button" variant="outline">
+                  <Button type="button" variant="outline" disabled={isSaving}>
                     Cancel
                   </Button>
                 </div>
@@ -249,8 +291,8 @@ export default function Account() {
                   <p className="text-muted-foreground mb-6">
                     {ordersError}
                   </p>
-                  <Button 
-                    onClick={() => user && fetchOrders(user.uid)} 
+                  <Button
+                    onClick={() => user && fetchOrders(user.uid)}
                     className="btn-premium"
                   >
                     Try Again
@@ -330,20 +372,6 @@ export default function Account() {
             <div className="space-y-6">
               <Card className="p-6">
                 <h3 className="exo-medium text-xl text-foreground mb-4">
-                  Password & Security
-                </h3>
-                <div className="space-y-4">
-                  <Button variant="outline" className="w-full justify-start">
-                    Change Password
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    Enable Two-Factor Authentication
-                  </Button>
-                </div>
-              </Card>
-
-              <Card className="p-6">
-                <h3 className="exo-medium text-xl text-foreground mb-4">
                   Notifications
                 </h3>
                 <div className="space-y-4">
@@ -370,21 +398,38 @@ export default function Account() {
                   Danger Zone
                 </h3>
                 <div className="space-y-4">
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-destructive hover:text-destructive"
-                    onClick={async () => {
-                      await signOut();
-                      toast.success("Signed out successfully");
-                      router.push("/");
-                    }}
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Sign Out
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start text-destructive hover:text-destructive">
-                    Delete Account
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start text-destructive hover:text-destructive"
+                      >
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Sign Out
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Sign Out</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to sign out of your account? You will need to sign in again to access your profile, orders, and wishlist.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={async () => {
+                            await signOut();
+                            toast.success("Signed out successfully");
+                            router.push("/");
+                          }}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          Sign Out
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </Card>
             </div>

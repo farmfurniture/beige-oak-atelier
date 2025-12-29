@@ -67,7 +67,7 @@ const Footer = () => {
 
           {/* Shop Links */}
           <div>
-            <h4 className="text-sm font-semibold text-white mb-4">Shop</h4>
+            <h4 className="text-lg font-bold text-white mb-4">Shop</h4>
             <ul className="space-y-3 text-sm">
               <li>
                 <Link
@@ -106,7 +106,7 @@ const Footer = () => {
 
           {/* Company Links */}
           <div>
-            <h4 className="text-sm font-semibold text-white mb-4">
+            <h4 className="text-lg font-bold text-white mb-4">
               Company
             </h4>
             <ul className="space-y-3 text-sm">
@@ -147,7 +147,7 @@ const Footer = () => {
 
           {/* Newsletter */}
           <div>
-            <h4 className="text-sm font-semibold text-white mb-4">
+            <h4 className="text-lg font-bold text-white mb-4">
               Stay Connected
             </h4>
             <p className="craft-detail text-white/70 mb-4">

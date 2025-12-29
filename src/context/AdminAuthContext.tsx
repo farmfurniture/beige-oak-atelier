@@ -13,50 +13,34 @@ const AdminAuthContext = createContext<AdminAuthContextValue | undefined>(undefi
 
 export type AdminAuthProviderProps = {
   children: ReactNode;
-  initialIsAuthenticated?: boolean;
 };
 
-export function AdminAuthProvider({
-  children,
-  initialIsAuthenticated = false,
-}: AdminAuthProviderProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    // Initialize with actual session state
-    if (typeof window !== 'undefined') {
-      return isAdminSessionValid();
-    }
-    return initialIsAuthenticated;
-  });
+export function AdminAuthProvider({ children }: AdminAuthProviderProps) {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  // Check authentication on mount and periodically
+  // Check authentication once on mount
   useEffect(() => {
-    // Only check and redirect if we're on an admin page (not login)
-    const isAdminPage = typeof window !== 'undefined' && 
-                        window.location.pathname.startsWith('/admin') && 
-                        window.location.pathname !== '/admin/login' &&
-                        window.location.pathname !== '/admin/setup';
+    const storedValue = localStorage.getItem('admin_logged_in');
+    console.log('[AdminAuthContext] Mount - localStorage value:', storedValue);
 
-    const checkAuth = () => {
-      const isValid = isAdminSessionValid();
-      setIsAuthenticated(isValid);
-      
-      // Only redirect if on admin page and not authenticated
-      if (!isValid && isAdminPage) {
-        router.replace("/admin/login");
-      }
-    };
+    const isValid = isAdminSessionValid();
+    console.log('[AdminAuthContext] isAdminSessionValid():', isValid);
 
-    // Initial check after a small delay to ensure session is set
-    const initialTimeout = setTimeout(checkAuth, 100);
-    
-    // Check every 5 minutes (not every minute to reduce checks)
-    const interval = setInterval(checkAuth, 5 * 60 * 1000);
-    
-    return () => {
-      clearTimeout(initialTimeout);
-      clearInterval(interval);
-    };
+    setIsAuthenticated(isValid);
+    setIsLoading(false);
+
+    // If not valid and on admin page (not login/setup), redirect
+    const pathname = window.location.pathname;
+    console.log('[AdminAuthContext] Current pathname:', pathname);
+
+    if (!isValid && pathname.startsWith('/admin') && pathname !== '/admin/login' && pathname !== '/admin/setup') {
+      console.log('[AdminAuthContext] Not authenticated, redirecting to login');
+      router.replace("/admin/login");
+    } else {
+      console.log('[AdminAuthContext] Auth check passed, not redirecting');
+    }
   }, [router]);
 
   const logout = useCallback(() => {
@@ -72,6 +56,15 @@ export function AdminAuthProvider({
     }),
     [isAuthenticated, logout]
   );
+
+  // Show loading state while checking
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   return <AdminAuthContext.Provider value={value}>{children}</AdminAuthContext.Provider>;
 }

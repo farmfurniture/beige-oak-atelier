@@ -57,20 +57,24 @@ const ProductCard = ({ product }: ProductCardProps) => {
               className="object-cover transition-transform duration-700 group-hover:scale-110"
             />
 
-            {/* Tags */}
-            {tags.length > 0 && (
-              <div className="absolute top-4 left-4 flex flex-wrap gap-2">
-                {tags.map((tag) => (
-                  <Badge
-                    key={tag}
-                    variant="secondary"
-                    className="bg-background/90 backdrop-blur-sm"
-                  >
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            )}
+            {/* Tags - Only show Premium and Bestseller */}
+            {(() => {
+              const allowedTags = ['Premium', 'Bestseller'];
+              const filteredTags = tags.filter(tag => allowedTags.includes(tag));
+              return filteredTags.length > 0 && (
+                <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+                  {filteredTags.map((tag) => (
+                    <Badge
+                      key={tag}
+                      variant="secondary"
+                      className="bg-background/90 backdrop-blur-sm"
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Content */}
@@ -143,7 +147,18 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </div>
 
         <div className="p-6 pt-0">
-          <AddToCartButton productId={id} className="w-full btn-premium" />
+          <AddToCartButton
+            product={{
+              id,
+              title,
+              image: images[0],
+              priceEstimateMin,
+              salePrice,
+              originalPrice,
+              slug,
+            }}
+            className="w-full btn-premium"
+          />
         </div>
       </div>
     </div>

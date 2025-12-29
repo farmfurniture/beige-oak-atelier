@@ -1,64 +1,9 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { jwtVerify } from "jose";
-
-const ADMIN_LOGIN_PATH = "/admin/login";
-
-/**
- * Verifies the admin session cookie.
- * Returns true only if the cookie is a valid admin token with the admin flag set.
- * This prevents privilege escalation from other JWT tokens that use the same secret.
- */
-async function verifyAdminSessionCookie(cookieValue: string): Promise<boolean> {
-  try {
-    const secret = process.env.JWT_SECRET;
-    if (!secret) {
-      console.error("JWT_SECRET not configured");
-      return false;
-    }
-
-    const encodedSecret = new TextEncoder().encode(secret);
-    const verified = await jwtVerify(cookieValue, encodedSecret);
-
-    // Ensure the token has the admin flag set to true
-    if (verified.payload.admin !== true) {
-      return false;
-    }
-
-    return true;
-  } catch (error) {
-    // Token is invalid, expired, or couldn't be verified
-    return false;
-  }
-}
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  const adminSessionCookie = request.cookies.get("admin_session")?.value;
-  const isAdminRoute = pathname.startsWith("/admin");
-  const isAuthRoute = pathname === ADMIN_LOGIN_PATH;
-
-  // Check if trying to access a protected admin route
-  if (isAdminRoute && !isAuthRoute) {
-    // Verify the session token
-    const isValidSession =
-      adminSessionCookie &&
-      (await verifyAdminSessionCookie(adminSessionCookie));
-
-    if (!isValidSession) {
-      const loginUrl = new URL(ADMIN_LOGIN_PATH, request.url);
-      loginUrl.searchParams.set("redirectTo", pathname);
-      return NextResponse.redirect(loginUrl);
-    }
-  }
-
-  // If already authenticated, redirect from login page to dashboard
-  if (isAuthRoute && adminSessionCookie) {
-    const isValidSession = await verifyAdminSessionCookie(adminSessionCookie);
-    if (isValidSession) {
-      return NextResponse.redirect(new URL("/admin", request.url));
-    }
-  }
+  // Admin auth is handled client-side with localStorage
+  // No server-side auth checks needed for admin routes
 
   const response = NextResponse.next();
 

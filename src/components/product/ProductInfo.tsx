@@ -253,7 +253,7 @@ export default function ProductInfo({
       <div className="w-full flex flex-col sm:flex-row gap-3 pt-4">
         <Button
           onClick={() => onAddToCart(quantity, selectedSizeId, selectedPolishType)}
-          className="w-full flex-1 h-14 text-base font-semibold rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
+          className="w-full flex-1 min-h-[48px] py-4 text-base font-semibold rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
           size="lg"
           variant="default"
         >
@@ -264,7 +264,7 @@ export default function ProductInfo({
           <Button
             onClick={() => onBuyNow(quantity, selectedSizeId, selectedPolishType)}
             variant="outline"
-            className="w-full flex-1 h-14 text-base font-semibold rounded-xl border-2 hover:bg-secondary/50 transition-all"
+            className="w-full flex-1 min-h-[48px] py-4 text-base font-semibold rounded-xl border-2 hover:bg-secondary/50 transition-all"
             size="lg"
           >
             Buy Now

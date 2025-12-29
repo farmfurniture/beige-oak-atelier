@@ -102,7 +102,7 @@ export default function Home() {
                 variant="outline"
                 className="btn-outline-premium text-base"
               >
-                <Link href="/custom-order">Request Custom Quote</Link>
+                <Link href="/contact">Request Custom Quote</Link>
               </Button>
             </div>
           </div>
@@ -327,7 +327,7 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Button asChild size="lg" className="bg-background text-primary hover:bg-background/90 text-base font-semibold">
-              <Link href="/showroom">Book Showroom Visit</Link>
+              <Link href="/contact">Book Showroom Visit</Link>
             </Button>
             <Button
               asChild
@@ -335,7 +335,7 @@ export default function Home() {
               variant="outline"
               className="text-base border-2 border-primary-foreground text-black hover:bg-primary-foreground hover:text-primary"
             >
-              <Link href="/custom-order">Start Custom Project</Link>
+              <Link href="/contact">Start Custom Project</Link>
             </Button>
           </div>
         </div>
