@@ -1,53 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useActionState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
-import { validateAdminCredentials, createAdminSession } from "@/config/admin-config";
-import { Lock, Mail } from "lucide-react";
+import { adminLoginAction, type AdminLoginState } from "@/actions/admin.actions";
+import { Lock, User } from "lucide-react";
 
 export default function AdminLoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!email || !password) {
-      toast.error("Please enter email and password");
-      return;
-    }
-
-    setLoading(true);
-
-    console.log('[Login] Validating credentials for:', email);
-    if (validateAdminCredentials(email, password)) {
-      // Create session - stores 'true' in localStorage
-      createAdminSession();
-
-      // Debug: Check if localStorage was set
-      const stored = localStorage.getItem('admin_logged_in');
-      console.log('[Login] Session created. localStorage value:', stored);
-
-      toast.success("Login successful!");
-
-      // Small delay before redirect
-      setTimeout(() => {
-        console.log('[Login] Redirecting to /admin/orders');
-        window.location.href = "/admin/orders";
-      }, 100);
-    } else {
-      console.log('[Login] Invalid credentials');
-      toast.error("Invalid credentials");
-      setLoading(false);
-    }
-  };
+  const [state, formAction, isPending] = useActionState<AdminLoginState, FormData>(
+    adminLoginAction,
+    {}
+  );
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-primary/10 p-4">
@@ -64,20 +29,19 @@ export default function AdminLoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form action={formAction} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="username">Username</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="admin@farmscraft.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  id="username"
+                  name="username"
+                  type="text"
+                  placeholder="Enter username"
                   className="pl-10"
                   required
-                  autoComplete="email"
+                  autoComplete="username"
                 />
               </div>
             </div>
@@ -88,10 +52,9 @@ export default function AdminLoginPage() {
                 <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="password"
+                  name="password"
                   type="password"
                   placeholder="Enter password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
                   className="pl-10"
                   required
                   autoComplete="current-password"
@@ -99,21 +62,22 @@ export default function AdminLoginPage() {
               </div>
             </div>
 
+            {state.error && (
+              <p className="text-sm text-destructive text-center">{state.error}</p>
+            )}
+
             <Button
               type="submit"
               className="w-full"
-              disabled={loading}
+              disabled={isPending}
             >
-              {loading ? "Logging in..." : "Login"}
+              {isPending ? "Logging in..." : "Login"}
             </Button>
           </form>
 
           <div className="mt-6 p-4 bg-muted rounded-lg">
             <p className="text-xs text-muted-foreground text-center">
-              Default: Session expire in 24 Hour
-            </p>
-            <p className="text-xs text-muted-foreground text-center mt-1">
-              Change <code className="bg-background px-1 py-0.5 rounded">Session</code>
+              Session expires in 2 hours
             </p>
           </div>
         </CardContent>
