@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useFormState, useFormStatus } from "react-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,8 +8,17 @@ import { Label } from "@/components/ui/label";
 import { adminLoginAction, type AdminLoginState } from "@/actions/admin.actions";
 import { Lock, User } from "lucide-react";
 
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" className="w-full" disabled={pending}>
+      {pending ? "Logging in..." : "Login"}
+    </Button>
+  );
+}
+
 export default function AdminLoginPage() {
-  const [state, formAction, isPending] = useActionState<AdminLoginState, FormData>(
+  const [state, formAction] = useFormState<AdminLoginState, FormData>(
     adminLoginAction,
     {}
   );
@@ -66,13 +75,7 @@ export default function AdminLoginPage() {
               <p className="text-sm text-destructive text-center">{state.error}</p>
             )}
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isPending}
-            >
-              {isPending ? "Logging in..." : "Login"}
-            </Button>
+            <SubmitButton />
           </form>
 
           <div className="mt-6 p-4 bg-muted rounded-lg">
