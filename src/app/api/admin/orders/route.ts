@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/config/firebase-admin';
-import { isAdminSessionValid } from '@/config/admin-config';
+import { validateAdminSession } from '@/lib/admin-auth';
 
 /**
  * GET /api/admin/orders
@@ -8,31 +8,10 @@ import { isAdminSessionValid } from '@/config/admin-config';
  */
 export async function GET(request: NextRequest) {
   try {
-    // Check admin session from cookie or header
-    const sessionCookie = request.cookies.get('admin_session')?.value;
-    
-    if (!sessionCookie) {
+    // Check admin session
+    if (!validateAdminSession(request)) {
       return NextResponse.json(
-        { error: 'Unauthorized - No admin session' },
-        { status: 401 }
-      );
-    }
-
-    // Validate session
-    try {
-      const session = JSON.parse(sessionCookie);
-      const now = Date.now();
-      const sessionDuration = 24 * 60 * 60 * 1000; // 24 hours
-      
-      if ((now - session.timestamp) >= sessionDuration) {
-        return NextResponse.json(
-          { error: 'Unauthorized - Session expired' },
-          { status: 401 }
-        );
-      }
-    } catch (e) {
-      return NextResponse.json(
-        { error: 'Unauthorized - Invalid session' },
+        { error: 'Unauthorized - No valid admin session' },
         { status: 401 }
       );
     }
@@ -59,10 +38,10 @@ export async function GET(request: NextRequest) {
     }));
 
     return NextResponse.json({ orders }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching orders:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch orders', details: error.message },
+      { error: 'Failed to fetch orders', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
@@ -75,30 +54,9 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     // Check admin session
-    const sessionCookie = request.cookies.get('admin_session')?.value;
-    
-    if (!sessionCookie) {
+    if (!validateAdminSession(request)) {
       return NextResponse.json(
-        { error: 'Unauthorized - No admin session' },
-        { status: 401 }
-      );
-    }
-
-    // Validate session
-    try {
-      const session = JSON.parse(sessionCookie);
-      const now = Date.now();
-      const sessionDuration = 24 * 60 * 60 * 1000;
-      
-      if ((now - session.timestamp) >= sessionDuration) {
-        return NextResponse.json(
-          { error: 'Unauthorized - Session expired' },
-          { status: 401 }
-        );
-      }
-    } catch (e) {
-      return NextResponse.json(
-        { error: 'Unauthorized - Invalid session' },
+        { error: 'Unauthorized - No valid admin session' },
         { status: 401 }
       );
     }
@@ -124,7 +82,7 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const updates: any = {
+    const updates: Record<string, unknown> = {
       status,
       updatedAt: new Date(),
     };
@@ -142,7 +100,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Update timeline based on status
-    const timeline: any = {};
+    const timeline: Record<string, Date> = {};
     const now = new Date();
 
     switch (status) {
@@ -163,10 +121,10 @@ export async function PATCH(request: NextRequest) {
     await orderRef.update({ ...updates, ...timeline });
 
     return NextResponse.json({ success: true }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error updating order:', error);
     return NextResponse.json(
-      { error: 'Failed to update order', details: error.message },
+      { error: 'Failed to update order', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }

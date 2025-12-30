@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/config/firebase-admin';
+import { validateAdminSession } from '@/lib/admin-auth';
 
 /**
  * GET /api/admin/products
@@ -8,30 +9,9 @@ import { adminDb } from '@/config/firebase-admin';
 export async function GET(request: NextRequest) {
     try {
         // Check admin session
-        const sessionCookie = request.cookies.get('admin_session')?.value;
-
-        if (!sessionCookie) {
+        if (!validateAdminSession(request)) {
             return NextResponse.json(
-                { error: 'Unauthorized - No admin session' },
-                { status: 401 }
-            );
-        }
-
-        // Validate session
-        try {
-            const session = JSON.parse(sessionCookie);
-            const now = Date.now();
-            const sessionDuration = 24 * 60 * 60 * 1000;
-
-            if ((now - session.timestamp) >= sessionDuration) {
-                return NextResponse.json(
-                    { error: 'Unauthorized - Session expired' },
-                    { status: 401 }
-                );
-            }
-        } catch (e) {
-            return NextResponse.json(
-                { error: 'Unauthorized - Invalid session' },
+                { error: 'Unauthorized - No valid admin session' },
                 { status: 401 }
             );
         }
@@ -51,10 +31,10 @@ export async function GET(request: NextRequest) {
         }));
 
         return NextResponse.json({ products }, { status: 200 });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error fetching products:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch products', details: error.message },
+            { error: 'Failed to fetch products', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }
@@ -67,30 +47,9 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
     try {
         // Check admin session
-        const sessionCookie = request.cookies.get('admin_session')?.value;
-
-        if (!sessionCookie) {
+        if (!validateAdminSession(request)) {
             return NextResponse.json(
-                { error: 'Unauthorized - No admin session' },
-                { status: 401 }
-            );
-        }
-
-        // Validate session
-        try {
-            const session = JSON.parse(sessionCookie);
-            const now = Date.now();
-            const sessionDuration = 24 * 60 * 60 * 1000;
-
-            if ((now - session.timestamp) >= sessionDuration) {
-                return NextResponse.json(
-                    { error: 'Unauthorized - Session expired' },
-                    { status: 401 }
-                );
-            }
-        } catch (e) {
-            return NextResponse.json(
-                { error: 'Unauthorized - Invalid session' },
+                { error: 'Unauthorized - No valid admin session' },
                 { status: 401 }
             );
         }
@@ -122,10 +81,10 @@ export async function PATCH(request: NextRequest) {
         });
 
         return NextResponse.json({ success: true }, { status: 200 });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error updating product:', error);
         return NextResponse.json(
-            { error: 'Failed to update product', details: error.message },
+            { error: 'Failed to update product', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }
@@ -138,30 +97,9 @@ export async function PATCH(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         // Check admin session
-        const sessionCookie = request.cookies.get('admin_session')?.value;
-
-        if (!sessionCookie) {
+        if (!validateAdminSession(request)) {
             return NextResponse.json(
-                { error: 'Unauthorized - No admin session' },
-                { status: 401 }
-            );
-        }
-
-        // Validate session
-        try {
-            const session = JSON.parse(sessionCookie);
-            const now = Date.now();
-            const sessionDuration = 24 * 60 * 60 * 1000;
-
-            if ((now - session.timestamp) >= sessionDuration) {
-                return NextResponse.json(
-                    { error: 'Unauthorized - Session expired' },
-                    { status: 401 }
-                );
-            }
-        } catch (e) {
-            return NextResponse.json(
-                { error: 'Unauthorized - Invalid session' },
+                { error: 'Unauthorized - No valid admin session' },
                 { status: 401 }
             );
         }
@@ -182,10 +120,10 @@ export async function POST(request: NextRequest) {
             success: true,
             productId: productRef.id
         }, { status: 201 });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error creating product:', error);
         return NextResponse.json(
-            { error: 'Failed to create product', details: error.message },
+            { error: 'Failed to create product', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }
@@ -198,30 +136,9 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
     try {
         // Check admin session
-        const sessionCookie = request.cookies.get('admin_session')?.value;
-
-        if (!sessionCookie) {
+        if (!validateAdminSession(request)) {
             return NextResponse.json(
-                { error: 'Unauthorized - No admin session' },
-                { status: 401 }
-            );
-        }
-
-        // Validate session
-        try {
-            const session = JSON.parse(sessionCookie);
-            const now = Date.now();
-            const sessionDuration = 24 * 60 * 60 * 1000;
-
-            if ((now - session.timestamp) >= sessionDuration) {
-                return NextResponse.json(
-                    { error: 'Unauthorized - Session expired' },
-                    { status: 401 }
-                );
-            }
-        } catch (e) {
-            return NextResponse.json(
-                { error: 'Unauthorized - Invalid session' },
+                { error: 'Unauthorized - No valid admin session' },
                 { status: 401 }
             );
         }
@@ -250,10 +167,10 @@ export async function DELETE(request: NextRequest) {
         await productRef.delete();
 
         return NextResponse.json({ success: true }, { status: 200 });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error deleting product:', error);
         return NextResponse.json(
-            { error: 'Failed to delete product', details: error.message },
+            { error: 'Failed to delete product', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }

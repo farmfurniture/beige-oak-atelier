@@ -4,7 +4,9 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { env } from "@/config/env.mjs";
-import { signAdminSession } from "@/lib/server/session";
+
+// Simple static session token - NOT using JWT
+const ADMIN_SESSION_TOKEN = "admin_authenticated_session_2024";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -39,20 +41,19 @@ export async function adminLoginAction(
 
   const { username, password } = parsed.data;
 
+  // Check credentials against env vars
   if (username !== env.ADMIN_USERNAME || password !== env.ADMIN_PASSWORD) {
     return { error: "Incorrect username or password" };
   }
 
   const cookieStore = cookies();
 
-  // Sign a JWT token instead of using a random UUID
-  const token = await signAdminSession();
-
+  // Set a simple session cookie (not JWT)
   cookieStore.set({
     name: "admin_session",
-    value: token,
+    value: ADMIN_SESSION_TOKEN,
     httpOnly: true,
-    sameSite: "strict",
+    sameSite: "lax",
     secure: env.NODE_ENV === "production",
     path: "/",
     maxAge: 60 * 60 * 2, // 2 hours
@@ -63,7 +64,6 @@ export async function adminLoginAction(
 
 export async function adminLogoutAction(): Promise<void> {
   const cookieStore = cookies();
-
   cookieStore.delete("admin_session");
 }
 

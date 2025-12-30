@@ -1,6 +1,7 @@
 "use client";
 
 import { useFormState, useFormStatus } from "react-dom";
+import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -76,6 +77,15 @@ export default function AdminLoginPage() {
             )}
 
             <SubmitButton />
+
+            <div className="text-center">
+              <Link
+                href="/admin/forgot-password"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                Forgot Password?
+              </Link>
+            </div>
           </form>
 
           <div className="mt-6 p-4 bg-muted rounded-lg">

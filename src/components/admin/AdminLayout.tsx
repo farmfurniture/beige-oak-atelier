@@ -2,15 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useMemo, useState, type ComponentType, type ReactNode, type SVGProps } from "react";
+import { useEffect, useMemo, useState, type ComponentType, type ReactNode, type SVGProps } from "react";
 import {
   BarChart3,
-  Boxes,
   CreditCard,
   FileChartColumnIncreasing,
-  FileText,
-  LayoutDashboard,
-  LineChart,
   LogOut,
   Menu,
   Package,
@@ -24,7 +20,8 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getAdminProfileAction } from "@/actions/admin-settings.actions";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 
 type NavItem = {
@@ -41,16 +38,9 @@ type NavSection = {
 
 const navSections: NavSection[] = [
   {
-    title: "Overview",
-    items: [
-      { title: "Dashboard", href: "/admin", icon: LayoutDashboard },
-      { title: "Analytics", href: "/admin/analytics", icon: LineChart, badge: "Soon" },
-    ],
-  },
-  {
     title: "Commerce",
     items: [
-      { title: "Orders", href: "/admin/orders", icon: ShoppingBag },
+      { title: "Orders", href: "/admin", icon: ShoppingBag },
       { title: "Products", href: "/admin/products", icon: Package },
       { title: "Customers", href: "/admin/customers", icon: Users },
     ],
@@ -60,14 +50,12 @@ const navSections: NavSection[] = [
     items: [
       { title: "Payments", href: "/admin/payments", icon: CreditCard },
       { title: "Shipping", href: "/admin/shipping", icon: Truck },
-      { title: "Reports", href: "/admin/reports", icon: FileText },
     ],
   },
   {
     title: "System",
     items: [
       { title: "Settings", href: "/admin/settings", icon: Settings },
-      { title: "Integrations", href: "/admin/integrations", icon: Boxes, badge: "Soon" },
     ],
   },
 ];
@@ -88,9 +76,11 @@ type SidebarProps = {
   activePath: string;
   onNavigate?: () => void;
   onSignOut?: () => void;
+  profilePictureUrl?: string;
+  adminEmail?: string;
 };
 
-function Sidebar({ activePath, onNavigate, onSignOut }: SidebarProps) {
+function Sidebar({ activePath, onNavigate, onSignOut, profilePictureUrl, adminEmail }: SidebarProps) {
   return (
     <div className="flex h-full w-full flex-col bg-[rgba(255,255,255,0.85)] px-6 py-8 backdrop-blur-md">
       <div className="mb-8 flex items-center gap-3">
@@ -98,7 +88,7 @@ function Sidebar({ activePath, onNavigate, onSignOut }: SidebarProps) {
           <FileChartColumnIncreasing className="size-6" strokeWidth={1.75} />
         </div>
         <div>
-          <p className="text-sm font-medium text-muted-foreground">Beige Oak Atelier</p>
+          <p className="text-sm font-medium text-muted-foreground">FarmCraft</p>
           <h1 className="text-xl font-semibold text-foreground">Admin Console</h1>
         </div>
       </div>
@@ -157,13 +147,14 @@ function Sidebar({ activePath, onNavigate, onSignOut }: SidebarProps) {
 
       <div className="flex items-center gap-4 rounded-2xl bg-white/60 p-4 shadow-inner shadow-primary/10">
         <Avatar className="size-12 border border-primary/20">
+          {profilePictureUrl && <AvatarImage src={profilePictureUrl} alt="Admin" />}
           <AvatarFallback className="bg-primary font-semibold text-primary-foreground">
             AD
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-foreground">Administrator</p>
-          <p className="truncate text-xs text-muted-foreground">admin@drbackfit.com</p>
+          <p className="truncate text-xs text-muted-foreground">{adminEmail || "admin@farmscraft.com"}</p>
         </div>
         <Button
           variant="ghost"
@@ -187,6 +178,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const pathname = usePathname();
   const { logout } = useAdminAuth();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [profile, setProfile] = useState<{ email: string; profilePictureUrl?: string } | null>(null);
+
+  useEffect(() => {
+    getAdminProfileAction().then(setProfile).catch(console.error);
+  }, []);
 
   const activeItem = useMemo(() => findActiveItem(pathname), [pathname]);
   const pageTitle = activeItem?.title ?? "Dashboard";
@@ -209,12 +205,19 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             activePath={pathname}
             onNavigate={() => setIsMobileNavOpen(false)}
             onSignOut={() => void logout()}
+            profilePictureUrl={profile?.profilePictureUrl}
+            adminEmail={profile?.email}
           />
         </SheetContent>
       </Sheet>
 
       <aside className="hidden w-[320px] shrink-0 border-r border-white/30 lg:block">
-        <Sidebar activePath={pathname} onSignOut={() => void logout()} />
+        <Sidebar
+          activePath={pathname}
+          onSignOut={() => void logout()}
+          profilePictureUrl={profile?.profilePictureUrl}
+          adminEmail={profile?.email}
+        />
       </aside>
 
       <div className="relative flex flex-1 flex-col">
