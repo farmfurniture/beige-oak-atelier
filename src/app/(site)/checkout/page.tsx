@@ -181,7 +181,7 @@ export default function Checkout() {
         key: clientEnv.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: razorpayOrder.amount,
         currency: razorpayOrder.currency,
-        name: 'Beige Oak Atelier',
+        name: 'Farm Craft',
         description: `Order #${orderId}`,
         order_id: razorpayOrder.id,
         handler: async function (response: any) {
