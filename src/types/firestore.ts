@@ -70,6 +70,40 @@ export type PaymentStatus =
   | 'failed'
   | 'refunded';
 
+/**
+ * Supported payment gateways
+ * Extend this union when you add more gateways (e.g., 'stripe')
+ */
+export type PaymentGateway =
+  | 'razorpay';
+
+/**
+ * Generic payment record stored in the `payments` collection
+ * Field names are gateway-agnostic so they work across providers
+ */
+export interface PaymentRecord {
+  /** Payment identifier from the gateway (e.g., Razorpay payment.id) */
+  paymentId: string;
+  /** Associated orderId in our Firestore `orders` collection */
+  orderId: string;
+  /** Which gateway processed this payment */
+  gateway: PaymentGateway;
+  /** Amount in major currency units (e.g., INR) */
+  amount: number;
+  /** Currency code, e.g. 'INR' */
+  currency: string;
+  /** Normalized payment status */
+  status: PaymentStatus;
+  /** Payment method from gateway (card, upi, netbanking, etc.) */
+  method?: string;
+  /** Created timestamp */
+  createdAt: Timestamp;
+  /** Last updated timestamp */
+  updatedAt: Timestamp;
+  /** Optional raw gateway payload for debugging/auditing */
+  raw?: Record<string, any>;
+}
+
 export interface OrderItem {
   productId: string;
   productName: string;
@@ -159,6 +193,12 @@ export type UpdateCartInput = Partial<Omit<Cart, 'userId' | 'createdAt'>>;
  * Type for creating a new order (without auto-generated fields)
  */
 export type CreateOrderInput = Omit<Order, 'orderId' | 'orderNumber' | 'createdAt' | 'updatedAt'>;
+
+/**
+ * Type for creating/upserting a payment record
+ * Timestamps are managed by the database layer
+ */
+export type CreatePaymentRecordInput = Omit<PaymentRecord, 'createdAt' | 'updatedAt'>;
 
 /**
  * Type for updating order status

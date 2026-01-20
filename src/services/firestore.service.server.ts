@@ -12,6 +12,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import type {
   Order,
   UpdateOrderStatusInput,
+  CreatePaymentRecordInput,
 } from '@/types/firestore';
 
 /**
@@ -129,6 +130,42 @@ export async function updateOrderStatus(
     await orderRef.update(updates);
   } catch (error) {
     console.error('Error updating order status:', error);
+    throw error;
+  }
+}
+
+/**
+ * Create or update a generic payment record in the `payments` collection.
+ * Uses a gateway-agnostic schema with `paymentId`, `orderId`, `gateway`, etc.
+ */
+export async function upsertPaymentRecord(
+  input: CreatePaymentRecordInput & { raw?: any }
+): Promise<void> {
+  try {
+    const paymentRef = adminDb.collection('payments').doc(input.paymentId);
+    const existing = await paymentRef.get();
+
+    const now = FieldValue.serverTimestamp();
+
+    const data: any = {
+      paymentId: input.paymentId,
+      orderId: input.orderId,
+      gateway: input.gateway,
+      amount: input.amount,
+      currency: input.currency,
+      status: input.status,
+      method: input.method,
+      raw: input.raw,
+      updatedAt: now,
+    };
+
+    if (!existing.exists) {
+      data.createdAt = now;
+    }
+
+    await paymentRef.set(data, { merge: true });
+  } catch (error) {
+    console.error('Error upserting payment record:', error);
     throw error;
   }
 }
