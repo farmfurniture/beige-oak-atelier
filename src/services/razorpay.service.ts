@@ -2,11 +2,18 @@ import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import { env } from '@/config/env.mjs';
 
-// Initialize Razorpay instance
-export const razorpay = new Razorpay({
-  key_id: env.RAZORPAY_KEY_ID || '',
-  key_secret: env.RAZORPAY_KEY_SECRET || '',
-});
+// Lazy-initialize Razorpay instance (only when needed, not at build time)
+let razorpayInstance: Razorpay | null = null;
+
+function getRazorpayInstance(): Razorpay {
+  if (!razorpayInstance) {
+    razorpayInstance = new Razorpay({
+      key_id: env.RAZORPAY_KEY_ID || '',
+      key_secret: env.RAZORPAY_KEY_SECRET || '',
+    });
+  }
+  return razorpayInstance;
+}
 
 /**
  * Create a Razorpay order
@@ -25,6 +32,7 @@ export async function createRazorpayOrder(params: {
       notes: params.notes || {},
     };
 
+    const razorpay = getRazorpayInstance();
     const order = await razorpay.orders.create(options);
     return order;
   } catch (error) {
@@ -80,6 +88,7 @@ export function verifyWebhookSignature(
  */
 export async function getPaymentDetails(paymentId: string) {
   try {
+    const razorpay = getRazorpayInstance();
     const payment = await razorpay.payments.fetch(paymentId);
     return payment;
   } catch (error) {
