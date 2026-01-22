@@ -216,9 +216,30 @@ export default function ProductDetail() {
     { id: "walnut-natural-matte", label: "Walnut Natural matte finish" },
   ];
 
-  const handleAddToCart = (quantity: number, sizeId: string, polishType: string) => {
+  // Custom Size type interface
+  interface CustomSizeDimensions {
+    length: string;
+    width: string;
+    height: string;
+  }
+
+  // Selected options interface
+  interface SelectedOptions {
+    color?: string;
+    fibre?: string;
+    subCategory?: string;
+  }
+
+  const handleAddToCart = (quantity: number, sizeId: string, polishType: string, customSize?: CustomSizeDimensions, selectedOptions?: SelectedOptions) => {
+    const isCustomSize = sizeId === "custom-size";
     const selectedSize = product.sizeVariants.find((v: any) => v.id === sizeId);
     const selectedPolish = POLISH_TYPES.find((p) => p.id === polishType);
+
+    // Build variant label for custom size
+    const variantLabel = isCustomSize && customSize
+      ? `Custom Size (${customSize.length} × ${customSize.width} × ${customSize.height} cm)`
+      : selectedSize?.label;
+
     addToCart(
       {
         id: basicProduct.id,
@@ -229,18 +250,26 @@ export default function ProductDetail() {
         originalPrice: basicProduct.originalPrice,
         slug: basicProduct.slug,
         variantId: sizeId,
-        variantLabel: selectedSize?.label,
+        variantLabel: variantLabel,
         polishType: polishType,
         polishTypeLabel: selectedPolish?.label,
+        customSize: isCustomSize ? customSize : undefined,
+        selectedColor: selectedOptions?.color,
+        selectedFibre: selectedOptions?.fibre,
+        selectedSubCategory: selectedOptions?.subCategory,
       },
       quantity
     );
+
+    if (isCustomSize) {
+      toast.info("Custom size requested. Our team will contact you to confirm pricing.");
+    }
   };
 
-  const handleBuyNow = (quantity: number, sizeId: string, polishType: string) => {
-    handleAddToCart(quantity, sizeId, polishType);
-    // Redirect to checkout
-    window.location.href = "/checkout";
+  const handleBuyNow = (quantity: number, sizeId: string, polishType: string, customSize?: CustomSizeDimensions, selectedOptions?: SelectedOptions) => {
+    handleAddToCart(quantity, sizeId, polishType, customSize, selectedOptions);
+    // Redirect to cart
+    window.location.href = "/cart";
   };
 
 
@@ -278,6 +307,7 @@ export default function ProductDetail() {
             {/* Right Column: Product Info */}
             <div className="w-full max-w-full min-w-0 space-y-6 md:space-y-8">
               <ProductInfo
+                productId={basicProduct.id}
                 title={product.title}
                 rating={product.reviewSummary.averageRating}
                 reviewCount={product.reviewSummary.totalReviews}
@@ -288,6 +318,9 @@ export default function ProductDetail() {
                 offers={product.offers}
                 sizeVariants={product.sizeVariants}
                 defaultSizeId={product.defaultSizeId}
+                colorOptions={basicProduct.colorOptions || []}
+                fibreOptions={basicProduct.fibreOptions || []}
+                subCategoryOptions={basicProduct.subCategoryOptions || []}
                 onAddToCart={handleAddToCart}
                 onBuyNow={handleBuyNow}
               />

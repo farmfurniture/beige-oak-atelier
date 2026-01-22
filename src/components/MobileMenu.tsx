@@ -77,7 +77,7 @@ export default function MobileMenu({ navLinks }: MobileMenuProps) {
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-border">
-              <h2 className="brand-name text-xl text-primary">FarmCraft</h2>
+              <h2 className="brand-name text-xl text-primary">FarmsCraft</h2>
               <Button
                 variant="ghost"
                 size="icon"
@@ -96,11 +96,10 @@ export default function MobileMenu({ navLinks }: MobileMenuProps) {
                     key={link.path}
                     href={link.path}
                     onClick={() => setIsOpen(false)}
-                    className={`block px-4 py-3 rounded-lg text-base font-medium transition-all ${
-                      isActive(link.path)
+                    className={`block px-4 py-3 rounded-lg text-base font-medium transition-all ${isActive(link.path)
                         ? "text-white bg-primary shadow-md"
                         : "text-foreground hover:bg-accent hover:text-primary"
-                    }`}
+                      }`}
                   >
                     {link.name}
                   </Link>

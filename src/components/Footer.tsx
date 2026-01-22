@@ -14,7 +14,7 @@ const Footer = () => {
           {/* Brand Column */}
           <div className="space-y-4">
             <h3 className="brand-name text-2xl text-white">
-              Farm Craft
+              FarmsCraft
             </h3>
             <p className="tagline text-white/70">
               Made by hand. Loved for years.
@@ -163,7 +163,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-white/20 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
           <p className="text-sm text-white/70">
-            © {currentYear} Farm Craft. All rights reserved.
+            © {currentYear} FarmsCraft. All rights reserved.
           </p>
           <div className="flex space-x-6 text-sm">
             <Link

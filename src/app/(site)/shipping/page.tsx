@@ -4,7 +4,7 @@ import { Truck, Package, RefreshCw, Clock, MapPin, Phone } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 export const metadata: Metadata = {
-    title: "Shipping & Returns | Farm Craft",
+    title: "Shipping & Returns | FarmsCraft",
     description: "Learn about Farm Industries shipping policies, delivery timelines, and return procedures for all furniture orders.",
 };
 

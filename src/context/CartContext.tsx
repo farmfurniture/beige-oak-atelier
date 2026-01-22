@@ -22,6 +22,14 @@ interface CartContextType {
       variantLabel?: string;
       polishType?: string;
       polishTypeLabel?: string;
+      customSize?: {
+        length: string;
+        width: string;
+        height: string;
+      };
+      selectedColor?: string;
+      selectedFibre?: string;
+      selectedSubCategory?: string;
     },
     quantity?: number
   ) => Promise<void>;
@@ -30,15 +38,16 @@ interface CartContextType {
   clearCart: () => Promise<void>;
   getTotal: () => number;
   getItemCount: () => number;
+  isInCart: (productId: string) => boolean;
   loading: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [items, setItems] = useState<CartItem[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Helper function to generate composite key
   const getItemKey = (item: CartItem | { id: string; variantId?: string }) => {
@@ -46,7 +55,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Load cart from Firestore when user logs in, or localStorage for guests
+  // Wait for auth loading to complete first to avoid race conditions
   useEffect(() => {
+    // Don't load cart until auth state is determined
+    if (authLoading) {
+      return;
+    }
+
     const loadCart = async () => {
       if (user) {
         setLoading(true);
@@ -93,7 +108,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     };
 
     loadCart();
-  }, [user]);
+  }, [user, authLoading]);
 
   const addToCart = async (
     product: {
@@ -108,6 +123,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       variantLabel?: string;
       polishType?: string;
       polishTypeLabel?: string;
+      customSize?: {
+        length: string;
+        width: string;
+        height: string;
+      };
+      selectedColor?: string;
+      selectedFibre?: string;
+      selectedSubCategory?: string;
     },
     quantity: number = 1
   ) => {
@@ -130,6 +153,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       variantLabel: product.variantLabel,
       polishType: product.polishType,
       polishTypeLabel: product.polishTypeLabel,
+      customSize: product.customSize,
+      selectedColor: product.selectedColor,
+      selectedFibre: product.selectedFibre,
+      selectedSubCategory: product.selectedSubCategory,
     };
 
     const updatedItems = (() => {
@@ -272,6 +299,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     return items.reduce((sum, item) => sum + item.quantity, 0);
   };
 
+  const isInCart = (productId: string) => {
+    return items.some((item) => item.id === productId);
+  };
+
   return (
     <CartContext.Provider
       value={{
@@ -282,6 +313,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         clearCart,
         getTotal,
         getItemCount,
+        isInCart,
         loading
       }}
     >

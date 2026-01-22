@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Star, ChevronDown, ChevronUp, Minus, Plus, ShoppingBag, Zap, Tag } from "lucide-react";
+import { Star, ChevronDown, ChevronUp, Minus, Plus, ShoppingBag, Zap, Tag, Ruler } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { type Offer, type SizeVariant } from "@/models/ProductDetail";
+import { useCart } from "@/context/CartContext";
 
 // Polish Type Options
 const POLISH_TYPES = [
@@ -22,7 +24,17 @@ const POLISH_TYPES = [
   { id: "walnut-natural-matte", label: "Walnut Natural matte finish" },
 ];
 
+// Custom Size Option ID
+const CUSTOM_SIZE_ID = "custom-size";
+
+interface CustomSizeDimensions {
+  length: string;
+  width: string;
+  height: string;
+}
+
 interface ProductInfoProps {
+  productId: string;
   title: string;
   rating: number;
   reviewCount: number;
@@ -33,11 +45,15 @@ interface ProductInfoProps {
   offers: Offer[];
   sizeVariants: SizeVariant[];
   defaultSizeId: string;
-  onAddToCart: (quantity: number, sizeId: string, polishType: string) => void;
-  onBuyNow?: (quantity: number, sizeId: string, polishType: string) => void;
+  colorOptions?: string[];
+  fibreOptions?: string[];
+  subCategoryOptions?: string[];
+  onAddToCart: (quantity: number, sizeId: string, polishType: string, customSize?: CustomSizeDimensions, selectedOptions?: { color?: string; fibre?: string; subCategory?: string }) => void;
+  onBuyNow?: (quantity: number, sizeId: string, polishType: string, customSize?: CustomSizeDimensions, selectedOptions?: { color?: string; fibre?: string; subCategory?: string }) => void;
 }
 
 export default function ProductInfo({
+  productId,
   title,
   rating,
   reviewCount,
@@ -48,17 +64,30 @@ export default function ProductInfo({
   offers,
   sizeVariants,
   defaultSizeId,
+  colorOptions = [],
+  fibreOptions = [],
+  subCategoryOptions = [],
   onAddToCart,
   onBuyNow,
 }: ProductInfoProps) {
+  const { isInCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [selectedSizeId, setSelectedSizeId] = useState(defaultSizeId);
   const [selectedPolishType, setSelectedPolishType] = useState(POLISH_TYPES[0].id);
   const [showAllOffers, setShowAllOffers] = useState(false);
+  const [customSize, setCustomSize] = useState<CustomSizeDimensions>({
+    length: "",
+    width: "",
+    height: "",
+  });
+  const [selectedColor, setSelectedColor] = useState(colorOptions[0] || "");
+  const [selectedFibre, setSelectedFibre] = useState(fibreOptions[0] || "");
+  const [selectedSubCategory, setSelectedSubCategory] = useState(subCategoryOptions[0] || "");
 
+  const isCustomSizeSelected = selectedSizeId === CUSTOM_SIZE_ID;
   const selectedSize = sizeVariants.find((v) => v.id === selectedSizeId);
-  const displayPrice = selectedSize?.price || salePrice;
-  const displayOriginalPrice = selectedSize?.originalPrice || originalPrice;
+  const displayPrice = isCustomSizeSelected ? salePrice : (selectedSize?.price || salePrice);
+  const displayOriginalPrice = isCustomSizeSelected ? originalPrice : (selectedSize?.originalPrice || originalPrice);
 
   const formatINR = (amount: number) => {
     return new Intl.NumberFormat("en-IN", {
@@ -218,9 +247,66 @@ export default function ProductInfo({
                     </div>
                   </SelectItem>
                 ))}
+                {/* Custom Size Option */}
+                <SelectItem
+                  key={CUSTOM_SIZE_ID}
+                  value={CUSTOM_SIZE_ID}
+                  className="py-3"
+                >
+                  <div className="flex items-center gap-2">
+                    <Ruler className="h-4 w-4 text-primary" />
+                    <span className="font-medium text-primary">Custom Size</span>
+                    <span className="text-muted-foreground text-xs">Enter your dimensions</span>
+                  </div>
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
+
+          {/* Custom Size Input Fields */}
+          {isCustomSizeSelected && (
+            <div className="w-full mt-4 p-4 rounded-xl border border-primary/30 bg-primary/5">
+              <div className="flex items-center gap-2 mb-3">
+                <Ruler className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium text-foreground">Enter Custom Dimensions (in cm)</span>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">Length</label>
+                  <Input
+                    type="number"
+                    placeholder="L"
+                    value={customSize.length}
+                    onChange={(e) => setCustomSize({ ...customSize, length: e.target.value })}
+                    className="h-10 rounded-lg text-center"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">Width</label>
+                  <Input
+                    type="number"
+                    placeholder="W"
+                    value={customSize.width}
+                    onChange={(e) => setCustomSize({ ...customSize, width: e.target.value })}
+                    className="h-10 rounded-lg text-center"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">Height</label>
+                  <Input
+                    type="number"
+                    placeholder="H"
+                    value={customSize.height}
+                    onChange={(e) => setCustomSize({ ...customSize, height: e.target.value })}
+                    className="h-10 rounded-lg text-center"
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Note: Final price will be confirmed after reviewing custom dimensions
+              </p>
+            </div>
+          )}
 
           {/* Polish Type Selector */}
           <div className="space-y-3 flex-1">
@@ -245,30 +331,112 @@ export default function ProductInfo({
             </Select>
           </div>
         </div>
+
+        {/* Second Row: Color, Fibre, SubCategory (only if options exist) */}
+        {(colorOptions.length > 0 || fibreOptions.length > 0 || subCategoryOptions.length > 0) && (
+          <div className="flex flex-col md:flex-row gap-5 md:items-end">
+            {/* Color Selector */}
+            {colorOptions.length > 0 && (
+              <div className="space-y-3 flex-1">
+                <label className="text-sm font-medium text-foreground block">
+                  Color
+                </label>
+                <Select value={selectedColor} onValueChange={setSelectedColor}>
+                  <SelectTrigger className="w-full h-12 rounded-xl border-border bg-background hover:border-primary/50 transition-colors">
+                    <SelectValue placeholder="Select Color" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {colorOptions.map((color) => (
+                      <SelectItem key={color} value={color} className="py-3">
+                        <span className="font-medium">{color}</span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Fibre Selector */}
+            {fibreOptions.length > 0 && (
+              <div className="space-y-3 flex-1">
+                <label className="text-sm font-medium text-foreground block">
+                  Fibre
+                </label>
+                <Select value={selectedFibre} onValueChange={setSelectedFibre}>
+                  <SelectTrigger className="w-full h-12 rounded-xl border-border bg-background hover:border-primary/50 transition-colors">
+                    <SelectValue placeholder="Select Fibre" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {fibreOptions.map((fibre) => (
+                      <SelectItem key={fibre} value={fibre} className="py-3">
+                        <span className="font-medium">{fibre}</span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* SubCategory Selector */}
+            {subCategoryOptions.length > 0 && (
+              <div className="space-y-3 flex-1">
+                <label className="text-sm font-medium text-foreground block">
+                  Type
+                </label>
+                <Select value={selectedSubCategory} onValueChange={setSelectedSubCategory}>
+                  <SelectTrigger className="w-full h-12 rounded-xl border-border bg-background hover:border-primary/50 transition-colors">
+                    <SelectValue placeholder="Select Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {subCategoryOptions.map((subCat) => (
+                      <SelectItem key={subCat} value={subCat} className="py-3">
+                        <span className="font-medium">{subCat}</span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
 
 
       {/* Action Buttons */}
       <div className="w-full flex flex-col sm:flex-row gap-3 pt-4">
-        <Button
-          onClick={() => onAddToCart(quantity, selectedSizeId, selectedPolishType)}
-          className="w-full flex-1 min-h-[48px] py-4 text-base font-semibold rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
-          size="lg"
-          variant="default"
-        >
-          <ShoppingBag className="mr-2 h-5 w-5" />
-          Add to Cart
-        </Button>
-        {onBuyNow && (
+        {isInCart(productId) ? (
           <Button
-            onClick={() => onBuyNow(quantity, selectedSizeId, selectedPolishType)}
-            variant="outline"
-            className="w-full flex-1 min-h-[48px] py-4 text-base font-semibold rounded-xl border-2 hover:bg-secondary/50 transition-all"
+            onClick={() => onBuyNow?.(quantity, selectedSizeId, selectedPolishType, isCustomSizeSelected ? customSize : undefined, { color: selectedColor || undefined, fibre: selectedFibre || undefined, subCategory: selectedSubCategory || undefined })}
+            className="w-full flex-1 min-h-[48px] py-4 text-base font-semibold rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
             size="lg"
+            variant="default"
           >
+            <ShoppingBag className="mr-2 h-5 w-5" />
             Buy Now
           </Button>
+        ) : (
+          <>
+            <Button
+              onClick={() => onAddToCart(quantity, selectedSizeId, selectedPolishType, isCustomSizeSelected ? customSize : undefined, { color: selectedColor || undefined, fibre: selectedFibre || undefined, subCategory: selectedSubCategory || undefined })}
+              className="w-full flex-1 min-h-[48px] py-4 text-base font-semibold rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
+              size="lg"
+              variant="default"
+            >
+              <ShoppingBag className="mr-2 h-5 w-5" />
+              Add to Cart
+            </Button>
+            {onBuyNow && (
+              <Button
+                onClick={() => onBuyNow(quantity, selectedSizeId, selectedPolishType, isCustomSizeSelected ? customSize : undefined, { color: selectedColor || undefined, fibre: selectedFibre || undefined, subCategory: selectedSubCategory || undefined })}
+                variant="outline"
+                className="w-full flex-1 min-h-[48px] py-4 text-base font-semibold rounded-xl border-2 hover:bg-secondary/50 transition-all"
+                size="lg"
+              >
+                Buy Now
+              </Button>
+            )}
+          </>
         )}
       </div>
     </div>

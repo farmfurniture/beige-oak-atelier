@@ -79,7 +79,7 @@ export async function sendPasswordResetEmail(
     <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px;">
       <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
         <div style="background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%); padding: 40px 20px; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 28px;">FarmCraft</h1>
+          <h1 style="color: white; margin: 0; font-size: 28px;">FarmsCraft</h1>
           <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">Admin Console</p>
         </div>
         
@@ -111,7 +111,7 @@ export async function sendPasswordResetEmail(
         
         <div style="background-color: #f9f9f9; padding: 20px; text-align: center;">
           <p style="color: #999; font-size: 12px; margin: 0;">
-            © ${new Date().getFullYear()} FarmCraft. All rights reserved.
+            © ${new Date().getFullYear()} FarmsCraft. All rights reserved.
           </p>
         </div>
       </div>
@@ -121,7 +121,7 @@ export async function sendPasswordResetEmail(
 
   return sendEmail({
     to: email,
-    subject: "Reset Your Admin Password - FarmCraft",
+    subject: "Reset Your Admin Password - FarmsCraft",
     html,
   });
 }

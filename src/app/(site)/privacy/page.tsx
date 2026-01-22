@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Farm Craft",
+  title: "Privacy Policy | FarmsCraft",
   description: "Learn how Farm Industries collects, uses, and protects your personal information when you use farmscraft.com.",
 };
 

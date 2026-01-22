@@ -1,5 +1,12 @@
 import { z } from "zod";
 
+// Custom size dimensions schema
+export const CustomSizeDimensionsSchema = z.object({
+  length: z.string(),
+  width: z.string(),
+  height: z.string(),
+});
+
 // Cart item schema
 export const CartItemSchema = z.object({
   id: z.string().min(1),
@@ -13,6 +20,11 @@ export const CartItemSchema = z.object({
   variantLabel: z.string().optional(), // Human-readable variant (e.g., "Queen Size")
   polishType: z.string().optional(), // Polish type identifier
   polishTypeLabel: z.string().optional(), // Human-readable polish type (e.g., "Walnut Honey glossy finish")
+  customSize: CustomSizeDimensionsSchema.optional(), // Custom size dimensions (L × W × H)
+  // Product options (admin-configurable per product)
+  selectedColor: z.string().optional(),
+  selectedFibre: z.string().optional(),
+  selectedSubCategory: z.string().optional(),
 });
 
 export const CartSchema = z.object({

@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-    title: "Terms & Conditions | Farm Craft",
+    title: "Terms & Conditions | FarmsCraft",
     description: "Read the terms and conditions for using Farmscraft and purchasing our products.",
 };
 

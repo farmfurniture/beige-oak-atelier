@@ -84,7 +84,7 @@ export default function Home() {
             <h1 className="hero-title text-foreground">
               The
               <br />
-              <span className="text-gradient-premium">FarmCraft</span>
+              <span className="text-gradient-premium">FarmsCraft</span>
             </h1>
             <p className="hero-subtitle text-muted-foreground">
               Premium furniture crafted by master artisans. Each piece tells a
@@ -118,7 +118,7 @@ export default function Home() {
                 Craftsmanship That Speaks
               </h2>
               <p className="product-description leading-relaxed">
-                For over two decades, Farm Craft has been creating furniture
+                For over two decades, FarmsCraft has been creating furniture
                 that transcends trends. Our workshop combines traditional
                 joinery techniques with modern design sensibilities, ensuring
                 each piece is both beautiful and built to last.
@@ -162,7 +162,7 @@ export default function Home() {
             <h2 className="section-title text-foreground">Bestsellers</h2>
             <p className="section-subtitle max-w-2xl mx-auto">
               Our most loved pieces. Shop customer favorites and see why they
-              choose Farm Craft.
+              choose FarmsCraft.
             </p>
           </div>
 
@@ -318,7 +318,7 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="section-padding bg-secondary text-primary-foreground">
+      <section className="section-padding">
         <div className="container mx-auto text-center space-y-6">
           <h2 className="section-title text-black">Ready to Create Something Special?</h2>
           <p className="premium-subtitle max-w-2xl mx-auto opacity-90">
@@ -326,14 +326,14 @@ export default function Home() {
             to bring your vision to life.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button asChild size="lg" className="bg-background text-primary hover:bg-background/90 text-base font-semibold">
+            <Button asChild size="lg" className="bg-primary text-white hover:bg-primary/90 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
               <Link href="/contact">Book Showroom Visit</Link>
             </Button>
             <Button
               asChild
               size="lg"
               variant="outline"
-              className="text-base border-2 border-primary-foreground text-black hover:bg-primary-foreground hover:text-primary"
+              className="text-base border-2 border-primary bg-white/80 text-primary hover:bg-primary hover:text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
             >
               <Link href="/contact">Start Custom Project</Link>
             </Button>

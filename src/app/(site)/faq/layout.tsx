@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "FAQ | Farm Craft",
+    title: "FAQ | FarmsCraft",
     description: "Find answers to frequently asked questions about Farm Industries furniture, ordering, shipping, and more.",
 };
 

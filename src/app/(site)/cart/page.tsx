@@ -3,17 +3,40 @@
 // Force dynamic rendering for cart page
 export const dynamic = "force-dynamic";
 
+import { useState } from "react";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 import Image from "next/image";
 import Link from "next/link";
-import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Minus, Plus, Trash2, ShoppingBag, LogIn, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { formatCurrency } from "@/utils/formatters";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function Cart() {
   const { items, updateQuantity, removeFromCart, getTotal, getItemCount, loading } =
     useCart();
+  const { user, isLoading: authLoading } = useAuth();
+  const router = useRouter();
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
+
+  const handleProceedToCheckout = () => {
+    if (authLoading) return;
+
+    if (!user) {
+      setShowLoginDialog(true);
+    } else {
+      router.push("/checkout");
+    }
+  };
 
   if (loading) {
     return (
@@ -181,8 +204,13 @@ export default function Cart() {
                 </div>
               </div>
 
-              <Button asChild className="w-full btn-premium" size="lg">
-                <Link href="/checkout">Proceed to Checkout</Link>
+              <Button
+                onClick={handleProceedToCheckout}
+                className="w-full btn-premium"
+                size="lg"
+                disabled={authLoading}
+              >
+                Proceed to Checkout
               </Button>
 
               <Button asChild variant="outline" className="w-full" size="lg">
@@ -192,6 +220,47 @@ export default function Cart() {
           </div>
         </div>
       </div>
+
+      {/* Login/Signup Dialog */}
+      <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-center">
+              Sign in to Continue
+            </DialogTitle>
+            <DialogDescription className="text-center pt-2">
+              Please sign in or create an account to proceed with your checkout.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 pt-4">
+            <Button
+              asChild
+              size="lg"
+              className="w-full btn-premium"
+            >
+              <Link href="/sign-in" onClick={() => setShowLoginDialog(false)}>
+                <LogIn className="mr-2 h-5 w-5" />
+                Sign In
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="w-full"
+            >
+              <Link href="/sign-up" onClick={() => setShowLoginDialog(false)}>
+                <UserPlus className="mr-2 h-5 w-5" />
+                Create Account
+              </Link>
+            </Button>
+          </div>
+          <p className="text-sm text-muted-foreground text-center pt-2">
+            Your cart items will be saved
+          </p>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+

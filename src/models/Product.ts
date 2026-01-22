@@ -38,6 +38,10 @@ export const ProductSchema = z
     // Admin publication controls
     published: z.boolean().default(true),
     featured: z.boolean().default(false),
+    // Dynamic product options (admin-configurable)
+    colorOptions: z.array(z.string()).default([]),
+    fibreOptions: z.array(z.string()).default([]),
+    subCategoryOptions: z.array(z.string()).default([]),
   })
   .transform((data) => ({
     ...data,
@@ -72,6 +76,10 @@ type ProductBase = {
   offers: Offer[];
   published: boolean;
   featured: boolean;
+  // Dynamic product options (admin-configurable)
+  colorOptions: string[];
+  fibreOptions: string[];
+  subCategoryOptions: string[];
 };
 
 // Product type with transformed price field

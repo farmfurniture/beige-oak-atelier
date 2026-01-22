@@ -10,7 +10,7 @@ import "./globals.css";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Farm Craft - Premium Handcrafted Furniture",
+  title: "FarmsCraft - Premium Handcrafted Furniture",
   description:
     "Premium furniture crafted by master artisans. Each piece tells a story of dedication, quality materials, and timeless design.",
   icons: {

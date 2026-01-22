@@ -1,7 +1,7 @@
 import { OrdersSection } from "@/components/admin/sections/OrdersSection";
 
 export const metadata = {
-  title: "Orders • FarmCraft Admin",
+  title: "Orders • FarmsCraft Admin",
 };
 
 export default function AdminDashboardPage() {

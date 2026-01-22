@@ -276,6 +276,9 @@ export function ProductsSection() {
     faqs: [{ question: "", answer: "" }],
     published: true,
     featured: false,
+    colorOptions: "",
+    fibreOptions: "",
+    subCategoryOptions: "",
   });
 
   // Load products via admin API on mount
@@ -386,6 +389,28 @@ export function ProductsSection() {
       faqs: productForm.faqs.filter(
         (faq: any) => faq.question.trim() !== "" && faq.answer.trim() !== ""
       ),
+      // Product options
+      colorOptions:
+        typeof productForm.colorOptions === "string"
+          ? productForm.colorOptions
+            .split(",")
+            .map((c: string) => c.trim())
+            .filter(Boolean)
+          : productForm.colorOptions || [],
+      fibreOptions:
+        typeof productForm.fibreOptions === "string"
+          ? productForm.fibreOptions
+            .split(",")
+            .map((f: string) => f.trim())
+            .filter(Boolean)
+          : productForm.fibreOptions || [],
+      subCategoryOptions:
+        typeof productForm.subCategoryOptions === "string"
+          ? productForm.subCategoryOptions
+            .split(",")
+            .map((s: string) => s.trim())
+            .filter(Boolean)
+          : productForm.subCategoryOptions || [],
     };
 
     try {
@@ -426,6 +451,9 @@ export function ProductsSection() {
         faqs: [{ question: "", answer: "" }],
         published: true,
         featured: false,
+        colorOptions: "",
+        fibreOptions: "",
+        subCategoryOptions: "",
       });
       setEditingProduct(null);
     } catch (error) {
@@ -456,6 +484,15 @@ export function ProductsSection() {
         product.faqs && product.faqs.length > 0
           ? product.faqs
           : [{ question: "", answer: "" }],
+      colorOptions: Array.isArray(product.colorOptions)
+        ? product.colorOptions.join(", ")
+        : product.colorOptions || "",
+      fibreOptions: Array.isArray(product.fibreOptions)
+        ? product.fibreOptions.join(", ")
+        : product.fibreOptions || "",
+      subCategoryOptions: Array.isArray(product.subCategoryOptions)
+        ? product.subCategoryOptions.join(", ")
+        : product.subCategoryOptions || "",
     });
     setIsAddProductOpen(true);
   };
@@ -785,6 +822,57 @@ export function ProductsSection() {
                   >
                     Allow Custom Orders
                   </Label>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold">Product Options (for customer selection)</h3>
+                <p className="text-xs text-muted-foreground">
+                  Add options customers can choose from on the product page. Leave empty if not applicable.
+                </p>
+                <div className="space-y-1">
+                  <Label className="text-xs">Color Options (comma-separated)</Label>
+                  <Input
+                    className="w-full"
+                    value={productForm.colorOptions || ""}
+                    onChange={(e) =>
+                      setProductForm({
+                        ...productForm,
+                        colorOptions: e.target.value,
+                      })
+                    }
+                    placeholder="Wine, Black, Cream, Pista, Natural"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Fibre Options (comma-separated)</Label>
+                  <Input
+                    className="w-full"
+                    value={productForm.fibreOptions || ""}
+                    onChange={(e) =>
+                      setProductForm({
+                        ...productForm,
+                        fibreOptions: e.target.value,
+                      })
+                    }
+                    placeholder="Cotton, Linen, Velvet, Polyester"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Sub-Category Options (comma-separated)</Label>
+                  <Input
+                    className="w-full"
+                    value={productForm.subCategoryOptions || ""}
+                    onChange={(e) =>
+                      setProductForm({
+                        ...productForm,
+                        subCategoryOptions: e.target.value,
+                      })
+                    }
+                    placeholder="Lounger, Recliner, Classic, Modern"
+                  />
                 </div>
               </div>
 

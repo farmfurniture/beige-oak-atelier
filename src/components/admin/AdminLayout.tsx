@@ -88,7 +88,7 @@ function Sidebar({ activePath, onNavigate, onSignOut, profilePictureUrl, adminEm
           <FileChartColumnIncreasing className="size-6" strokeWidth={1.75} />
         </div>
         <div>
-          <p className="text-sm font-medium text-muted-foreground">FarmCraft</p>
+          <p className="text-sm font-medium text-muted-foreground">FarmsCraft</p>
           <h1 className="text-xl font-semibold text-foreground">Admin Console</h1>
         </div>
       </div>

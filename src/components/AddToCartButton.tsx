@@ -1,9 +1,10 @@
 ﻿"use client";
 
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface AddToCartButtonProps {
   product: {
@@ -22,8 +23,11 @@ export default function AddToCartButton({
   product,
   className,
 }: AddToCartButtonProps) {
-  const { addToCart } = useCart();
+  const { addToCart, isInCart } = useCart();
   const [isPending, setIsPending] = useState(false);
+  const router = useRouter();
+
+  const productInCart = isInCart(product.id);
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -46,6 +50,24 @@ export default function AddToCartButton({
       setIsPending(false);
     }
   };
+
+  const handleBuyNow = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    router.push("/cart");
+  };
+
+  if (productInCart) {
+    return (
+      <Button
+        onClick={handleBuyNow}
+        className={className}
+      >
+        <ShoppingBag className="h-4 w-4 mr-2" />
+        Buy Now
+      </Button>
+    );
+  }
 
   return (
     <Button

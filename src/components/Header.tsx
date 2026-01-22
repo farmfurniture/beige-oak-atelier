@@ -19,7 +19,7 @@ const Header = () => {
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <h1 className="brand-name text-xl sm:text-2xl md:text-3xl text-primary">
-              FarmCraft
+              FarmsCraft
             </h1>
           </Link>
 
