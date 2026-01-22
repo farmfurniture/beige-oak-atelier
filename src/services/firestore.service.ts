@@ -210,6 +210,32 @@ export async function applyCoupon(userId: string, couponCode: string): Promise<v
 /**
  * Create new order from cart
  */
+/**
+ * Recursively remove undefined values from an object
+ * Firestore doesn't accept undefined values
+ */
+function removeUndefinedValues(obj: any): any {
+    if (obj === null || obj === undefined) {
+        return obj;
+    }
+
+    if (Array.isArray(obj)) {
+        return obj.map(item => removeUndefinedValues(item));
+    }
+
+    if (typeof obj === 'object' && obj.constructor === Object) {
+        const cleaned: any = {};
+        for (const [key, value] of Object.entries(obj)) {
+            if (value !== undefined) {
+                cleaned[key] = removeUndefinedValues(value);
+            }
+        }
+        return cleaned;
+    }
+
+    return obj;
+}
+
 export async function createOrder(orderInput: CreateOrderInput): Promise<string> {
     try {
         const ordersRef = collection(db, 'orders');
@@ -223,7 +249,10 @@ export async function createOrder(orderInput: CreateOrderInput): Promise<string>
             updatedAt: Timestamp.now(),
         };
 
-        await setDoc(newOrderRef, order);
+        // Remove undefined values before saving to Firestore
+        const cleanOrder = removeUndefinedValues(order) as Order;
+
+        await setDoc(newOrderRef, cleanOrder);
 
         // Clear user's cart after order creation
         await clearCart(orderInput.userId);

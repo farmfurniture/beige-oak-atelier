@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import {
   createContext,
@@ -74,8 +74,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const sendEmailLink = useCallback(
     async (email: string, flow: EmailLinkFlow, metadata?: EmailLinkMetadata) => {
+      // Use current origin when in browser (for ngrok support), fallback to env var
+      const baseUrl = typeof window !== "undefined" 
+        ? window.location.origin 
+        : clientEnv.APP_URL;
+      
       const actionCodeSettings = {
-        url: `${clientEnv.APP_URL}/auth/verify-email?flow=${flow}`,
+        url: `${baseUrl}/auth/verify-email?flow=${flow}`,
         handleCodeInApp: true,
       };
 

@@ -4,6 +4,7 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
+import Script from "next/script";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -17,14 +18,24 @@ import { formatCurrency } from "@/utils/formatters";
 import { createOrder } from "@/services/firestore.service";
 import { CreateOrderInput, OrderItem } from "@/types/firestore";
 import { Timestamp } from "firebase/firestore";
-import { Truck, MapPin, Phone, User } from "lucide-react";
+import { Truck, MapPin, Phone, User, CreditCard } from "lucide-react";
 import Image from "next/image";
+import { clientEnv } from "@/config/client-env";
+
+// Declare Razorpay types
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 
 export default function Checkout() {
   const { items, getTotal, clearCart } = useCart();
   const { user, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'razorpay'>('cod');
+  const [processingPayment, setProcessingPayment] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -53,8 +64,189 @@ export default function Checkout() {
     }));
   };
 
+  const handleRazorpayPayment = async () => {
+    if (!user) {
+      toast.error("Please login to place an order");
+      return;
+    }
+
+    if (items.length === 0) {
+      toast.error("Your cart is empty");
+      return;
+    }
+
+    setProcessingPayment(true);
+
+    try {
+      const subtotal = getTotal();
+      const shippingCost = 0;
+      const tax = Math.round(subtotal * 0.05);
+      const total = subtotal + shippingCost + tax;
+
+      // Create order in Firestore first (with pending payment status)
+      const orderItems: OrderItem[] = items.map(item => {
+        const orderItem: OrderItem = {
+          productId: item.id,
+          productName: item.title,
+          productSlug: item.slug,
+          quantity: item.quantity,
+          price: item.price,
+          imageUrl: item.image,
+        };
+
+        // Only add variant if we have valid variant data
+        if (item.variantId || item.polishType) {
+          const variant: any = {};
+          if (item.variantId) variant.id = item.variantId;
+          if (item.variantLabel) variant.label = item.variantLabel;
+          if (item.polishType) variant.polishType = item.polishType;
+          
+          // Only add variant if it has at least one property
+          if (Object.keys(variant).length > 0) {
+            orderItem.variant = variant;
+          }
+        }
+
+        return orderItem;
+      });
+
+      const shippingAddress: any = {
+        fullName: `${formData.firstName} ${formData.lastName}`,
+        phone: formData.phone,
+        addressLine1: formData.address,
+        city: formData.city,
+        state: formData.state,
+        pinCode: formData.zipCode,
+        country: formData.country,
+      };
+
+      // Only include addressLine2 if it has a value
+      if (formData.addressLine2 && formData.addressLine2.trim()) {
+        shippingAddress.addressLine2 = formData.addressLine2.trim();
+      }
+
+      const orderInput: CreateOrderInput = {
+        userId: user.uid,
+        userEmail: formData.email,
+        userPhone: formData.phone,
+        status: 'pending',
+        paymentMethod: 'online',
+        paymentStatus: 'pending',
+        items: orderItems,
+        pricing: {
+          subtotal,
+          tax,
+          shippingCost,
+          discount: 0,
+          total
+        },
+        shippingAddress,
+        billingAddress: shippingAddress,
+        timeline: {
+          placedAt: Timestamp.now()
+        }
+      };
+
+      const orderId = await createOrder(orderInput);
+
+      // Create Razorpay order
+      const response = await fetch('/api/payments/razorpay/create-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: total,
+          receipt: `order_${orderId}`,
+          notes: {
+            orderId: orderId,
+            userId: user.uid,
+          },
+        }),
+      });
+
+      const razorpayOrder = await response.json();
+
+      if (!response.ok) {
+        throw new Error(razorpayOrder.error || 'Failed to create payment order');
+      }
+
+      // Check if Razorpay is loaded
+      if (!window.Razorpay) {
+        throw new Error('Razorpay SDK not loaded. Please refresh the page.');
+      }
+
+      // Initialize Razorpay checkout
+      const options = {
+        key: clientEnv.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        name: 'Farm Craft',
+        description: `Order #${orderId}`,
+        order_id: razorpayOrder.id,
+        handler: async function (response: any) {
+          // Verify payment on server
+          const verifyResponse = await fetch('/api/payments/razorpay/verify', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              orderId: orderId,
+            }),
+          });
+
+          const verifyResult = await verifyResponse.json();
+
+          if (verifyResult.success) {
+            toast.success("Payment successful!");
+            await clearCart();
+            router.push(`/orders/${orderId}`);
+          } else {
+            toast.error("Payment verification failed");
+            setProcessingPayment(false);
+          }
+        },
+        prefill: {
+          name: `${formData.firstName} ${formData.lastName}`,
+          email: formData.email,
+          contact: formData.phone,
+        },
+        theme: {
+          color: '#000000', // Match your brand color
+        },
+        modal: {
+          ondismiss: function() {
+            setProcessingPayment(false);
+            toast.info("Payment cancelled");
+          }
+        }
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+      razorpay.on('payment.failed', function (response: any) {
+        toast.error(`Payment failed: ${response.error.description}`);
+        setProcessingPayment(false);
+      });
+
+    } catch (error: any) {
+      console.error("Error processing payment:", error);
+      toast.error(error.message || "Failed to process payment. Please try again.");
+      setProcessingPayment(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (paymentMethod === 'razorpay') {
+      await handleRazorpayPayment();
+      return;
+    }
 
     if (!user) {
       toast.error("Please login to place an order");
@@ -76,31 +268,47 @@ export default function Checkout() {
       const total = subtotal + shippingCost + tax;
 
       // Prepare order items with polishType included in variant
-      const orderItems: OrderItem[] = items.map(item => ({
-        productId: item.id,
-        productName: item.title,
-        productSlug: item.slug,
-        quantity: item.quantity,
-        price: item.price,
-        imageUrl: item.image,
-        variant: (item.variantId || item.polishType) ? {
-          id: item.variantId,
-          label: item.variantLabel,
-          polishType: item.polishType,
-        } : undefined
-      }));
+      const orderItems: OrderItem[] = items.map(item => {
+        const orderItem: OrderItem = {
+          productId: item.id,
+          productName: item.title,
+          productSlug: item.slug,
+          quantity: item.quantity,
+          price: item.price,
+          imageUrl: item.image,
+        };
+
+        // Only add variant if we have valid variant data
+        if (item.variantId || item.polishType) {
+          const variant: any = {};
+          if (item.variantId) variant.id = item.variantId;
+          if (item.variantLabel) variant.label = item.variantLabel;
+          if (item.polishType) variant.polishType = item.polishType;
+          
+          // Only add variant if it has at least one property
+          if (Object.keys(variant).length > 0) {
+            orderItem.variant = variant;
+          }
+        }
+
+        return orderItem;
+      });
 
       // Prepare shipping address
-      const shippingAddress = {
+      const shippingAddress: any = {
         fullName: `${formData.firstName} ${formData.lastName}`,
         phone: formData.phone,
         addressLine1: formData.address,
-        addressLine2: formData.addressLine2,
         city: formData.city,
         state: formData.state,
         pinCode: formData.zipCode,
         country: formData.country,
       };
+
+      // Only include addressLine2 if it has a value
+      if (formData.addressLine2 && formData.addressLine2.trim()) {
+        shippingAddress.addressLine2 = formData.addressLine2.trim();
+      }
 
       const orderInput: CreateOrderInput = {
         userId: user.uid,
@@ -158,6 +366,15 @@ export default function Checkout() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Load Razorpay Script */}
+      <Script
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        strategy="lazyOnload"
+        onLoad={() => {
+          console.log('Razorpay SDK loaded');
+        }}
+      />
+      
       <div className="bg-secondary/20 border-b border-border">
         <div className="container mx-auto px-4 py-12">
           <h1 className="section-title text-foreground mb-4">
@@ -308,26 +525,47 @@ export default function Checkout() {
               {/* Payment Method */}
               <Card className="p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <Truck className="h-5 w-5 text-primary" />
+                  <CreditCard className="h-5 w-5 text-primary" />
                   <h2 className="exo-medium text-xl text-foreground">
                     Payment Method
                   </h2>
                 </div>
-                <div className="p-4 border rounded-lg bg-secondary/10 border-primary/20">
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="radio"
-                      id="cod"
-                      name="paymentMethod"
-                      checked
-                      readOnly
-                      className="h-4 w-4 text-primary"
-                    />
-                    <Label htmlFor="cod" className="font-medium">Cash on Delivery (COD)</Label>
+                <div className="space-y-4">
+                  <div className="p-4 border rounded-lg bg-secondary/10 border-primary/20 hover:border-primary/40 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="radio"
+                        id="cod"
+                        name="paymentMethod"
+                        value="cod"
+                        checked={paymentMethod === 'cod'}
+                        onChange={(e) => setPaymentMethod(e.target.value as 'cod' | 'razorpay')}
+                        className="h-4 w-4 text-primary"
+                      />
+                      <Label htmlFor="cod" className="font-medium cursor-pointer">Cash on Delivery (COD)</Label>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-2 ml-7">
+                      Pay securely with cash when your order is delivered.
+                    </p>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2 ml-7">
-                    Pay securely with cash when your order is delivered.
-                  </p>
+
+                  <div className="p-4 border rounded-lg bg-secondary/10 border-primary/20 hover:border-primary/40 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="radio"
+                        id="razorpay"
+                        name="paymentMethod"
+                        value="razorpay"
+                        checked={paymentMethod === 'razorpay'}
+                        onChange={(e) => setPaymentMethod(e.target.value as 'cod' | 'razorpay')}
+                        className="h-4 w-4 text-primary"
+                      />
+                      <Label htmlFor="razorpay" className="font-medium cursor-pointer">Pay Online (Razorpay)</Label>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-2 ml-7">
+                      Pay securely using UPI, Cards, Net Banking, or Wallets.
+                    </p>
+                  </div>
                 </div>
               </Card>
             </div>
@@ -392,9 +630,15 @@ export default function Checkout() {
                   type="submit"
                   className="w-full btn-premium"
                   size="lg"
-                  disabled={loading}
+                  disabled={loading || processingPayment}
                 >
-                  {loading ? "Placing Order..." : "Place Order (COD)"}
+                  {processingPayment 
+                    ? "Processing Payment..." 
+                    : paymentMethod === 'razorpay'
+                    ? "Pay Now"
+                    : loading 
+                    ? "Placing Order..." 
+                    : "Place Order (COD)"}
                 </Button>
 
                 <p className="text-xs text-center text-muted-foreground">
