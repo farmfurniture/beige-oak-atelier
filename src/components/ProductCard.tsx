@@ -140,6 +140,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
               offers: product.offers || [],
               published: product.published,
               featured: product.featured,
+              colorOptions: product.colorOptions || [],
+              fibreOptions: product.fibreOptions || [],
+              subCategoryOptions: product.subCategoryOptions || [],
               price, // Consistent price passed from schema
             }}
             className="bg-background/80 backdrop-blur-sm hover:bg-background rounded-full p-2"
