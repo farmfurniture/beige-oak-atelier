@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/config/firebase-admin';
 import { validateAdminSession } from '@/lib/admin-auth';
 
+// Force dynamic rendering since this route uses cookies for admin session validation
+export const dynamic = 'force-dynamic';
 /**
  * GET /api/admin/products
  * Fetch all products for admin dashboard

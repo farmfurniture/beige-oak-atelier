@@ -3,6 +3,9 @@ import { adminDb } from '@/config/firebase-admin';
 import { validateAdminSession } from '@/lib/admin-auth';
 import type { PaymentRecord, PaymentStatus } from '@/types/firestore';
 
+// Force dynamic rendering since this route uses cookies for admin session validation
+export const dynamic = 'force-dynamic';
+
 type TransactionEntry = {
   id: string;
   customer: string;
